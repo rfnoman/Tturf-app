@@ -3,6 +3,7 @@ from __future__ import annotations
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from apps.core.utils import plain_decimal
 from apps.sports.serializers import StatDefinitionSerializer
 
 from .models import (
@@ -215,9 +216,9 @@ class ScorecardSerializer(serializers.ModelSerializer):
                     "is_motm": row.player_id == obj.motm_id,
                 },
             )
-            # Trailing zeros make a scorecard look like a spreadsheet; `normalize`
-            # renders 2 as "2" and cricket's 4.3 as "4.3".
-            bucket["stats"][row.stat_definition.key] = str(row.value.normalize())
+            # Trailing zeros make a scorecard look like a spreadsheet, and a bare
+            # `normalize()` turns 100.00 into "1E+2".
+            bucket["stats"][row.stat_definition.key] = plain_decimal(row.value)
 
         return sorted(by_player.values(), key=lambda row: (row["side"], row["name"]))
 

@@ -28,7 +28,11 @@ export async function PlayerSportCardView({
   className?: string;
 }) {
   const t = await getTranslations("playerCard");
-  const unverified = card.is_provisional || !card.is_verified;
+  // Two different facts, and merging them reads wrong: a player can have unlocked a
+  // sport by playing a locked match (`is_verified`) while their rating is still finding
+  // its level (`is_provisional`, the first few matches).
+  const verified = card.is_verified;
+  const provisional = card.is_provisional;
 
   return (
     <article
@@ -76,11 +80,22 @@ export async function PlayerSportCardView({
                 {player.area ? <span>· {player.area}</span> : null}
               </p>
             </div>
-            {unverified && (
-              <Badge variant="outline" className="shrink-0 text-[0.625rem]">
-                {t("unverified")}
-              </Badge>
-            )}
+            <span className="flex shrink-0 flex-col items-end gap-1">
+              {verified ? (
+                <Badge variant="secondary" className="text-[0.625rem]">
+                  {t("verified")}
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-[0.625rem]">
+                  {t("unverified")}
+                </Badge>
+              )}
+              {provisional && (
+                <Badge variant="outline" className="text-[0.625rem]">
+                  {t("provisional")}
+                </Badge>
+              )}
+            </span>
           </div>
 
           {!compact && card.skills.length > 0 && (

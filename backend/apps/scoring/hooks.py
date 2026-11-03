@@ -23,9 +23,22 @@ def register_scorecard_locked_hook(hook: ScorecardLockedHook) -> None:
         _locked_hooks.append(hook)
 
 
-def clear_scorecard_locked_hooks() -> None:
-    """Test hook."""
+def clear_scorecard_locked_hooks() -> list[ScorecardLockedHook]:
+    """Test hook: unsubscribe everything and hand back what was there.
+
+    Returns the previous subscribers so a test that silences the registry can put it
+    back — clearing it permanently would quietly disable the rating engine for every
+    test that ran afterwards in the same process.
+    """
+    previous = list(_locked_hooks)
     _locked_hooks.clear()
+    return previous
+
+
+def restore_scorecard_locked_hooks(hooks) -> None:
+    """Test hook: put back what `clear_scorecard_locked_hooks` returned."""
+    _locked_hooks.clear()
+    _locked_hooks.extend(hooks)
 
 
 def scorecard_locked(*, scorecard, **context) -> None:

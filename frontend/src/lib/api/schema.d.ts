@@ -1992,6 +1992,201 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/players/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search players
+         * @description Find players to invite (DOMAIN §3).
+         */
+        get: operations["player_search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My availability windows
+         * @description "I'm free on Friday evening" (DOMAIN §3).
+         */
+        get: operations["my_availability"];
+        put?: never;
+        /**
+         * Say when I am free
+         * @description "I'm free on Friday evening" (DOMAIN §3).
+         */
+        post: operations["my_availability_add"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/availability/{availability_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Withdraw an availability window */
+        delete: operations["my_availability_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/players/{player_id}/track-record": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A player's record, per ground
+         * @description Where somebody has played, and what they did there (DOMAIN §8).
+         */
+        get: operations["player_track_record"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/players/{player_id}/rating-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A player's rating history in one sport
+         * @description The chart, and "why did my rating change?" underneath it.
+         */
+        get: operations["player_rating_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/players/{player_id}/fair-play": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A player's fair-play standing */
+        get: operations["player_fair_play"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/conduct-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report a player's conduct
+         * @description Reporting somebody for what happened in a match (DOMAIN §8).
+         */
+        post: operations["conduct_report_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/conduct-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Conduct reports awaiting review
+         * @description The admin review queue.
+         */
+        get: operations["conduct_queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/conduct-reports/{report_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Uphold or dismiss a report */
+        post: operations["conduct_review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leaderboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A leaderboard
+         * @description A turf's or the platform's board (DOMAIN §8).
+         */
+        get: operations["leaderboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2224,6 +2419,44 @@ export interface components {
             ends_at: string;
             reason?: string;
         };
+        ConductReport: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly match: string;
+            readonly match_summary: string;
+            readonly reporter_name: string;
+            readonly reported_name: string;
+            readonly reason: components["schemas"]["ReasonEnum"];
+            readonly reason_label: string;
+            readonly details: string;
+            readonly status: components["schemas"]["ConductReportStatusEnum"];
+            readonly review_note: string;
+            /** Format: date-time */
+            readonly reviewed_at: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        ConductReportCreateRequest: {
+            /**
+             * Format: uuid
+             * @description The reported player's profile id.
+             */
+            player_id: string;
+            reason: components["schemas"]["ReasonEnum"];
+            details?: string;
+        };
+        /**
+         * @description * `open` - Awaiting review
+         *     * `upheld` - Upheld
+         *     * `dismissed` - Dismissed
+         * @enum {string}
+         */
+        ConductReportStatusEnum: "open" | "upheld" | "dismissed";
+        ConductReviewRequest: {
+            uphold: boolean;
+            note?: string;
+        };
         DecideRequest: {
             approve: boolean;
         };
@@ -2238,6 +2471,13 @@ export interface components {
         };
         DisputeRequest: {
             reason: string;
+        };
+        FairPlay: {
+            score: number;
+            band: string;
+            yellow_cards: number;
+            red_cards: number;
+            upheld_reports: number;
         };
         Ground: {
             /** Format: uuid */
@@ -2325,6 +2565,23 @@ export interface components {
          * @enum {string}
          */
         JoinRequestStatusEnum: "pending" | "approved" | "declined" | "withdrawn" | "expired";
+        LeaderboardEntry: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly rank: number;
+            /** Format: uuid */
+            readonly player_id: string;
+            readonly player_name: string;
+            readonly photo_url: string;
+            /** Format: decimal */
+            readonly value: string;
+            readonly metric: components["schemas"]["MetricEnum"];
+            /**
+             * Stat
+             * @description Only for metric="top_stat", e.g. "goals".
+             */
+            readonly stat_key: string;
+        };
         MarkPaidRequest: {
             /**
              * Format: decimal
@@ -2462,6 +2719,15 @@ export interface components {
          * @enum {string}
          */
         MatchVisibilityEnum: "board" | "private" | "squad";
+        /**
+         * @description * `rating` - Highest rated
+         *     * `motm` - Most MOTM awards
+         *     * `wins` - Most wins
+         *     * `reliability` - Most reliable
+         *     * `top_stat` - Top of a sport stat
+         * @enum {string}
+         */
+        MetricEnum: "rating" | "motm" | "wins" | "reliability" | "top_stat";
         MotmVoteRequest: {
             /**
              * Format: uuid
@@ -2695,6 +2961,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["OwnerTurf"][];
+        };
+        PaginatedPlayerSearchResultList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["PlayerSearchResult"][];
         };
         PaginatedPriceCoverageGapList: {
             /** @example 123 */
@@ -3011,6 +3292,38 @@ export interface components {
             source: string;
         };
         /**
+         * @description Named `PlayerAvailability` in the schema: `apps.turfs` already has an
+         *     `Availability` component meaning a ground's open slots, and two components with one
+         *     name silently produce a wrong client.
+         */
+        PlayerAvailability: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly sport_slug: string | null;
+            readonly sport_name: string | null;
+            /**
+             * From
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Until
+             * Format: date-time
+             */
+            ends_at: string;
+            area?: string;
+            note?: string;
+        };
+        PlayerAvailabilityWriteRequest: {
+            sport?: (string) | null;
+            /** Format: date-time */
+            starts_at: string;
+            /** Format: date-time */
+            ends_at: string;
+            area?: string;
+            note?: string;
+        };
+        /**
          * @description * `male` - Male
          *     * `female` - Female
          *     * `other` - Other
@@ -3062,6 +3375,35 @@ export interface components {
             readonly sport_cards: components["schemas"]["PlayerSportCard"][];
             /** Format: date-time */
             readonly created_at: string;
+        };
+        /** @description A search hit: the public profile card, plus when they said they are free. */
+        PlayerSearchResult: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            /** @description Shown on the match board and scorecards. Defaults to the Clerk name. */
+            readonly display_name: string;
+            readonly photo_url: string;
+            readonly gender: components["schemas"]["PlayerGenderEnum"];
+            /** Height (cm) */
+            readonly height_cm: number | null;
+            /** @description Neighbourhood, e.g. Dhanmondi. Used to suggest nearby turfs and matches. */
+            readonly area: string;
+            /** Preferred foot / hand */
+            readonly preferred_side: components["schemas"]["PlayerPreferredSideEnum"];
+            readonly bio: string;
+            /**
+             * Reliability
+             * @description 0–100. Drops on no-shows and late cancels, recovers on completed matches.
+             */
+            readonly reliability_score: number;
+            readonly onboarding_completed: boolean;
+            readonly attributes: components["schemas"]["PlayerAttribute"][];
+            readonly sport_cards: components["schemas"]["PlayerSportCard"][];
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly age: number | null;
+            readonly availability: components["schemas"]["PlayerAvailability"][];
         };
         PlayerSkill: {
             key: string;
@@ -3257,6 +3599,34 @@ export interface components {
             readonly stat_definitions: components["schemas"]["StatDefinition"][];
             readonly rows: components["schemas"]["PlayerStatRow"][];
         };
+        /** @description One match's effect, with the engine's own explanation attached. */
+        RatingChange: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly match: string;
+            readonly sport: string;
+            readonly turf_name: string;
+            /** Before */
+            readonly before_overall: number;
+            /** After */
+            readonly after_overall: number;
+            readonly delta: number;
+            /** @description The engine's explanation: components, weights, clamps and deltas. */
+            readonly breakdown: unknown;
+            readonly weights_version: number;
+            /** Format: date-time */
+            readonly played_at: string;
+        };
+        /**
+         * @description * `abusive` - Abusive behaviour
+         *     * `left_early` - Left the match early
+         *     * `no_show` - Did not turn up
+         *     * `unsafe_play` - Unsafe play
+         *     * `other` - Something else
+         * @enum {string}
+         */
+        ReasonEnum: "abusive" | "left_early" | "no_show" | "unsafe_play" | "other";
         RemovePlayerRequest: {
             /**
              * Format: uuid
@@ -3535,6 +3905,19 @@ export interface components {
             slug: string;
             readonly icon: string;
         };
+        /** @description Career totals in one sport, plus the last few results. */
+        SportTotals: {
+            sport: string;
+            matches: number;
+            wins: number;
+            draws: number;
+            losses: number;
+            motm_awards: number;
+            stat_totals: {
+                [key: string]: string;
+            };
+            form: string[];
+        };
         Squad: {
             /** Format: uuid */
             readonly id: string;
@@ -3695,6 +4078,28 @@ export interface components {
          * @enum {string}
          */
         TeamSideEnum: "A" | "B";
+        /** @description Everything the track-record tab shows. */
+        TrackRecord: {
+            grounds: components["schemas"]["TrackRecordEntry"][];
+            totals: {
+                [key: string]: components["schemas"]["SportTotals"];
+            };
+        };
+        /** @description A player's record at one ground. */
+        TrackRecordEntry: {
+            turf_name: string;
+            turf_slug: string;
+            ground_name: string;
+            sport: string;
+            matches: number;
+            wins: number;
+            draws: number;
+            losses: number;
+            motm_awards: number;
+            stat_totals: {
+                [key: string]: string;
+            };
+        };
         /** @description What a listing row needs: identity, position, and what can be played. */
         TurfDetail: {
             /** Format: uuid */
@@ -6833,6 +7238,282 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResultSummary"][];
+                };
+            };
+        };
+    };
+    player_search: {
+        parameters: {
+            query?: {
+                area?: string;
+                /** @description ISO datetime. */
+                available_from?: string;
+                /** @description ISO datetime. */
+                available_until?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description Turf slug. */
+                played_at_turf?: string;
+                /** @description Only with `sport`. */
+                position?: string;
+                /** @description Name fragment. */
+                q?: string;
+                rating_max?: number;
+                rating_min?: number;
+                reliability_min?: number;
+                /** @description Sport slug. */
+                sport?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPlayerSearchResultList"];
+                };
+            };
+        };
+    };
+    my_availability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerAvailability"][];
+                };
+            };
+        };
+    };
+    my_availability_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlayerAvailabilityWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PlayerAvailabilityWriteRequest"];
+                "multipart/form-data": components["schemas"]["PlayerAvailabilityWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerAvailability"];
+                };
+            };
+        };
+    };
+    my_availability_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                availability_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    player_track_record: {
+        parameters: {
+            query?: {
+                /** @description Sport slug. */
+                sport?: string;
+            };
+            header?: never;
+            path: {
+                player_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackRecord"];
+                };
+            };
+        };
+    };
+    player_rating_history: {
+        parameters: {
+            query: {
+                /** @description Sport slug. */
+                sport: string;
+            };
+            header?: never;
+            path: {
+                player_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RatingChange"][];
+                };
+            };
+        };
+    };
+    player_fair_play: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                player_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FairPlay"];
+                };
+            };
+        };
+    };
+    conduct_report_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConductReportCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ConductReportCreateRequest"];
+                "multipart/form-data": components["schemas"]["ConductReportCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConductReport"];
+                };
+            };
+        };
+    };
+    conduct_queue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConductReport"][];
+                };
+            };
+        };
+    };
+    conduct_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConductReviewRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ConductReviewRequest"];
+                "multipart/form-data": components["schemas"]["ConductReviewRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConductReport"];
+                };
+            };
+        };
+    };
+    leaderboard: {
+        parameters: {
+            query: {
+                /** @description rating | motm | wins | top_stat. Default rating. */
+                metric?: string;
+                /** @description month | all_time. Default month. */
+                period?: string;
+                /** @description Sport slug. */
+                sport: string;
+                /** @description Only with metric="top_stat". */
+                stat_key?: string;
+                /** @description Turf slug; omit for platform-wide. */
+                turf?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeaderboardEntry"][];
                 };
             };
         };

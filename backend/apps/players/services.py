@@ -167,16 +167,20 @@ def compute_overall(*, profile: PlayerProfile, sport: Sport) -> int:
 
 @transaction.atomic
 def refresh_sport_rating(*, profile: PlayerProfile, sport: Sport) -> PlayerSportRating:
-    """Recompute and store the overall for one (player, sport).
+    """Recompute and store the overall for one (player, sport) from the self-assessment.
 
-    The single writer of ``PlayerSportRating.overall``: ``provisional`` is derived from
-    ``matches_counted`` here so no caller has to remember the rule.
+    The writer of ``PlayerSportRating.overall`` **until the player has played**. Once a
+    locked match has been counted, Phase 06's engine owns the number and this leaves it
+    alone: otherwise editing a skill slider on the settings page would silently undo
+    every match a player had earned (DECISIONS D44).
     """
-    overall = compute_overall(profile=profile, sport=sport)
     rating, _ = PlayerSportRating.objects.get_or_create(
-        profile=profile, sport=sport, defaults={"overall": overall}
+        profile=profile,
+        sport=sport,
+        defaults={"overall": compute_overall(profile=profile, sport=sport)},
     )
-    rating.overall = overall
+    if rating.matches_counted == 0:
+        rating.overall = compute_overall(profile=profile, sport=sport)
     rating.is_provisional = rating.matches_counted < int(settings.RATING_PROVISIONAL_MATCHES)
     rating.save(update_fields=["overall", "is_provisional", "updated_at"])
     return rating
