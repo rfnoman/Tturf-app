@@ -19,6 +19,7 @@ api_v1 = [
     path("", include("apps.accounts.urls")),
     path("", include("apps.sports.urls")),
     path("", include("apps.players.urls")),
+    path("", include("apps.turfs.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     # url_name must carry the namespace: these URLs live under the "v1" instance namespace.
     path("docs/", SpectacularSwaggerView.as_view(url_name="v1:schema"), name="swagger-ui"),

@@ -12,7 +12,8 @@
     "admin": "Admin",
     "profile": "Profile",
     "debug": "Debug",
-    "settings": "Settings"
+    "settings": "Settings",
+    "findTurf": "Turfs"
   },
   "auth": {
     "signIn": "Sign in",
@@ -36,13 +37,20 @@
   },
   "owner": {
     "heading": "Turf dashboard",
-    "empty": "No turfs yet. Turf registration arrives in Phase 02."
+    "body": "Your turfs, their review status, and the staff who run them.",
+    "empty": "You have not registered a turf yet.",
+    "register": "Register a turf",
+    "groundCount": "{count, plural, one {# ground} other {# grounds}}",
+    "invitations": "Invitations",
+    "invitedAs": "{turf} invited you as {role}",
+    "viewInvite": "View"
   },
   "admin": {
     "heading": "Platform admin",
     "empty": "Review queues arrive in Phase 02.",
     "forbidden": "You need platform administrator access to view this page.",
-    "navSports": "Sports catalogue"
+    "navSports": "Sports catalogue",
+    "navTurfs": "Turf review"
   },
   "me": {
     "heading": "Backend session",
@@ -175,5 +183,180 @@
       "rejected": "Rejected"
     },
     "createdSport": "Created the sport “{sport}”."
+  },
+  "turfs": {
+    "heading": "Find a turf",
+    "body": "Filter by sport and area, or let us sort by how far away they are.",
+    "searchPlaceholder": "Search by name, area or address",
+    "nearMe": "Near me",
+    "nearMeOn": "Near me ✓",
+    "locating": "Finding you…",
+    "geolocationDenied": "No problem — showing every turf instead.",
+    "geolocationUnsupported": "This browser cannot share your location.",
+    "view": "View",
+    "viewList": "List",
+    "viewMap": "Map",
+    "filterSport": "Sport",
+    "filterArea": "Area",
+    "allSports": "All sports",
+    "allAreas": "All areas",
+    "clearFilters": "Clear",
+    "searching": "Searching…",
+    "resultCount": "{count, plural, =0 {No turfs} one {# turf} other {# turfs}}",
+    "noResults": "No turfs match those filters yet.",
+    "kmAway": "{km} km away",
+    "priceFrom": "from ৳{price}",
+    "groundCount": "{count, plural, one {# ground} other {# grounds}}",
+    "taka": "৳{price}",
+    "availability": "Availability",
+    "availabilityHint": "Pick a ground and a date to see what is open and what it costs.",
+    "ground": "Ground",
+    "date": "Date",
+    "loadingSlots": "Loading slots…",
+    "noSlots": "The turf is closed on this date.",
+    "noGrounds": "No bookable grounds yet.",
+    "selectedSlot": "{time} · ৳{price}",
+    "bookingSoon": "Booking arrives in Phase 03",
+    "openingHours": "Opening hours",
+    "closed": "Closed",
+    "amenities": "Amenities",
+    "noAmenities": "No amenities listed.",
+    "phone": "Phone: {phone}",
+    "slotReason": {
+      "booked": "Booked",
+      "closed": "Closed",
+      "unpriced": "No price set"
+    },
+    "weekday": {
+      "0": "Monday",
+      "1": "Tuesday",
+      "2": "Wednesday",
+      "3": "Thursday",
+      "4": "Friday",
+      "5": "Saturday",
+      "6": "Sunday"
+    }
+  },
+  "ownerRegister": {
+    "stepCounter": "Step {current} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "saving": "Saving…",
+    "createDraft": "Create draft",
+    "failed": "Could not create the turf. Check the details and try again.",
+    "details": {
+      "heading": "About your turf",
+      "body": "Name, address and area. Players search on all three."
+    },
+    "location": {
+      "heading": "Where is it?",
+      "body": "Drop a pin so players can find you and see how far away you are.",
+      "hint": "Click the map or drag the pin. You can fine-tune the coordinates below."
+    },
+    "amenities": {
+      "heading": "What do you offer?",
+      "body": "Pick everything that applies. You can change this later."
+    },
+    "fields": {
+      "name": "Turf name",
+      "address": "Address",
+      "area": "Area",
+      "areaPlaceholder": "e.g. Dhanmondi",
+      "phone": "Contact phone",
+      "description": "Description",
+      "latitude": "Latitude",
+      "longitude": "Longitude"
+    }
+  },
+  "ownerManage": {
+    "failed": "That did not work. Please try again.",
+    "review": "Review status",
+    "reviewHint": "A turf is only visible to players once an admin approves it.",
+    "submit": "Submit for review",
+    "viewPublic": "View public page",
+    "backToDashboard": "Back to dashboard",
+    "grounds": "Grounds",
+    "groundsHint": "A ground becomes bookable once its open hours are fully priced.",
+    "noGrounds": "No grounds yet. Add one below.",
+    "addGround": "Add ground",
+    "groundName": "Name",
+    "maxPlayers": "Max players",
+    "slotMinutes": "Slot (minutes)",
+    "sportFormats": "Sports and formats",
+    "slotLength": "{minutes} min slots",
+    "capacity": "up to {count}",
+    "active": "Bookable",
+    "inactive": "Not bookable",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "prices": "Prices ({count})",
+    "price": "Price (৳)",
+    "label": "Label",
+    "labelPlaceholder": "Peak",
+    "addPrice": "Add price",
+    "priceHint": "An end time at or before the start wraps past midnight. Equal times mean all day.",
+    "everyDay": "Every day",
+    "from": "From",
+    "until": "Until",
+    "remove": "Remove",
+    "weekdays": "Days",
+    "hours": "Opening hours",
+    "hoursHint": "Closing after midnight is fine — set 18:00 to 02:00 for a late evening.",
+    "opens": "Opens",
+    "closes": "Closes",
+    "setHours": "Set hours",
+    "closed": "Closed",
+    "nextDay": "(next day)",
+    "staff": "Staff",
+    "staffHint": "Managers and cashiers can confirm bookings and take payments. Only you can edit the turf.",
+    "staffEmail": "Email",
+    "staffRole": "Role",
+    "roleCashier": "Cashier",
+    "roleManager": "Manager",
+    "invite": "Invite",
+    "staffActive": "Active",
+    "staffInvited": "Invitation sent",
+    "weekday": {
+      "0": "Monday",
+      "1": "Tuesday",
+      "2": "Wednesday",
+      "3": "Thursday",
+      "4": "Friday",
+      "5": "Saturday",
+      "6": "Sunday"
+    },
+    "weekdayShort": {
+      "0": "Mon",
+      "1": "Tue",
+      "2": "Wed",
+      "3": "Thu",
+      "4": "Fri",
+      "5": "Sat",
+      "6": "Sun"
+    }
+  },
+  "adminTurfs": {
+    "heading": "Turfs",
+    "body": "Approve new venues, and suspend ones that stop meeting the bar.",
+    "empty": "Nothing in this queue.",
+    "filter": "Filter by status",
+    "approve": "Approve",
+    "reject": "Reject",
+    "suspend": "Suspend",
+    "viewPublic": "View public page",
+    "reason": "Reason",
+    "reasonPlaceholder": "Reason for the owner (required to reject)",
+    "rejectHint": "Rejection needs a reason — the owner sees it and fixes it.",
+    "actionFailed": "That action failed. Reload and try again.",
+    "slotLength": "{minutes} min slots",
+    "priceRules": "{count, plural, one {# price rule} other {# price rules}}",
+    "summary": "{grounds} ground(s), {hours} opening-hours row(s)",
+    "status": {
+      "pending_review": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "suspended": "Suspended",
+      "draft": "Draft"
+    }
   }
 }

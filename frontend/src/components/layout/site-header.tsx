@@ -26,7 +26,10 @@ export async function SiteHeader() {
             <Link href="/profile">{t("nav.profile")}</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/turfs">{t("nav.owner")}</Link>
+            <Link href="/turfs">{t("nav.findTurf")}</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/owner">{t("nav.owner")}</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/me">{t("nav.debug")}</Link>

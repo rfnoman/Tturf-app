@@ -17,19 +17,19 @@ test.describe("onboarding", () => {
     await expect(page.getByRole("heading", { name: "Tell us about you" })).toBeVisible();
 
     await page.getByLabel("Area").fill("Dhanmondi");
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Step 2 cannot be left without a sport.
     await expect(page.getByRole("heading", { name: "What do you play?" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Next" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Next", exact: true })).toBeDisabled();
 
     await page.getByRole("button", { name: /Football/ }).click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     // Step 3: positions and the self-assessment sliders for the chosen sport.
     await expect(page.getByRole("heading", { name: "Rate yourself" })).toBeVisible();
     await page.getByRole("button", { name: "MID", exact: true }).click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     await expect(page.getByRole("heading", { name: "Your physical attributes" })).toBeVisible();
     await page.getByRole("button", { name: "Finish" }).click();
@@ -50,9 +50,9 @@ test.describe("onboarding", () => {
     signedInPage: page,
   }) => {
     await page.goto("/onboarding");
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
     await page.getByRole("button", { name: /Football/ }).click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
 
     const slider = page.getByRole("slider").first();
     await slider.focus();

@@ -8,10 +8,10 @@ test.describe("profile", () => {
   test.beforeEach(async ({ signedInPage: page }) => {
     await page.goto("/onboarding");
     await page.getByLabel("Area").fill("Banani");
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
     await page.getByRole("button", { name: /Badminton/ }).click();
-    await page.getByRole("button", { name: "Next" }).click();
-    await page.getByRole("button", { name: "Next" }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
     await page.getByRole("button", { name: "Finish" }).click();
     await expect(page).toHaveURL(/\/profile/);
   });

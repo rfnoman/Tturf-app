@@ -17,7 +17,7 @@ export default async function HomePage() {
           <Link href="/play">{t("ctaPlay")}</Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/turfs">{t("ctaOwner")}</Link>
+          <Link href="/owner">{t("ctaOwner")}</Link>
         </Button>
       </div>
     </section>

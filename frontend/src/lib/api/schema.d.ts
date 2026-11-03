@@ -356,10 +356,770 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/amenities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Amenities a turf can offer */
+        get: operations["amenities_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/grounds/{ground_id}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Slot availability for a ground
+         * @description Operating hours minus closures minus active bookings, sliced by the ground's `slot_minutes`. Unavailable slots are included with a `reason` so the UI can grey them out rather than leave a gap.
+         */
+        get: operations["ground_availability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/grounds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Grounds at my turf
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_grounds_list"];
+        put?: never;
+        /**
+         * Add a ground
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        post: operations["my_grounds_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/grounds/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One ground
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_grounds_retrieve"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a ground
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        delete: operations["my_grounds_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a ground
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        patch: operations["my_grounds_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/grounds/{id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activate a ground
+         * @description Refused until price rules cover every open minute (DOMAIN §4). The 400 lists the gaps.
+         */
+        post: operations["my_grounds_activate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/grounds/{id}/deactivate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deactivate a ground
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        post: operations["my_grounds_deactivate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/grounds/{id}/price-coverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Open hours with no price
+         * @description Empty means the ground can be activated.
+         */
+        get: operations["my_grounds_price_coverage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/grounds/{ground_pk}/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Price rules for a ground
+         * @description Price rules hang off a ground, which hangs off the turf in the URL.
+         */
+        get: operations["my_prices_list"];
+        put?: never;
+        /**
+         * Add a price rule
+         * @description Price rules hang off a ground, which hangs off the turf in the URL.
+         */
+        post: operations["my_prices_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/grounds/{ground_pk}/prices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One price rule
+         * @description Price rules hang off a ground, which hangs off the turf in the URL.
+         */
+        get: operations["my_prices_retrieve"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a price rule
+         * @description Price rules hang off a ground, which hangs off the turf in the URL.
+         */
+        delete: operations["my_prices_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a price rule
+         * @description Price rules hang off a ground, which hangs off the turf in the URL.
+         */
+        patch: operations["my_prices_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Opening hours
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_hours_list"];
+        put?: never;
+        /**
+         * Add opening hours
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        post: operations["my_hours_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/hours/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One opening-hours row
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_hours_retrieve"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete opening hours
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        delete: operations["my_hours_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update opening hours
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        patch: operations["my_hours_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/closures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Closures
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_closures_list"];
+        put?: never;
+        /**
+         * Add a closure
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        post: operations["my_closures_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/closures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One closure
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_closures_retrieve"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a closure
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        delete: operations["my_closures_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a closure
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        patch: operations["my_closures_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Turf photos
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_photos_list"];
+        put?: never;
+        /**
+         * Upload a turf photo
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        post: operations["my_photos_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/photos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One photo
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        get: operations["my_photos_retrieve"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a photo
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        delete: operations["my_photos_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a photo
+         * @description Shared wiring for grounds, hours, closures, prices and photos.
+         *
+         *     Each is scoped to one turf from the URL, and every one of them is owner-only — so
+         *     the lookup, the permission check and the `turf` injection live here once instead of
+         *     five times.
+         */
+        patch: operations["my_photos_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/staff/{membership_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove a staff member
+         * @description An owner removing someone from their turf.
+         */
+        delete: operations["my_turfs_remove_staff"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/turfs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find turfs
+         * @description Approved turfs only. With `near` the results are annotated with `distance_km` and sorted nearest-first; without it, alphabetically, so the endpoint still works for a player who declines geolocation.
+         */
+        get: operations["turfs_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/turfs/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One turf, by slug */
+        get: operations["turfs_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Turfs I work at
+         * @description The owner's area. Authorisation is by membership, never by a user flag.
+         */
+        get: operations["my_turfs_list"];
+        put?: never;
+        /**
+         * Register a turf
+         * @description The owner's area. Authorisation is by membership, never by a user flag.
+         */
+        post: operations["my_turfs_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One of my turfs
+         * @description The owner's area. Authorisation is by membership, never by a user flag.
+         */
+        get: operations["my_turfs_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update one of my turfs
+         * @description The owner's area. Authorisation is by membership, never by a user flag.
+         */
+        patch: operations["my_turfs_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/staff/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Invite staff
+         * @description The owner's area. Authorisation is by membership, never by a user flag.
+         */
+        post: operations["my_turfs_invite_staff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Staff at this turf
+         * @description The owner's area. Authorisation is by membership, never by a user flag.
+         */
+        get: operations["my_turfs_staff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit for review
+         * @description The owner's area. Authorisation is by membership, never by a user flag.
+         */
+        post: operations["my_turfs_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/memberships": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My turf roles and invitations
+         * @description My own staff invitations and memberships, across every turf.
+         */
+        get: operations["my_memberships_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/memberships/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Leave a turf
+         * @description My own staff invitations and memberships, across every turf.
+         */
+        delete: operations["my_memberships_leave"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/memberships/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept a staff invitation
+         * @description My own staff invitations and memberships, across every turf.
+         */
+        post: operations["my_memberships_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/turfs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Turf review queue */
+        get: operations["admin_turfs_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/turfs/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One turf under review */
+        get: operations["admin_turfs_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/turfs/{slug}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a turf */
+        post: operations["admin_turfs_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/turfs/{slug}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject a turf */
+        post: operations["admin_turfs_reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/turfs/{slug}/suspend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suspend a turf */
+        post: operations["admin_turfs_suspend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Amenity: {
+            /** Format: uuid */
+            readonly id: string;
+            key: string;
+            label: string;
+            icon?: string;
+            /** Display order */
+            order?: number;
+        };
         Attribute: {
             /** Format: uuid */
             readonly id: string;
@@ -368,6 +1128,14 @@ export interface components {
             description?: string;
             /** Display order */
             order?: number;
+        };
+        Availability: {
+            /** Format: uuid */
+            ground_id: string;
+            /** Format: date */
+            date: string;
+            slot_minutes: number;
+            slots: components["schemas"]["Slot"][];
         };
         /** @enum {unknown} */
         BlankEnum: "";
@@ -383,6 +1151,44 @@ export interface components {
             currency: string;
             time_zone: string;
         };
+        Closure: {
+            /** Format: uuid */
+            readonly id: string;
+            /**
+             * Format: uuid
+             * @description Leave empty to close the whole turf.
+             */
+            ground?: string | null;
+            /**
+             * Starts
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends
+             * Format: date-time
+             */
+            ends_at: string;
+            reason?: string;
+        };
+        ClosureRequest: {
+            /**
+             * Format: uuid
+             * @description Leave empty to close the whole turf.
+             */
+            ground?: string | null;
+            /**
+             * Starts
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends
+             * Format: date-time
+             */
+            ends_at: string;
+            reason?: string;
+        };
         /**
          * @description * `male` - Male
          *     * `female` - Female
@@ -391,6 +1197,43 @@ export interface components {
          * @enum {string}
          */
         GenderEnum: "male" | "female" | "other" | "undisclosed";
+        Ground: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            readonly slug: string;
+            readonly surface: components["schemas"]["SurfaceEnum"];
+            readonly surface_label: string;
+            /**
+             * Maximum players
+             * @description Caps match capacity even when the format would allow more.
+             */
+            readonly max_players: number;
+            /** Slot length (minutes) */
+            readonly slot_minutes: components["schemas"]["SlotMinutesEnum"];
+            /**
+             * Active
+             * @description Bookable. Activation is refused until price rules cover every open minute (see apps.turfs.services.activate_ground).
+             */
+            readonly is_active: boolean;
+            readonly notes: string;
+            readonly sport_formats: components["schemas"]["SportFormat"][];
+            readonly sports: components["schemas"]["SportSummary"][];
+            readonly price_rules: components["schemas"]["PriceRule"][];
+        };
+        GroundWriteRequest: {
+            name: string;
+            surface?: components["schemas"]["SurfaceEnum"];
+            /**
+             * Maximum players
+             * @description Caps match capacity even when the format would allow more.
+             */
+            max_players: number;
+            /** Slot length (minutes) */
+            slot_minutes?: components["schemas"]["SlotMinutesEnum"];
+            notes?: string;
+            sport_format_ids?: string[];
+        };
         Health: {
             status: string;
             database: string;
@@ -422,6 +1265,183 @@ export interface components {
                 [key: string]: number;
             };
         };
+        OperatingHours: {
+            /** Format: uuid */
+            readonly id: string;
+            weekday: components["schemas"]["WeekdayEnum"];
+            readonly weekday_label: string;
+            /**
+             * Opens
+             * Format: time
+             */
+            open_time: string;
+            /**
+             * Closes
+             * Format: time
+             */
+            close_time: string;
+            readonly crosses_midnight: boolean;
+        };
+        OperatingHoursRequest: {
+            weekday: components["schemas"]["WeekdayEnum"];
+            /**
+             * Opens
+             * Format: time
+             */
+            open_time: string;
+            /**
+             * Closes
+             * Format: time
+             */
+            close_time: string;
+        };
+        /** @description The owner's own view: status and review feedback, which players never see. */
+        OwnerTurf: {
+            /** Format: uuid */
+            readonly id: string;
+            name: string;
+            slug: string;
+            /** @description Neighbourhood, e.g. Dhanmondi. Players filter and search on this. */
+            area: string;
+            city?: string;
+            address: string;
+            /** Format: double */
+            readonly latitude: number;
+            /** Format: double */
+            readonly longitude: number;
+            readonly amenities: components["schemas"]["Amenity"][];
+            readonly photos: components["schemas"]["TurfPhoto"][];
+            readonly sports: components["schemas"]["SportSummary"][];
+            readonly ground_count: number;
+            readonly price_from: string | null;
+            /** Format: double */
+            readonly distance_km: number | null;
+            description?: string;
+            /** Contact phone */
+            phone?: string;
+            /**
+             * Free cancellation window (hours)
+             * @description Cancelling later than this counts against the player's reliability.
+             */
+            cancellation_free_hours?: number;
+            readonly grounds: components["schemas"]["Ground"][];
+            readonly operating_hours: components["schemas"]["OperatingHours"][];
+            status?: components["schemas"]["OwnerTurfStatusEnum"];
+            readonly status_label: string;
+            rejection_reason?: string;
+            /**
+             * Submitted for review at
+             * Format: date-time
+             */
+            submitted_at?: string | null;
+            /** Format: date-time */
+            reviewed_at?: string | null;
+            /**
+             * Auto-confirm reliable players
+             * @description DECISIONS D3: when off, every cash booking waits for owner or staff confirmation regardless of the player's record.
+             */
+            auto_confirm_enabled?: boolean;
+            readonly my_role: string | null;
+        };
+        /**
+         * @description * `draft` - Draft
+         *     * `pending_review` - Pending review
+         *     * `approved` - Approved
+         *     * `rejected` - Rejected
+         *     * `suspended` - Suspended
+         * @enum {string}
+         */
+        OwnerTurfStatusEnum: "draft" | "pending_review" | "approved" | "rejected" | "suspended";
+        PaginatedClosureList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Closure"][];
+        };
+        PaginatedGroundList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Ground"][];
+        };
+        PaginatedOperatingHoursList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["OperatingHours"][];
+        };
+        PaginatedOwnerTurfList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["OwnerTurf"][];
+        };
+        PaginatedPriceCoverageGapList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["PriceCoverageGap"][];
+        };
+        PaginatedPriceRuleList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["PriceRule"][];
+        };
         PaginatedSportProposalList: {
             /** @example 123 */
             count: number;
@@ -436,6 +1456,118 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["SportProposal"][];
+        };
+        PaginatedTurfMembershipList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["TurfMembership"][];
+        };
+        PaginatedTurfPhotoList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["TurfPhoto"][];
+        };
+        PaginatedTurfSummaryList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["TurfSummary"][];
+        };
+        PatchedClosureRequest: {
+            /**
+             * Format: uuid
+             * @description Leave empty to close the whole turf.
+             */
+            ground?: string | null;
+            /**
+             * Starts
+             * Format: date-time
+             */
+            starts_at?: string;
+            /**
+             * Ends
+             * Format: date-time
+             */
+            ends_at?: string;
+            reason?: string;
+        };
+        PatchedGroundWriteRequest: {
+            name?: string;
+            surface?: components["schemas"]["SurfaceEnum"];
+            /**
+             * Maximum players
+             * @description Caps match capacity even when the format would allow more.
+             */
+            max_players?: number;
+            /** Slot length (minutes) */
+            slot_minutes?: components["schemas"]["SlotMinutesEnum"];
+            notes?: string;
+            sport_format_ids?: string[];
+        };
+        PatchedOperatingHoursRequest: {
+            weekday?: components["schemas"]["WeekdayEnum"];
+            /**
+             * Opens
+             * Format: time
+             */
+            open_time?: string;
+            /**
+             * Closes
+             * Format: time
+             */
+            close_time?: string;
+        };
+        PatchedPriceRuleRequest: {
+            /** @description Monday is 0. Empty means every day. */
+            weekdays?: number[];
+            /**
+             * From
+             * Format: time
+             */
+            start_time?: string;
+            /**
+             * Until
+             * Format: time
+             * @description An end at or before the start wraps past midnight — 22:00–02:00 is a night rate. Equal times therefore mean the full 24 hours, which is how a turf prices every open minute with one rule.
+             */
+            end_time?: string;
+            /**
+             * Price per slot
+             * Format: decimal
+             * @description BDT. Money is always Decimal (CLAUDE.md).
+             */
+            price?: string;
+            /** @description e.g. Peak, Off-peak, Night. */
+            label?: string;
         };
         /** @description PATCH /me/profile. Attributes may be re-assessed from the settings page. */
         PatchedProfileUpdateRequest: {
@@ -467,6 +1599,38 @@ export interface components {
             attributes?: {
                 [key: string]: number;
             };
+        };
+        PatchedTurfPhotoRequest: {
+            /** Format: binary */
+            image?: string;
+            caption?: string;
+            /** Display order */
+            order?: number;
+        };
+        PatchedTurfWriteRequest: {
+            name?: string;
+            description?: string;
+            address?: string;
+            /** @description Neighbourhood, e.g. Dhanmondi. Players filter and search on this. */
+            area?: string;
+            city?: string;
+            /** Contact phone */
+            phone?: string;
+            /** Format: double */
+            latitude?: number;
+            /** Format: double */
+            longitude?: number;
+            amenity_ids?: string[];
+            /**
+             * Auto-confirm reliable players
+             * @description DECISIONS D3: when off, every cash booking waits for owner or staff confirmation regardless of the player's record.
+             */
+            auto_confirm_enabled?: boolean;
+            /**
+             * Free cancellation window (hours)
+             * @description Cancelling later than this counts against the player's reliability.
+             */
+            cancellation_free_hours?: number;
         };
         /** @description Flattened for the card: the UI wants a key, a label and a number. */
         PlayerAttribute: {
@@ -569,6 +1733,62 @@ export interface components {
          * @enum {string}
          */
         PreferredSideEnum: "left" | "right" | "both";
+        PriceCoverageGap: {
+            weekday: components["schemas"]["WeekdayEnum"];
+            weekday_label: string;
+            /** Format: time */
+            start_time: string;
+            /** Format: time */
+            end_time: string;
+        };
+        PriceRule: {
+            /** Format: uuid */
+            readonly id: string;
+            /** @description Monday is 0. Empty means every day. */
+            weekdays?: number[];
+            /**
+             * From
+             * Format: time
+             */
+            start_time: string;
+            /**
+             * Until
+             * Format: time
+             * @description An end at or before the start wraps past midnight — 22:00–02:00 is a night rate. Equal times therefore mean the full 24 hours, which is how a turf prices every open minute with one rule.
+             */
+            end_time: string;
+            /**
+             * Price per slot
+             * Format: decimal
+             * @description BDT. Money is always Decimal (CLAUDE.md).
+             */
+            price: string;
+            /** @description e.g. Peak, Off-peak, Night. */
+            label?: string;
+        };
+        PriceRuleRequest: {
+            /** @description Monday is 0. Empty means every day. */
+            weekdays?: number[];
+            /**
+             * From
+             * Format: time
+             */
+            start_time: string;
+            /**
+             * Until
+             * Format: time
+             * @description An end at or before the start wraps past midnight — 22:00–02:00 is a night rate. Equal times therefore mean the full 24 hours, which is how a turf prices every open minute with one rule.
+             */
+            end_time: string;
+            /**
+             * Price per slot
+             * Format: decimal
+             * @description BDT. Money is always Decimal (CLAUDE.md).
+             */
+            price: string;
+            /** @description e.g. Peak, Off-peak, Night. */
+            label?: string;
+        };
         /**
          * @description What other players may see: no contact details, no exact date of birth.
          *
@@ -602,12 +1822,35 @@ export interface components {
             readonly created_at: string;
             readonly age: number | null;
         };
+        ReviewDecisionRequest: {
+            reason?: string;
+        };
         /**
          * @description * `player` - Per player
          *     * `team` - Per team
          * @enum {string}
          */
         ScopeEnum: "player" | "team";
+        /** @description One slot from ``apps.turfs.availability``. */
+        Slot: {
+            /** Format: date-time */
+            start: string;
+            /** Format: date-time */
+            end: string;
+            /** Format: decimal */
+            price: string | null;
+            label: string;
+            available: boolean;
+            reason: string;
+            readonly minutes: number;
+        };
+        /**
+         * @description * `60` - 60 minutes
+         *     * `90` - 90 minutes
+         *     * `120` - 120 minutes
+         * @enum {integer}
+         */
+        SlotMinutesEnum: 60 | 90 | 120;
         /** @description The full catalogue entry: one request feeds the whole onboarding wizard. */
         Sport: {
             /** Format: uuid */
@@ -659,7 +1902,7 @@ export interface components {
             /** Proposed name */
             name: string;
             description?: string;
-            readonly status: components["schemas"]["StatusEnum"];
+            readonly status: components["schemas"]["SportProposalStatusEnum"];
             readonly merged_into: components["schemas"]["SportSummary"];
             readonly review_note: string;
             /** Format: date-time */
@@ -688,6 +1931,14 @@ export interface components {
         SportProposalRejectRequest: {
             note: string;
         };
+        /**
+         * @description * `pending` - Pending review
+         *     * `approved` - Approved
+         *     * `merged` - Merged into an existing sport
+         *     * `rejected` - Rejected
+         * @enum {string}
+         */
+        SportProposalStatusEnum: "pending" | "approved" | "merged" | "rejected";
         SportRemoved: {
             status: string;
         };
@@ -711,6 +1962,17 @@ export interface components {
             slug: string;
             readonly icon: string;
         };
+        StaffInviteRequest: {
+            role: components["schemas"]["StaffInviteRoleEnum"];
+            email?: string;
+            phone?: string;
+        };
+        /**
+         * @description * `manager` - Manager
+         *     * `cashier` - Cashier
+         * @enum {string}
+         */
+        StaffInviteRoleEnum: "manager" | "cashier";
         StatDefinition: {
             /** Format: uuid */
             readonly id: string;
@@ -741,13 +2003,145 @@ export interface components {
             order?: number;
         };
         /**
-         * @description * `pending` - Pending review
-         *     * `approved` - Approved
-         *     * `merged` - Merged into an existing sport
-         *     * `rejected` - Rejected
+         * @description * `artificial_turf` - Artificial turf
+         *     * `natural_grass` - Natural grass
+         *     * `concrete` - Concrete
+         *     * `wooden` - Wooden
+         *     * `synthetic` - Synthetic court
+         *     * `clay` - Clay
          * @enum {string}
          */
-        StatusEnum: "pending" | "approved" | "merged" | "rejected";
+        SurfaceEnum: "artificial_turf" | "natural_grass" | "concrete" | "wooden" | "synthetic" | "clay";
+        /** @description What a listing row needs: identity, position, and what can be played. */
+        TurfDetail: {
+            /** Format: uuid */
+            readonly id: string;
+            name: string;
+            slug: string;
+            /** @description Neighbourhood, e.g. Dhanmondi. Players filter and search on this. */
+            area: string;
+            city?: string;
+            address: string;
+            /** Format: double */
+            readonly latitude: number;
+            /** Format: double */
+            readonly longitude: number;
+            readonly amenities: components["schemas"]["Amenity"][];
+            readonly photos: components["schemas"]["TurfPhoto"][];
+            readonly sports: components["schemas"]["SportSummary"][];
+            readonly ground_count: number;
+            readonly price_from: string | null;
+            /** Format: double */
+            readonly distance_km: number | null;
+            description?: string;
+            /** Contact phone */
+            phone?: string;
+            /**
+             * Free cancellation window (hours)
+             * @description Cancelling later than this counts against the player's reliability.
+             */
+            cancellation_free_hours?: number;
+            readonly grounds: components["schemas"]["Ground"][];
+            readonly operating_hours: components["schemas"]["OperatingHours"][];
+        };
+        TurfMembership: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly turf: string;
+            readonly turf_name: string;
+            /** @default  */
+            readonly user_name: string;
+            /** @default  */
+            readonly user_email: string;
+            /** Format: email */
+            readonly invited_email: string;
+            readonly invited_phone: string;
+            readonly role: components["schemas"]["TurfMembershipRoleEnum"];
+            readonly role_label: string;
+            readonly status: components["schemas"]["TurfMembershipStatusEnum"];
+            /** Format: date-time */
+            readonly accepted_at: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `owner` - Owner
+         *     * `manager` - Manager
+         *     * `cashier` - Cashier
+         * @enum {string}
+         */
+        TurfMembershipRoleEnum: "owner" | "manager" | "cashier";
+        /**
+         * @description * `invited` - Invited
+         *     * `active` - Active
+         *     * `removed` - Removed
+         * @enum {string}
+         */
+        TurfMembershipStatusEnum: "invited" | "active" | "removed";
+        TurfPhoto: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uri */
+            image: string;
+            caption?: string;
+            /** Display order */
+            order?: number;
+        };
+        TurfPhotoRequest: {
+            /** Format: binary */
+            image: string;
+            caption?: string;
+            /** Display order */
+            order?: number;
+        };
+        /** @description What a listing row needs: identity, position, and what can be played. */
+        TurfSummary: {
+            /** Format: uuid */
+            readonly id: string;
+            name: string;
+            slug: string;
+            /** @description Neighbourhood, e.g. Dhanmondi. Players filter and search on this. */
+            area: string;
+            city?: string;
+            address: string;
+            /** Format: double */
+            readonly latitude: number;
+            /** Format: double */
+            readonly longitude: number;
+            readonly amenities: components["schemas"]["Amenity"][];
+            readonly photos: components["schemas"]["TurfPhoto"][];
+            readonly sports: components["schemas"]["SportSummary"][];
+            readonly ground_count: number;
+            readonly price_from: string | null;
+            /** Format: double */
+            readonly distance_km: number | null;
+        };
+        TurfWriteRequest: {
+            name: string;
+            description?: string;
+            address: string;
+            /** @description Neighbourhood, e.g. Dhanmondi. Players filter and search on this. */
+            area: string;
+            city?: string;
+            /** Contact phone */
+            phone?: string;
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            amenity_ids?: string[];
+            /**
+             * Auto-confirm reliable players
+             * @description DECISIONS D3: when off, every cash booking waits for owner or staff confirmation regardless of the player's record.
+             */
+            auto_confirm_enabled?: boolean;
+            /**
+             * Free cancellation window (hours)
+             * @description Cancelling later than this counts against the player's reliability.
+             */
+            cancellation_free_hours?: number;
+        };
         User: {
             /** Format: uuid */
             readonly id: string;
@@ -801,6 +2195,17 @@ export interface components {
         WebhookRejected: {
             detail: string;
         };
+        /**
+         * @description * `0` - Monday
+         *     * `1` - Tuesday
+         *     * `2` - Wednesday
+         *     * `3` - Thursday
+         *     * `4` - Friday
+         *     * `5` - Saturday
+         *     * `6` - Sunday
+         * @enum {integer}
+         */
+        WeekdayEnum: 0 | 1 | 2 | 3 | 4 | 5 | 6;
     };
     responses: never;
     parameters: never;
@@ -1269,6 +2674,1176 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicPlayerProfile"];
+                };
+            };
+        };
+    };
+    amenities_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Amenity"][];
+                };
+            };
+        };
+    };
+    ground_availability: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM-DD, Dhaka time. */
+                date?: string;
+            };
+            header?: never;
+            path: {
+                ground_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+        };
+    };
+    my_grounds_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedGroundList"];
+                };
+            };
+        };
+    };
+    my_grounds_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroundWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["GroundWriteRequest"];
+                "multipart/form-data": components["schemas"]["GroundWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ground"];
+                };
+            };
+        };
+    };
+    my_grounds_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ground"];
+                };
+            };
+        };
+    };
+    my_grounds_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_grounds_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedGroundWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedGroundWriteRequest"];
+                "multipart/form-data": components["schemas"]["PatchedGroundWriteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ground"];
+                };
+            };
+        };
+    };
+    my_grounds_activate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ground"];
+                };
+            };
+        };
+    };
+    my_grounds_deactivate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ground"];
+                };
+            };
+        };
+    };
+    my_grounds_price_coverage: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPriceCoverageGapList"];
+                };
+            };
+        };
+    };
+    my_prices_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                ground_pk: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedPriceRuleList"];
+                };
+            };
+        };
+    };
+    my_prices_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ground_pk: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PriceRuleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PriceRuleRequest"];
+                "multipart/form-data": components["schemas"]["PriceRuleRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceRule"];
+                };
+            };
+        };
+    };
+    my_prices_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ground_pk: string;
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceRule"];
+                };
+            };
+        };
+    };
+    my_prices_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ground_pk: string;
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_prices_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ground_pk: string;
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedPriceRuleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedPriceRuleRequest"];
+                "multipart/form-data": components["schemas"]["PatchedPriceRuleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PriceRule"];
+                };
+            };
+        };
+    };
+    my_hours_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedOperatingHoursList"];
+                };
+            };
+        };
+    };
+    my_hours_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatingHoursRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["OperatingHoursRequest"];
+                "multipart/form-data": components["schemas"]["OperatingHoursRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatingHours"];
+                };
+            };
+        };
+    };
+    my_hours_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatingHours"];
+                };
+            };
+        };
+    };
+    my_hours_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_hours_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedOperatingHoursRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedOperatingHoursRequest"];
+                "multipart/form-data": components["schemas"]["PatchedOperatingHoursRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatingHours"];
+                };
+            };
+        };
+    };
+    my_closures_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedClosureList"];
+                };
+            };
+        };
+    };
+    my_closures_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClosureRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ClosureRequest"];
+                "multipart/form-data": components["schemas"]["ClosureRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Closure"];
+                };
+            };
+        };
+    };
+    my_closures_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Closure"];
+                };
+            };
+        };
+    };
+    my_closures_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_closures_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedClosureRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedClosureRequest"];
+                "multipart/form-data": components["schemas"]["PatchedClosureRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Closure"];
+                };
+            };
+        };
+    };
+    my_photos_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTurfPhotoList"];
+                };
+            };
+        };
+    };
+    my_photos_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["TurfPhotoRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TurfPhotoRequest"];
+                "application/json": components["schemas"]["TurfPhotoRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurfPhoto"];
+                };
+            };
+        };
+    };
+    my_photos_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurfPhoto"];
+                };
+            };
+        };
+    };
+    my_photos_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_photos_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "multipart/form-data": components["schemas"]["PatchedTurfPhotoRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTurfPhotoRequest"];
+                "application/json": components["schemas"]["PatchedTurfPhotoRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurfPhoto"];
+                };
+            };
+        };
+    };
+    my_turfs_remove_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                membership_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    turfs_list: {
+        parameters: {
+            query?: {
+                /** @description Exact area, e.g. `Dhanmondi`. */
+                area?: string;
+                /** @description `latitude,longitude`. */
+                near?: string;
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description Free text over name, area and address. */
+                q?: string;
+                /** @description Only with `near`. Capped at 50. */
+                radius_km?: number;
+                /** @description Sport slug, e.g. `football`. */
+                sport?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTurfSummaryList"];
+                };
+            };
+        };
+    };
+    turfs_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurfDetail"];
+                };
+            };
+        };
+    };
+    my_turfs_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedOwnerTurfList"];
+                };
+            };
+        };
+    };
+    my_turfs_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TurfWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["TurfWriteRequest"];
+                "multipart/form-data": components["schemas"]["TurfWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    my_turfs_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    my_turfs_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedTurfWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedTurfWriteRequest"];
+                "multipart/form-data": components["schemas"]["PatchedTurfWriteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    my_turfs_invite_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffInviteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StaffInviteRequest"];
+                "multipart/form-data": components["schemas"]["StaffInviteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurfMembership"];
+                };
+            };
+        };
+    };
+    my_turfs_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurfMembership"][];
+                };
+            };
+        };
+    };
+    my_turfs_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    my_memberships_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedTurfMembershipList"];
+                };
+            };
+        };
+    };
+    my_memberships_leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this turf membership. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_memberships_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this turf membership. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurfMembership"];
+                };
+            };
+        };
+    };
+    admin_turfs_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description Defaults to `pending_review`. */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedOwnerTurfList"];
+                };
+            };
+        };
+    };
+    admin_turfs_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    admin_turfs_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    admin_turfs_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ReviewDecisionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ReviewDecisionRequest"];
+                "multipart/form-data": components["schemas"]["ReviewDecisionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    admin_turfs_suspend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ReviewDecisionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ReviewDecisionRequest"];
+                "multipart/form-data": components["schemas"]["ReviewDecisionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerTurf"];
                 };
             };
         };
