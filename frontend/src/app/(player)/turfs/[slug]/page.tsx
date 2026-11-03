@@ -56,7 +56,11 @@ export default async function TurfDetailPage({ params }: { params: Promise<{ slu
           <p className="text-muted-foreground text-xs">{t("availabilityHint")}</p>
         </CardHeader>
         <CardContent>
-          <BookingPanel grounds={data.grounds} horizonDays={config.booking_horizon_days} />
+          <BookingPanel
+            grounds={data.grounds}
+            horizonDays={config.booking_horizon_days}
+            cancellationFreeHours={data.cancellation_free_hours}
+          />
         </CardContent>
       </Card>
 

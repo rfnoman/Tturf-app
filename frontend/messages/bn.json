@@ -216,7 +216,6 @@
     "noSlots": "The turf is closed on this date.",
     "noGrounds": "No bookable grounds yet.",
     "selectedSlot": "{time} · ৳{price}",
-    "bookingSoon": "Booking arrives in Phase 03",
     "openingHours": "খোলার সময়",
     "closed": "বন্ধ",
     "amenities": "সুবিধাসমূহ",
@@ -235,7 +234,21 @@
       "4": "শুক্রবার",
       "5": "শনিবার",
       "6": "রবিবার"
-    }
+    },
+    "visibility": "কারা যোগ দিতে পারবে?",
+    "visibility_public": "খেলোয়াড় খুঁজছি",
+    "visibility_private": "ব্যক্তিগত খেলা",
+    "visibilityHint_public": "Your match appears on the board so other players can ask to join.",
+    "visibilityHint_private": "Only people you invite can join.",
+    "notes": "Anything the turf should know?",
+    "notesPlaceholder": "Optional",
+    "payCash": "You pay cash at the turf.",
+    "cancellationPolicy": "Free cancellation up to {hours}h before kick-off.",
+    "confirmBooking": "Book for ৳{price}",
+    "booking": "বুকিং হচ্ছে…",
+    "bookingFailed": "Could not book that slot. Please try again.",
+    "slotJustTaken": "Someone just took that slot. Pick another one.",
+    "format": "ফরম্যাট"
   },
   "ownerRegister": {
     "stepCounter": "ধাপ {current} / {total}",
@@ -333,7 +346,8 @@
       "4": "শুক্র",
       "5": "শনি",
       "6": "রবি"
-    }
+    },
+    "viewBookings": "বুকিং"
   },
   "adminTurfs": {
     "heading": "টার্ফ",
@@ -358,5 +372,73 @@
       "suspended": "স্থগিত",
       "draft": "খসড়া"
     }
+  },
+  "notifications": {
+    "heading": "বিজ্ঞপ্তি",
+    "ariaLabel": "{count, plural, =0 {Notifications} one {# unread notification} other {# unread notifications}}",
+    "empty": "এখনো কিছু নেই।",
+    "loading": "লোড হচ্ছে…",
+    "markAllRead": "সব পঠিত চিহ্নিত করুন",
+    "seeAll": "সব বিজ্ঞপ্তি দেখুন"
+  },
+  "myBookings": {
+    "heading": "আমার বুকিং",
+    "body": "Everything you have booked, and everything you have played.",
+    "filter": "Filter",
+    "upcoming": "আসন্ন",
+    "past": "পূর্ববর্তী",
+    "empty_upcoming": "Nothing booked yet.",
+    "empty_past": "No past bookings.",
+    "findTurf": "টার্ফ খুঁজুন"
+  },
+  "bookingDetail": {
+    "actions": "কার্যক্রম",
+    "timeline": "সময়রেখা",
+    "details": "বিস্তারিত",
+    "confirm": "বুকিং নিশ্চিত করুন",
+    "markPaid": "Mark paid (৳{price})",
+    "noShow": "অনুপস্থিত চিহ্নিত করুন",
+    "cancel": "বুকিং বাতিল করুন",
+    "cancelReason": "কারণ",
+    "cancelReasonPlaceholder": "Reason (optional)",
+    "failed": "That did not work. Please try again.",
+    "awaitingConfirmation": "The turf has not confirmed yet. If nobody confirms in time the slot is released and you are told.",
+    "player": "খেলোয়াড়",
+    "phone": "ফোন",
+    "visibility": "Visibility",
+    "visibility_public": "Looking for players",
+    "visibility_private": "Private",
+    "payment": "পেমেন্ট",
+    "paidAmount": "৳{amount} received",
+    "payAtTurf": "Cash at the turf",
+    "cancellationPolicy": "Cancellation",
+    "freeUntil": "Free up to {hours}h before",
+    "notes": "নোট",
+    "autoConfirmed": "Auto-confirmed",
+    "myBookings": "আমার বুকিং",
+    "viewTurf": "টার্ফ দেখুন"
+  },
+  "turfCalendar": {
+    "body": "Today's bookings, the confirmation queue, and walk-ins.",
+    "manageTurf": "টার্ফ পরিচালনা",
+    "day": "বুকিং",
+    "date": "তারিখ",
+    "noBookings": "Nothing booked for this day.",
+    "pending": "{count, plural, one {# booking needs confirmation} other {# bookings need confirmation}}",
+    "pendingHint": "Confirm before the deadline or the slot is released automatically.",
+    "expires": "expires",
+    "confirm": "নিশ্চিত করুন",
+    "decline": "প্রত্যাখ্যান",
+    "declinedByTurf": "Declined by the turf",
+    "markPaid": "পরিশোধিত চিহ্নিত করুন",
+    "noShow": "অনুপস্থিত",
+    "failed": "That did not work. Please try again.",
+    "walkIn": "Walk-in booking",
+    "walkInHint": "For someone at the counter with no account. Confirmed straight away.",
+    "ground": "মাঠ",
+    "time": "শুরুর সময়",
+    "customerName": "নাম",
+    "customerPhone": "ফোন",
+    "book": "বুক করুন"
   }
 }

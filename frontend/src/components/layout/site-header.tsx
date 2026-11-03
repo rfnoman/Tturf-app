@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { LanguageSwitcher } from "./language-switcher";
+import { NotificationBell } from "./notification-bell";
 
 export async function SiteHeader() {
   const t = await getTranslations();
@@ -21,6 +22,9 @@ export async function SiteHeader() {
         <nav className="hidden items-center gap-1 sm:flex" aria-label={t("nav.home")}>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/play">{t("nav.play")}</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/bookings">{t("nav.myBookings")}</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/profile">{t("nav.profile")}</Link>
@@ -51,6 +55,8 @@ export async function SiteHeader() {
             </SignUpButton>
           </Show>
           <Show when="signed-in">
+            {/* Inside <Show>, so it only polls for a signed-in reader. */}
+            <NotificationBell />
             <UserButton />
           </Show>
         </Suspense>

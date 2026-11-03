@@ -292,3 +292,8 @@ class PlayerSportRating(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.profile.name} / {self.sport.name} = {self.overall}"
+
+
+#: Importable aliases for ENUM_NAME_OVERRIDES (see apps/turfs/models.py).
+PLAYER_GENDER_CHOICES = PlayerProfile.Gender.choices
+PLAYER_PREFERRED_SIDE_CHOICES = PlayerProfile.PreferredSide.choices

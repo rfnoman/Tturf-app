@@ -1107,6 +1107,266 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My notifications
+         * @description The notification centre. Scoped to the caller — there is no cross-user read.
+         */
+        get: operations["my_notifications_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark notifications read
+         * @description The notification centre. Scoped to the caller — there is no cross-user read.
+         */
+        post: operations["my_notifications_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Unread count
+         * @description What the bell badge shows. Cheap enough to poll.
+         */
+        get: operations["my_notifications_unread_count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My bookings
+         * @description The player's own bookings, split the way the UI shows them.
+         */
+        get: operations["my_bookings_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bookings at my turf
+         * @description The owner/staff calendar for one turf.
+         */
+        get: operations["turf_bookings_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/bookings/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bookings awaiting confirmation
+         * @description The confirmation queue, soonest deadline first (DECISIONS D3).
+         */
+        get: operations["turf_bookings_pending"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/bookings/walk-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book on behalf of a walk-in (staff)
+         * @description Recorded against the staff member's account with the customer's name and phone, and confirmed immediately — they are standing at the counter.
+         */
+        post: operations["turf_bookings_walk_in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book a slot
+         * @description Applies DECISIONS D3: a reliable player at a turf that allows it is confirmed immediately, otherwise the slot is held until `expires_at`. Returns **409** when another player took the slot first.
+         */
+        post: operations["bookings_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One booking
+         * @description Visible to the player who booked it and to staff at that turf.
+         */
+        get: operations["bookings_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a booking
+         * @description A player cancelling inside the turf's free window takes a reliability hit; a cancellation by the turf does not.
+         */
+        post: operations["bookings_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm a booking (staff)
+         * @description A single booking and everything that can be done to it.
+         */
+        post: operations["bookings_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings/{id}/mark-paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record cash payment (staff)
+         * @description A single booking and everything that can be done to it.
+         */
+        post: operations["bookings_mark_paid"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings/{id}/no-show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark a no-show (staff)
+         * @description Refused until the grace period after kickoff has passed — a player stuck in traffic three minutes away is not a no-show.
+         */
+        post: operations["bookings_no_show"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1139,6 +1399,139 @@ export interface components {
         };
         /** @enum {unknown} */
         BlankEnum: "";
+        /** @description One booking, with the timeline that makes its status explicable. */
+        Booking: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly turf_name: string;
+            readonly turf_slug: string;
+            readonly turf_area: string;
+            /** Format: uuid */
+            readonly ground_id: string;
+            readonly ground_name: string;
+            readonly sport: components["schemas"]["SportSummary"];
+            readonly sport_format: components["schemas"]["SportFormat"];
+            /** Format: date-time */
+            readonly starts_at: string;
+            /** Format: date-time */
+            readonly ends_at: string;
+            /**
+             * Format: decimal
+             * @description BDT, resolved from the ground's price rules when the booking is made.
+             */
+            readonly price: string;
+            readonly price_label: string;
+            readonly mode: components["schemas"]["BookingModeEnum"];
+            /**
+             * @description DECISIONS D2: the booker chooses. Public bookings reach the match board.
+             *
+             *     * `public` - Public — looking for players
+             *     * `private` - Private
+             */
+            readonly visibility: components["schemas"]["BookingVisibilityEnum"];
+            readonly status: components["schemas"]["BookingStatusEnum"];
+            readonly status_label: string;
+            /**
+             * Reservation expires at
+             * Format: date-time
+             * @description Only while `reserved`: the point at which an unconfirmed slot is released (DECISIONS D3).
+             */
+            readonly expires_at: string | null;
+            /** @description True when the player's record met the bar in DECISIONS D3. */
+            readonly auto_confirmed: boolean;
+            /** Format: date-time */
+            readonly confirmed_at: string | null;
+            /** Format: date-time */
+            readonly cancelled_at: string | null;
+            /** Cancellation reason */
+            readonly cancel_reason: string;
+            /**
+             * Late cancellation
+             * @description Cancelled inside the turf's free window, so it counted against reliability.
+             */
+            readonly was_late_cancel: boolean;
+            readonly player_name: string;
+            /** Walk-in phone */
+            readonly booked_for_phone: string;
+            readonly notes: string;
+            readonly cancellation_free_hours: number;
+            readonly events: components["schemas"]["BookingEvent"][];
+            readonly payments: components["schemas"]["Payment"][];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        BookingCreate: {
+            /** Format: uuid */
+            ground_id: string;
+            /**
+             * Format: date-time
+             * @description The slot's start, exactly as the availability endpoint reported it.
+             */
+            start: string;
+            /** Format: uuid */
+            sport_format_id: string;
+            /** @default individual */
+            mode: components["schemas"]["BookingModeEnum"];
+            /** @default public */
+            visibility: components["schemas"]["BookingVisibilityEnum"];
+            notes?: string;
+        };
+        BookingCreateRequest: {
+            /** Format: uuid */
+            ground_id: string;
+            /**
+             * Format: date-time
+             * @description The slot's start, exactly as the availability endpoint reported it.
+             */
+            start: string;
+            /** Format: uuid */
+            sport_format_id: string;
+            /** @default individual */
+            mode: components["schemas"]["BookingModeEnum"];
+            /** @default public */
+            visibility: components["schemas"]["BookingVisibilityEnum"];
+            notes?: string;
+        };
+        BookingEvent: {
+            /** Format: uuid */
+            readonly id: string;
+            /** From */
+            readonly from_status: components["schemas"]["BookingStatusEnum"];
+            /** To */
+            readonly to_status: components["schemas"]["BookingStatusEnum"];
+            readonly to_status_label: string;
+            /** @default  */
+            readonly actor_name: string;
+            readonly note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `individual` - Individual
+         *     * `group` - Group
+         * @enum {string}
+         */
+        BookingModeEnum: "individual" | "group";
+        /**
+         * @description * `reserved` - Reserved
+         *     * `confirmed` - Confirmed
+         *     * `paid` - Paid
+         *     * `completed` - Completed
+         *     * `expired` - Expired
+         *     * `cancelled` - Cancelled
+         *     * `no_show` - No-show
+         * @enum {string}
+         */
+        BookingStatusEnum: "reserved" | "confirmed" | "paid" | "completed" | "expired" | "cancelled" | "no_show";
+        /**
+         * @description * `public` - Public — looking for players
+         *     * `private` - Private
+         * @enum {string}
+         */
+        BookingVisibilityEnum: "public" | "private";
+        CancelBookingRequest: {
+            reason?: string;
+        };
         ClientConfig: {
             rating_min: number;
             rating_max: number;
@@ -1189,20 +1582,12 @@ export interface components {
             ends_at: string;
             reason?: string;
         };
-        /**
-         * @description * `male` - Male
-         *     * `female` - Female
-         *     * `other` - Other
-         *     * `undisclosed` - Prefer not to say
-         * @enum {string}
-         */
-        GenderEnum: "male" | "female" | "other" | "undisclosed";
         Ground: {
             /** Format: uuid */
             readonly id: string;
             readonly name: string;
             readonly slug: string;
-            readonly surface: components["schemas"]["SurfaceEnum"];
+            readonly surface: components["schemas"]["GroundSurfaceEnum"];
             readonly surface_label: string;
             /**
              * Maximum players
@@ -1221,9 +1606,19 @@ export interface components {
             readonly sports: components["schemas"]["SportSummary"][];
             readonly price_rules: components["schemas"]["PriceRule"][];
         };
+        /**
+         * @description * `artificial_turf` - Artificial turf
+         *     * `natural_grass` - Natural grass
+         *     * `concrete` - Concrete
+         *     * `wooden` - Wooden
+         *     * `synthetic` - Synthetic court
+         *     * `clay` - Clay
+         * @enum {string}
+         */
+        GroundSurfaceEnum: "artificial_turf" | "natural_grass" | "concrete" | "wooden" | "synthetic" | "clay";
         GroundWriteRequest: {
             name: string;
-            surface?: components["schemas"]["SurfaceEnum"];
+            surface?: components["schemas"]["GroundSurfaceEnum"];
             /**
              * Maximum players
              * @description Caps match capacity even when the format would allow more.
@@ -1240,17 +1635,64 @@ export interface components {
             postgis: string | null;
             version: string;
         };
+        MarkPaidRequest: {
+            /**
+             * Format: decimal
+             * @description Defaults to the booking price. Set it when a discount was given.
+             */
+            amount?: string;
+        };
+        MarkReadRequest: {
+            /** @description Omit to mark everything read. */
+            ids?: string[];
+        };
+        MarkedRead: {
+            marked: number;
+        };
+        NoteRequest: {
+            note?: string;
+        };
+        Notification: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly kind: components["schemas"]["NotificationKindEnum"];
+            readonly title: string;
+            readonly body: string;
+            /**
+             * Link
+             * @description Relative path the notification opens, e.g. /bookings/<id>.
+             */
+            readonly url: string;
+            /** @description Whatever the UI needs to link onwards, e.g. {'booking_id': ...}. */
+            readonly data: unknown;
+            readonly is_read: boolean;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `booking_created` - Booking created
+         *     * `booking_pending_confirmation` - Booking needs confirmation
+         *     * `booking_confirmed` - Booking confirmed
+         *     * `booking_expired` - Booking expired
+         *     * `booking_cancelled` - Booking cancelled
+         *     * `booking_paid` - Payment received
+         *     * `booking_no_show` - Marked as a no-show
+         *     * `booking_completed` - Booking completed
+         *     * `booking_reminder` - Booking reminder
+         * @enum {string}
+         */
+        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder";
         /** @description The wizard payload. Field-level validation only; rules live in the service. */
         OnboardingRequest: {
             display_name?: string;
             /** Format: date */
             date_of_birth?: string | null;
-            gender?: components["schemas"]["GenderEnum"] | components["schemas"]["BlankEnum"];
+            gender?: components["schemas"]["PlayerGenderEnum"] | components["schemas"]["BlankEnum"];
             height_cm?: number;
             /** Format: decimal */
             weight_kg?: string;
             area?: string;
-            preferred_side?: components["schemas"]["PreferredSideEnum"] | components["schemas"]["BlankEnum"];
+            preferred_side?: components["schemas"]["PlayerPreferredSideEnum"] | components["schemas"]["BlankEnum"];
             bio?: string;
             discoverable?: boolean;
             attributes?: {
@@ -1299,12 +1741,12 @@ export interface components {
         OwnerTurf: {
             /** Format: uuid */
             readonly id: string;
-            name: string;
-            slug: string;
+            readonly name: string;
+            readonly slug: string;
             /** @description Neighbourhood, e.g. Dhanmondi. Players filter and search on this. */
-            area: string;
-            city?: string;
-            address: string;
+            readonly area: string;
+            readonly city: string;
+            readonly address: string;
             /** Format: double */
             readonly latitude: number;
             /** Format: double */
@@ -1316,17 +1758,17 @@ export interface components {
             readonly price_from: string | null;
             /** Format: double */
             readonly distance_km: number | null;
-            description?: string;
+            readonly description: string;
             /** Contact phone */
-            phone?: string;
+            readonly phone: string;
             /**
              * Free cancellation window (hours)
              * @description Cancelling later than this counts against the player's reliability.
              */
-            cancellation_free_hours?: number;
+            readonly cancellation_free_hours: number;
             readonly grounds: components["schemas"]["Ground"][];
             readonly operating_hours: components["schemas"]["OperatingHours"][];
-            status?: components["schemas"]["OwnerTurfStatusEnum"];
+            status?: components["schemas"]["TurfStatusEnum"];
             readonly status_label: string;
             rejection_reason?: string;
             /**
@@ -1343,15 +1785,6 @@ export interface components {
             auto_confirm_enabled?: boolean;
             readonly my_role: string | null;
         };
-        /**
-         * @description * `draft` - Draft
-         *     * `pending_review` - Pending review
-         *     * `approved` - Approved
-         *     * `rejected` - Rejected
-         *     * `suspended` - Suspended
-         * @enum {string}
-         */
-        OwnerTurfStatusEnum: "draft" | "pending_review" | "approved" | "rejected" | "suspended";
         PaginatedClosureList: {
             /** @example 123 */
             count: number;
@@ -1381,6 +1814,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["Ground"][];
+        };
+        PaginatedNotificationList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["Notification"][];
         };
         PaginatedOperatingHoursList: {
             /** @example 123 */
@@ -1522,7 +1970,7 @@ export interface components {
         };
         PatchedGroundWriteRequest: {
             name?: string;
-            surface?: components["schemas"]["SurfaceEnum"];
+            surface?: components["schemas"]["GroundSurfaceEnum"];
             /**
              * Maximum players
              * @description Caps match capacity even when the format would allow more.
@@ -1580,7 +2028,7 @@ export interface components {
             photo?: string | null;
             /** Format: date */
             date_of_birth?: string | null;
-            gender?: components["schemas"]["GenderEnum"] | components["schemas"]["BlankEnum"];
+            gender?: components["schemas"]["PlayerGenderEnum"] | components["schemas"]["BlankEnum"];
             /** Height (cm) */
             height_cm?: number | null;
             /**
@@ -1592,7 +2040,7 @@ export interface components {
             /** @description Neighbourhood, e.g. Dhanmondi. Used to suggest nearby turfs and matches. */
             area?: string;
             /** Preferred foot / hand */
-            preferred_side?: components["schemas"]["PreferredSideEnum"] | components["schemas"]["BlankEnum"];
+            preferred_side?: components["schemas"]["PlayerPreferredSideEnum"] | components["schemas"]["BlankEnum"];
             bio?: string;
             /** @description Appear in player search. A direct profile link still works (DOMAIN §3). */
             discoverable?: boolean;
@@ -1632,6 +2080,42 @@ export interface components {
              */
             cancellation_free_hours?: number;
         };
+        Payment: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly method: components["schemas"]["PaymentMethodEnum"];
+            readonly method_label: string;
+            /**
+             * Format: decimal
+             * @description BDT. Money is always Decimal (CLAUDE.md).
+             */
+            readonly amount: string;
+            readonly status: components["schemas"]["PaymentStatusEnum"];
+            /** @default  */
+            readonly collected_by_name: string;
+            /** Format: date-time */
+            readonly collected_at: string | null;
+            /** @description Provider transaction id from Phase 10. Empty for cash. */
+            readonly reference: string;
+            readonly note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `cash` - Cash
+         *     * `sslcommerz` - SSLCommerz
+         *     * `bkash` - bKash
+         * @enum {string}
+         */
+        PaymentMethodEnum: "cash" | "sslcommerz" | "bkash";
+        /**
+         * @description * `pending` - Pending
+         *     * `paid` - Paid
+         *     * `refunded` - Refunded
+         *     * `failed` - Failed
+         * @enum {string}
+         */
+        PaymentStatusEnum: "pending" | "paid" | "refunded" | "failed";
         /** @description Flattened for the card: the UI wants a key, a label and a number. */
         PlayerAttribute: {
             key: string;
@@ -1639,6 +2123,21 @@ export interface components {
             value: number;
             source: string;
         };
+        /**
+         * @description * `male` - Male
+         *     * `female` - Female
+         *     * `other` - Other
+         *     * `undisclosed` - Prefer not to say
+         * @enum {string}
+         */
+        PlayerGenderEnum: "male" | "female" | "other" | "undisclosed";
+        /**
+         * @description * `left` - Left
+         *     * `right` - Right
+         *     * `both` - Both
+         * @enum {string}
+         */
+        PlayerPreferredSideEnum: "left" | "right" | "both";
         /** @description The public player card (DOMAIN §3). */
         PlayerProfile: {
             /** Format: uuid */
@@ -1649,7 +2148,7 @@ export interface components {
             readonly photo_url: string;
             /** Format: date */
             readonly date_of_birth: string | null;
-            readonly gender: components["schemas"]["GenderEnum"];
+            readonly gender: components["schemas"]["PlayerGenderEnum"];
             /** Height (cm) */
             readonly height_cm: number | null;
             /**
@@ -1662,7 +2161,7 @@ export interface components {
             /** @description Neighbourhood, e.g. Dhanmondi. Used to suggest nearby turfs and matches. */
             readonly area: string;
             /** Preferred foot / hand */
-            readonly preferred_side: components["schemas"]["PreferredSideEnum"];
+            readonly preferred_side: components["schemas"]["PlayerPreferredSideEnum"];
             readonly bio: string;
             /** @description Appear in player search. A direct profile link still works (DOMAIN §3). */
             readonly discoverable: boolean;
@@ -1726,13 +2225,6 @@ export interface components {
                 [key: string]: number;
             };
         };
-        /**
-         * @description * `left` - Left
-         *     * `right` - Right
-         *     * `both` - Both
-         * @enum {string}
-         */
-        PreferredSideEnum: "left" | "right" | "both";
         PriceCoverageGap: {
             weekday: components["schemas"]["WeekdayEnum"];
             weekday_label: string;
@@ -1802,13 +2294,13 @@ export interface components {
             /** @description Shown on the match board and scorecards. Defaults to the Clerk name. */
             readonly display_name: string;
             readonly photo_url: string;
-            readonly gender: components["schemas"]["GenderEnum"];
+            readonly gender: components["schemas"]["PlayerGenderEnum"];
             /** Height (cm) */
             readonly height_cm: number | null;
             /** @description Neighbourhood, e.g. Dhanmondi. Used to suggest nearby turfs and matches. */
             readonly area: string;
             /** Preferred foot / hand */
-            readonly preferred_side: components["schemas"]["PreferredSideEnum"];
+            readonly preferred_side: components["schemas"]["PlayerPreferredSideEnum"];
             readonly bio: string;
             /**
              * Reliability
@@ -1825,12 +2317,6 @@ export interface components {
         ReviewDecisionRequest: {
             reason?: string;
         };
-        /**
-         * @description * `player` - Per player
-         *     * `team` - Per team
-         * @enum {string}
-         */
-        ScopeEnum: "player" | "team";
         /** @description One slot from ``apps.turfs.availability``. */
         Slot: {
             /** Format: date-time */
@@ -1979,8 +2465,8 @@ export interface components {
             key: string;
             label: string;
             /** Type */
-            value_type?: components["schemas"]["ValueTypeEnum"];
-            scope?: components["schemas"]["ScopeEnum"];
+            value_type?: components["schemas"]["StatValueTypeEnum"];
+            scope?: components["schemas"]["StatScopeEnum"];
             /**
              * Minimum
              * Format: decimal
@@ -2003,25 +2489,28 @@ export interface components {
             order?: number;
         };
         /**
-         * @description * `artificial_turf` - Artificial turf
-         *     * `natural_grass` - Natural grass
-         *     * `concrete` - Concrete
-         *     * `wooden` - Wooden
-         *     * `synthetic` - Synthetic court
-         *     * `clay` - Clay
+         * @description * `player` - Per player
+         *     * `team` - Per team
          * @enum {string}
          */
-        SurfaceEnum: "artificial_turf" | "natural_grass" | "concrete" | "wooden" | "synthetic" | "clay";
+        StatScopeEnum: "player" | "team";
+        /**
+         * @description * `int` - Whole number
+         *     * `bool` - Yes/no
+         *     * `decimal` - Decimal
+         * @enum {string}
+         */
+        StatValueTypeEnum: "int" | "bool" | "decimal";
         /** @description What a listing row needs: identity, position, and what can be played. */
         TurfDetail: {
             /** Format: uuid */
             readonly id: string;
-            name: string;
-            slug: string;
+            readonly name: string;
+            readonly slug: string;
             /** @description Neighbourhood, e.g. Dhanmondi. Players filter and search on this. */
-            area: string;
-            city?: string;
-            address: string;
+            readonly area: string;
+            readonly city: string;
+            readonly address: string;
             /** Format: double */
             readonly latitude: number;
             /** Format: double */
@@ -2033,14 +2522,14 @@ export interface components {
             readonly price_from: string | null;
             /** Format: double */
             readonly distance_km: number | null;
-            description?: string;
+            readonly description: string;
             /** Contact phone */
-            phone?: string;
+            readonly phone: string;
             /**
              * Free cancellation window (hours)
              * @description Cancelling later than this counts against the player's reliability.
              */
-            cancellation_free_hours?: number;
+            readonly cancellation_free_hours: number;
             readonly grounds: components["schemas"]["Ground"][];
             readonly operating_hours: components["schemas"]["OperatingHours"][];
         };
@@ -2095,6 +2584,15 @@ export interface components {
             /** Display order */
             order?: number;
         };
+        /**
+         * @description * `draft` - Draft
+         *     * `pending_review` - Pending review
+         *     * `approved` - Approved
+         *     * `rejected` - Rejected
+         *     * `suspended` - Suspended
+         * @enum {string}
+         */
+        TurfStatusEnum: "draft" | "pending_review" | "approved" | "rejected" | "suspended";
         /** @description What a listing row needs: identity, position, and what can be played. */
         TurfSummary: {
             /** Format: uuid */
@@ -2142,6 +2640,9 @@ export interface components {
              */
             cancellation_free_hours?: number;
         };
+        UnreadCount: {
+            unread: number;
+        };
         User: {
             /** Format: uuid */
             readonly id: string;
@@ -2181,13 +2682,44 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
         };
-        /**
-         * @description * `int` - Whole number
-         *     * `bool` - Yes/no
-         *     * `decimal` - Decimal
-         * @enum {string}
-         */
-        ValueTypeEnum: "int" | "bool" | "decimal";
+        /** @description Staff booking on behalf of someone at the counter. */
+        WalkInBooking: {
+            /** Format: uuid */
+            ground_id: string;
+            /**
+             * Format: date-time
+             * @description The slot's start, exactly as the availability endpoint reported it.
+             */
+            start: string;
+            /** Format: uuid */
+            sport_format_id: string;
+            /** @default individual */
+            mode: components["schemas"]["BookingModeEnum"];
+            /** @default public */
+            visibility: components["schemas"]["BookingVisibilityEnum"];
+            notes?: string;
+            booked_for_name: string;
+            booked_for_phone?: string;
+        };
+        /** @description Staff booking on behalf of someone at the counter. */
+        WalkInBookingRequest: {
+            /** Format: uuid */
+            ground_id: string;
+            /**
+             * Format: date-time
+             * @description The slot's start, exactly as the availability endpoint reported it.
+             */
+            start: string;
+            /** Format: uuid */
+            sport_format_id: string;
+            /** @default individual */
+            mode: components["schemas"]["BookingModeEnum"];
+            /** @default public */
+            visibility: components["schemas"]["BookingVisibilityEnum"];
+            notes?: string;
+            booked_for_name: string;
+            booked_for_phone?: string;
+        };
         WebhookAccepted: {
             status: string;
             event: string | null;
@@ -3844,6 +4376,347 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OwnerTurf"];
+                };
+            };
+        };
+    };
+    my_notifications_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description Only unread ones. */
+                unread?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedNotificationList"];
+                };
+            };
+        };
+    };
+    my_notifications_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MarkReadRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MarkReadRequest"];
+                "multipart/form-data": components["schemas"]["MarkReadRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MarkedRead"];
+                };
+            };
+        };
+    };
+    my_notifications_unread_count: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadCount"];
+                };
+            };
+        };
+    };
+    my_bookings_list: {
+        parameters: {
+            query?: {
+                /** @description `upcoming` (default) or `past`. */
+                filter?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"][];
+                };
+            };
+        };
+    };
+    turf_bookings_list: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM-DD, Dhaka time. Defaults to today. */
+                date?: string;
+                /** @description Filter by booking status. */
+                status?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"][];
+                };
+            };
+        };
+    };
+    turf_bookings_pending: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"][];
+                };
+            };
+        };
+    };
+    turf_bookings_walk_in: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WalkInBookingRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["WalkInBookingRequest"];
+                "multipart/form-data": components["schemas"]["WalkInBookingRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WalkInBooking"];
+                };
+            };
+        };
+    };
+    bookings_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["BookingCreateRequest"];
+                "multipart/form-data": components["schemas"]["BookingCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BookingCreate"];
+                };
+            };
+        };
+    };
+    bookings_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this booking. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+        };
+    };
+    bookings_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this booking. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CancelBookingRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CancelBookingRequest"];
+                "multipart/form-data": components["schemas"]["CancelBookingRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+        };
+    };
+    bookings_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this booking. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["NoteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["NoteRequest"];
+                "multipart/form-data": components["schemas"]["NoteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+        };
+    };
+    bookings_mark_paid: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this booking. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MarkPaidRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MarkPaidRequest"];
+                "multipart/form-data": components["schemas"]["MarkPaidRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+        };
+    };
+    bookings_no_show: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this booking. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["NoteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["NoteRequest"];
+                "multipart/form-data": components["schemas"]["NoteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
                 };
             };
         };

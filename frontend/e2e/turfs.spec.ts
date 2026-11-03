@@ -72,7 +72,9 @@ test.describe("turf detail", () => {
     );
     await page.getByLabel("Date").fill(tomorrow);
 
-    const slot = page.getByRole("button", { name: /৳/ }).first();
+    // Selected on the data hook, not on the text: once a slot is picked, the review
+    // panel adds a "Book for ৳…" button that a price-based locator also matches.
+    const slot = page.locator("[data-slot-start][data-slot-available='true']").first();
     await expect(slot).toBeVisible();
     await slot.click();
     await expect(slot).toHaveAttribute("aria-pressed", "true");
@@ -88,7 +90,7 @@ test.describe("turf detail", () => {
     );
     await page.getByLabel("Date").fill(tomorrow);
 
-    await expect(page.getByRole("button", { name: /৳3200/ }).first()).toBeVisible();
+    await expect(page.locator("[data-slot-start]", { hasText: "৳3200" }).first()).toBeVisible();
   });
 
   test("availability matches what the API reports", async ({ signedInPage: page }) => {
@@ -97,7 +99,7 @@ test.describe("turf detail", () => {
       new Date(Date.now() + 86_400_000),
     );
     await page.getByLabel("Date").fill(tomorrow);
-    await expect(page.getByRole("button", { name: /৳/ }).first()).toBeVisible();
+    await expect(page.locator("[data-slot-start]").first()).toBeVisible();
 
     const fromApi = await page.evaluate(
       async ([base, date]) => {
@@ -119,7 +121,7 @@ test.describe("turf detail", () => {
       [apiBaseUrl(), tomorrow] as const,
     );
 
-    await expect(page.getByRole("button", { name: /৳/ })).toHaveCount(fromApi);
+    await expect(page.locator("[data-slot-start]")).toHaveCount(fromApi);
   });
 });
 

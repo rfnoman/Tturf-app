@@ -278,3 +278,9 @@ class SportProposal(BaseModel):
     @property
     def is_open(self) -> bool:
         return self.status == self.Status.PENDING
+
+
+#: Importable alias for ENUM_NAME_OVERRIDES (see apps/turfs/models.py).
+SPORT_PROPOSAL_STATUS_CHOICES = SportProposal.Status.choices
+STAT_VALUE_TYPE_CHOICES = StatDefinition.ValueType.choices
+STAT_SCOPE_CHOICES = StatDefinition.Scope.choices

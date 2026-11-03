@@ -7,7 +7,7 @@ Updated by Claude Code at the end of each phase.
 | 00 Foundation | **done** (auth flow pending Clerk keys) | 2026-11-03 | Monorepo, Django 6.1 + PostGIS, Clerk JWT auth + webhook, Next.js 16 shell, CI |
 | 01 Accounts, sports, profiles | **done** | 2026-11-03 | Sports catalogue + proposals, player profiles, onboarding wizard, FIFA-style card, authenticated e2e |
 | 02 Turfs & grounds | **done** | 2026-11-03 | Turfs, grounds, hours, prices, PostGIS discovery, Leaflet maps, admin review, staff |
-| 03 Bookings & cash payment | not started | | |
+| 03 Bookings & cash payment | **done** | 2026-11-03 | Exclusion-constraint bookings, state machine, cash payments, reliability, Celery jobs, notifications |
 | 04 Matches, squads, joining | not started | | |
 | 05 Scoreboard | not started | | |
 | 06 Ratings, track record, discovery | not started | | |
@@ -303,4 +303,99 @@ it then appeared publicly with the correct ৳2800 peak price. No console errors
   endpoints, so these are frontend-only gaps.
 - Catalogue and amenity labels come from the database and are English in both locales,
   like the sports catalogue. Phase 11 needs one strategy for all of them.
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 03 — Bookings and cash payment (2026-11-03)
+
+**Built**
+
+- **`apps/bookings`** (DOMAIN §5, DECISIONS D3):
+  - `Booking` on a `DateTimeRangeField` with a Postgres **`ExclusionConstraint`** —
+    `ground WITH =, time_range WITH &&`, scoped to the statuses that hold a slot (D29).
+    Double booking is impossible *at the database level*, not merely unlikely.
+  - The state machine, one service per transition, each writing a `BookingEvent`:
+    `reserved → confirmed → paid → completed`, plus `expired`, `cancelled` and
+    `no_show`. Nothing else assigns `status`.
+  - **D3 applied**: a player with ≥3 completed bookings and reliability ≥80, at a turf
+    that allows it, is confirmed instantly; everyone else is held until
+    `min(now + 2h, start − 1h)` — a slot released *after* kickoff helps nobody.
+  - The price is re-derived from `get_availability`, never taken from the client, so a
+    booking can only be made for a slot the turf offers at the price it advertised.
+  - `mark_no_show` waits out `BOOKING_NO_SHOW_GRACE_MINUTES`: a player stuck in Dhaka
+    traffic three minutes away is not a no-show.
+  - Celery beat: reservation expiry every minute, completion every five.
+- **`apps/payments`**: `Payment` with cash now and the shape Phase 10's providers and
+  ledger need (D30). `record_cash_payment` is idempotent — a cashier double-tapping
+  "mark paid" on a slow connection must not produce two rows.
+- **`apps/notifications`** (DOMAIN §11): `Notification` + `notify()`, rendered once at
+  creation from a template table (D31). Email goes out through `transaction.on_commit`,
+  so nobody is emailed about a transition that then rolled back, and delivery failure
+  never breaks the caller.
+- **Phase 02's seam used as designed**: `BookingsConfig.ready()` registers a booked-range
+  provider, so `apps/turfs/availability.py` needed **no change at all** and a booked slot
+  immediately reads as taken.
+- **Frontend**: booking review step (visibility, format, cash note, cancellation policy)
+  on the slot grid; booking page with its status timeline and role-aware actions; my
+  bookings split upcoming/past; the owner day calendar with the confirmation queue,
+  inline confirm / mark-paid / no-show and a walk-in form; a polling notification bell
+  and a notifications page.
+- **Tests**: 562 backend (84 in `apps/bookings`, 24 in `apps/notifications`), 17 Vitest,
+  43 Playwright across desktop and mobile.
+
+**The concurrency test the phase asked for**
+
+`apps/bookings/tests/test_concurrency.py` runs real threads against real connections
+(`django_db(transaction=True)`), lined up on a `threading.Barrier`: two threads, then
+ten, race for one slot and **exactly one wins** every time; the rest get `SlotTakenError`.
+It also proves back-to-back slots do not collide (the range is half-open), that cancelling
+frees a slot at once, and that the constraint is per ground rather than per turf.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): booked a slot at
+Dhanmondi Arena → `reserved` with "the turf has not confirmed yet", cash note and the
+12h cancellation policy; the timeline recorded it. Took a walk-in for "Karim Uddin" at
+the counter — the first attempt was correctly refused with "that slot has already
+started", the second confirmed instantly and **Mark paid** moved it to `paid`. The booked
+20:00 slot then showed as **BOOKED** on the player's availability grid, which is the
+Phase 02 → Phase 03 seam working with no change to `apps/turfs`. No console errors.
+
+**Bugs found and fixed along the way**
+
+- **The exclusion constraint failed on a fresh database**: `uuid` has no default GiST
+  operator class, so it needs `btree_gist`. The extension existed from Phase 00 but the
+  bookings migration did not *depend* on it — it only worked because the dev database
+  already had it. Caught by the first `--create-db` run.
+- **Transactional tests wiped the seeded catalogue for the rest of the session.**
+  `transaction=True` truncates tables, taking migration-seeded data with it;
+  `serialized_rollback` does not help under `--reuse-db`. A module teardown now restores
+  it explicitly.
+- **`drf-spectacular` minted `Status4eaEnum`** for colliding `status` choice sets (D34).
+- **`cancellation_free_hours` and `slot_minutes` read as `number | undefined`** on the
+  client because model defaults make a serializer field optional; the response-only
+  serializers now declare `read_only_fields = fields`.
+- **The booking timeline rendered a time *range* for a single timestamp**
+  (`09:07 PM–09:07 PM`); it now has its own `DhakaMoment` component.
+- **A ground hosting several formats silently booked the first one**; the review step
+  now asks when there is a choice.
+
+**Deviations / notes**
+
+- `Booking.squad_id` is a nullable UUID, not yet a FK — Phase 04 introduces `Squad` and
+  replaces it, which is what the phase file asked for.
+- The e2e walk-in spec asserts the *refusal* path (a draft turf takes no bookings) rather
+  than the full counter flow: approving a turf needs a platform admin, which an
+  unattended run cannot grant itself. The full flow is covered by backend tests and was
+  driven by hand in the browser.
+- `SlotGrid` buttons now carry `data-slot-start` / `data-slot-available`, a stable hook
+  for tests and for Phase 04's deep links. Price and time text matched each other far
+  too easily to select on.
+
+**Known gaps / follow-ups**
+
+- No reminder notifications yet (`BOOKING_REMINDER` has a template but nothing sends it)
+  — Phase 09 owns reminders and web push.
+- The owner calendar is a day list, not the day/week grid the phase file sketched. It
+  carries every action, and a visual grid is cosmetic; worth revisiting in Phase 11.
+- Cancelling a `paid` booking does not refund the cash payment — `refund_payment` exists
+  and is tested, but nothing calls it. Phase 10 owns refunds.
+- django-storages is still not wired up (carried from Phase 02).
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
