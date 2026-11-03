@@ -67,6 +67,7 @@ LOCAL_APPS = [
     "apps.payments",
     "apps.bookings",
     "apps.matches",
+    "apps.scoring",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -163,6 +164,15 @@ CELERY_BEAT_SCHEDULE: dict[str, dict] = {
         "task": "matches.advance_statuses",
         "schedule": 120.0,
     },
+    "auto-confirm-scorecards": {
+        "task": "scoring.auto_confirm",
+        # Hourly: the window is 24h, so minute-level precision buys nothing.
+        "schedule": 3600.0,
+    },
+    "close-motm-voting": {
+        "task": "scoring.close_motm",
+        "schedule": 3600.0,
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -256,6 +266,9 @@ SPECTACULAR_SETTINGS = {
         "SquadRoleEnum": "apps.matches.models.SQUAD_ROLE_CHOICES",
         "SquadMembershipStatusEnum": "apps.matches.models.SQUAD_MEMBERSHIP_STATUS_CHOICES",
         "MatchPlayerSourceEnum": "apps.matches.models.MATCH_PLAYER_SOURCE_CHOICES",
+        "ScorecardStatusEnum": "apps.scoring.models.SCORECARD_STATUS_CHOICES",
+        "MatchResultEnum": "apps.scoring.models.MATCH_RESULT_CHOICES",
+        "TeamSideEnum": "apps.scoring.models.TEAM_SIDE_CHOICES",
     },
 }
 
@@ -306,6 +319,8 @@ RELIABILITY_COMPLETED_MATCH_DELTA = 2
 # Scoring / ratings (DOMAIN §7–8, DECISIONS D7)
 SCORECARD_AUTO_CONFIRM_HOURS = 24
 MOTM_VOTE_WINDOW_HOURS = 24
+# How many other players one person may rate after a match (DOMAIN §7's "up to N").
+PEER_RATING_MAX_PER_MATCH = 10
 SELF_ASSESSED_RATING_CAP = 75
 RATING_PROVISIONAL_MATCHES = 10
 RATING_VERIFIED_SCORECARD_WEIGHT = 1.5

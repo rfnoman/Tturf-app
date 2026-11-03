@@ -1724,6 +1724,274 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/matches/{match_id}/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Teams for a match
+         * @description The two sides, and setting them.
+         */
+        get: operations["match_teams"];
+        put?: never;
+        /**
+         * Split the roster into two teams
+         * @description The two sides, and setting them.
+         */
+        post: operations["match_teams_set"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/teams/auto-balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Auto-balance the teams by rating
+         * @description Shared lookup: a match this reader may see.
+         */
+        post: operations["match_teams_auto_balance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/teams/captain": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Name a team's captain
+         * @description Shared lookup: a match this reader may see.
+         */
+        post: operations["match_teams_set_captain"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/scorecard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A match's scorecard
+         * @description Created in draft on first access, so this never 404s for a visible match.
+         */
+        get: operations["scorecard_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Save the scorer's draft
+         * @description Not validated: a scorer filling in a phone form is not blocked halfway.
+         */
+        patch: operations["scorecard_save"];
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/scorecard/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit the scorecard
+         * @description Runs the sport's validators. A 400 maps each message to the field it is about, so the entry form can show them inline.
+         */
+        post: operations["scorecard_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/scorecard/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm the scorecard (opposing captain or staff)
+         * @description Shared lookup: a match this reader may see.
+         */
+        post: operations["scorecard_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/scorecard/dispute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dispute the scorecard
+         * @description Shared lookup: a match this reader may see.
+         */
+        post: operations["scorecard_dispute"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/scorecard/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resolve a dispute (turf staff or admin)
+         * @description Corrects the card if needed, then confirms and locks it.
+         */
+        post: operations["scorecard_resolve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/scorecard/scorer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Hand scoring to somebody else
+         * @description Shared lookup: a match this reader may see.
+         */
+        post: operations["scorecard_assign_scorer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/motm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Vote for man of the match
+         * @description Shared lookup: a match this reader may see.
+         */
+        post: operations["motm_vote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{match_id}/peer-ratings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Rate the other players
+         * @description Anonymous to the recipients; re-submitting replaces an earlier rating.
+         */
+        post: operations["peer_ratings_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/matches/{match_id}/scorecard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public scorecard
+         * @description Locked scorecards only. No authentication required — this is the shared link.
+         */
+        get: operations["public_scorecard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/players/{player_id}/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A player's recent results
+         * @description A player's recent results, for the profile track record.
+         */
+        get: operations["player_results"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1736,6 +2004,13 @@ export interface components {
             icon?: string;
             /** Display order */
             order?: number;
+        };
+        AssignScorerRequest: {
+            /**
+             * Format: uuid
+             * @description The player's profile id.
+             */
+            player_id: string;
         };
         Attribute: {
             /** Format: uuid */
@@ -1961,6 +2236,9 @@ export interface components {
             add_to_squad: boolean;
             note?: string;
         };
+        DisputeRequest: {
+            reason: string;
+        };
         Ground: {
             /** Format: uuid */
             readonly id: string;
@@ -2125,6 +2403,13 @@ export interface components {
          */
         MatchInviteStatusEnum: "proposed" | "leader_approved" | "accepted" | "declined" | "rejected" | "cancelled" | "expired";
         /**
+         * @description * `A` - Team A won
+         *     * `B` - Team B won
+         *     * `draw` - Draw
+         * @enum {string}
+         */
+        MatchResultEnum: "A" | "B" | "draw";
+        /**
          * @description * `upcoming` - Upcoming
          *     * `in_progress` - In progress
          *     * `finished` - Finished
@@ -2160,6 +2445,16 @@ export interface components {
             /** Format: double */
             readonly distance_km: number | null;
         };
+        MatchTeam: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly side: components["schemas"]["TeamSideEnum"];
+            readonly name: string;
+            readonly display_name: string;
+            readonly captain_name: string;
+            readonly players: components["schemas"]["TeamPlayer"][];
+            readonly score: number | null;
+        };
         /**
          * @description * `board` - On the match board
          *     * `private` - Invite only
@@ -2167,6 +2462,13 @@ export interface components {
          * @enum {string}
          */
         MatchVisibilityEnum: "board" | "private" | "squad";
+        MotmVoteRequest: {
+            /**
+             * Format: uuid
+             * @description The nominee's profile id.
+             */
+            player_id: string;
+        };
         NoteRequest: {
             note?: string;
         };
@@ -2209,9 +2511,13 @@ export interface components {
          *     * `match_invite_proposed` - A player was proposed
          *     * `match_invite_accepted` - Invitation accepted
          *     * `match_invite_declined` - Invitation declined
+         *     * `scorecard_submitted` - Scorecard needs confirming
+         *     * `scorecard_disputed` - Scorecard disputed
+         *     * `scorecard_locked` - Scorecard final
+         *     * `motm_awarded` - Man of the match
          * @enum {string}
          */
-        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined";
+        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined" | "scorecard_submitted" | "scorecard_disputed" | "scorecard_locked" | "motm_awarded";
         /** @description The wizard payload. Field-level validation only; rules live in the service. */
         OnboardingRequest: {
             display_name?: string;
@@ -2593,6 +2899,19 @@ export interface components {
                 [key: string]: number;
             };
         };
+        PatchedSaveScorecardRequest: {
+            team_a_score?: number;
+            team_b_score?: number;
+            /** @description {player_id: {stat_key: value}}. Replaces the whole set. */
+            stats?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
+            extra?: {
+                [key: string]: unknown;
+            };
+        };
         PatchedSquadWriteRequest: {
             name?: string;
             description?: string;
@@ -2672,6 +2991,18 @@ export interface components {
          * @enum {string}
          */
         PaymentStatusEnum: "pending" | "paid" | "refunded" | "failed";
+        PeerRatingEntryRequest: {
+            /** Format: uuid */
+            player_id: string;
+            overall: number;
+            skill_taps?: string[];
+        };
+        PeerRatingsRequest: {
+            ratings: components["schemas"]["PeerRatingEntryRequest"][];
+        };
+        PeerRatingsSaved: {
+            saved: number;
+        };
         /** @description Flattened for the card: the UI wants a key, a label and a number. */
         PlayerAttribute: {
             key: string;
@@ -2781,6 +3112,19 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** @description One player's stats on the scorecard, flattened for display. */
+        PlayerStatRow: {
+            /** Format: uuid */
+            player_id: string;
+            /** Format: uuid */
+            profile_id: string | null;
+            name: string;
+            side: string;
+            stats: {
+                [key: string]: string;
+            };
+            is_motm: boolean;
+        };
         PriceCoverageGap: {
             weekday: components["schemas"]["WeekdayEnum"];
             weekday_label: string;
@@ -2870,12 +3214,87 @@ export interface components {
             readonly created_at: string;
             readonly age: number | null;
         };
+        /** @description The shareable version: no reader-specific permissions or history. */
+        PublicScorecard: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly match_id: string;
+            readonly sport: string;
+            readonly sport_slug: string;
+            readonly turf_name: string;
+            readonly ground_name: string;
+            /** Format: date-time */
+            readonly played_at: string;
+            /** Team A */
+            readonly team_a_score: number;
+            /** Team B */
+            readonly team_b_score: number;
+            /**
+             * Team stats
+             * @description Sport-specific team-scope values keyed by StatDefinition key, e.g. cricket overs and wickets per side, as {side: {stat_key: value}}.
+             */
+            readonly extra: unknown;
+            readonly result: components["schemas"]["MatchResultEnum"];
+            readonly status: components["schemas"]["ScorecardStatusEnum"];
+            readonly status_label: string;
+            /**
+             * Verified by the turf
+             * @description DECISIONS D7: entered or confirmed by turf staff. Weighs x1.5 in ratings.
+             */
+            readonly verified_by_staff: boolean;
+            /** @description Nobody acted within the window, which DOMAIN §7 counts as agreement. */
+            readonly auto_confirmed: boolean;
+            /** Format: date-time */
+            readonly submitted_at: string | null;
+            /** Format: date-time */
+            readonly locked_at: string | null;
+            readonly scorer_name: string;
+            readonly motm_name: string;
+            /** Format: uuid */
+            readonly motm_profile_id: string | null;
+            readonly teams: components["schemas"]["MatchTeam"][];
+            readonly stat_definitions: components["schemas"]["StatDefinition"][];
+            readonly rows: components["schemas"]["PlayerStatRow"][];
+        };
         RemovePlayerRequest: {
             /**
              * Format: uuid
              * @description The player's profile id.
              */
             player_id: string;
+        };
+        ResolveRequest: {
+            team_a_score?: number;
+            team_b_score?: number;
+            /** @description {player_id: {stat_key: value}}. Replaces the whole set. */
+            stats?: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
+            extra?: {
+                [key: string]: unknown;
+            };
+        };
+        /** @description A player's recent results, for the profile track record. */
+        ResultSummary: {
+            /** Format: uuid */
+            match_id: string;
+            /** Format: uuid */
+            scorecard_id: string;
+            sport: string;
+            turf_name: string;
+            /** Format: date-time */
+            played_at: string;
+            team_a_score: number;
+            team_b_score: number;
+            result: components["schemas"]["MatchResultEnum"] | components["schemas"]["BlankEnum"];
+            my_side: string;
+            /** @description win, loss or draw, from this player's side. */
+            outcome: string;
+            is_motm: boolean;
+            verified_by_staff: boolean;
         };
         ReviewDecisionRequest: {
             reason?: string;
@@ -2894,6 +3313,96 @@ export interface components {
             source: string;
             overall: number | null;
             is_provisional: boolean;
+        };
+        /** @description The scorecard as everyone sees it, plus what *this* reader may do with it. */
+        Scorecard: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly match_id: string;
+            readonly sport: string;
+            readonly sport_slug: string;
+            readonly turf_name: string;
+            readonly ground_name: string;
+            /** Format: date-time */
+            readonly played_at: string;
+            /** Team A */
+            readonly team_a_score: number;
+            /** Team B */
+            readonly team_b_score: number;
+            /**
+             * Team stats
+             * @description Sport-specific team-scope values keyed by StatDefinition key, e.g. cricket overs and wickets per side, as {side: {stat_key: value}}.
+             */
+            readonly extra: unknown;
+            readonly result: components["schemas"]["MatchResultEnum"];
+            readonly status: components["schemas"]["ScorecardStatusEnum"];
+            readonly status_label: string;
+            /**
+             * Verified by the turf
+             * @description DECISIONS D7: entered or confirmed by turf staff. Weighs x1.5 in ratings.
+             */
+            readonly verified_by_staff: boolean;
+            /** @description Nobody acted within the window, which DOMAIN §7 counts as agreement. */
+            readonly auto_confirmed: boolean;
+            readonly dispute_reason: string;
+            /** Format: date-time */
+            readonly submitted_at: string | null;
+            /** Format: date-time */
+            readonly locked_at: string | null;
+            readonly scorer_name: string;
+            readonly motm_name: string;
+            /** Format: uuid */
+            readonly motm_profile_id: string | null;
+            readonly teams: components["schemas"]["MatchTeam"][];
+            readonly stat_definitions: components["schemas"]["StatDefinition"][];
+            readonly rows: components["schemas"]["PlayerStatRow"][];
+            readonly events: components["schemas"]["ScorecardEvent"][];
+            readonly can_edit: boolean;
+            readonly can_confirm: boolean;
+            readonly can_resolve: boolean;
+            readonly motm_voting_open: boolean;
+            /** Format: uuid */
+            readonly my_motm_vote: string | null;
+            readonly my_peer_ratings: {
+                [key: string]: number;
+            };
+        };
+        ScorecardEvent: {
+            /** Format: uuid */
+            readonly id: string;
+            /** From */
+            readonly from_status: components["schemas"]["ScorecardStatusEnum"];
+            /** To */
+            readonly to_status: components["schemas"]["ScorecardStatusEnum"];
+            readonly to_status_label: string;
+            readonly actor_name: string;
+            readonly note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `draft` - Draft
+         *     * `submitted` - Submitted, awaiting confirmation
+         *     * `disputed` - Disputed
+         *     * `confirmed` - Confirmed
+         *     * `locked` - Locked
+         * @enum {string}
+         */
+        ScorecardStatusEnum: "draft" | "submitted" | "disputed" | "confirmed" | "locked";
+        SetCaptainRequest: {
+            side: components["schemas"]["TeamSideEnum"];
+            /**
+             * Format: uuid
+             * @description The player's profile id.
+             */
+            player_id: string | null;
+        };
+        SetTeamsRequest: {
+            /** @description {match_player_id: "A"|"B"}. Anyone omitted is left off a team sheet. */
+            assignments: {
+                [key: string]: "A" | "B";
+            };
         };
         /** @description One slot from ``apps.turfs.availability``. */
         Slot: {
@@ -3169,6 +3678,23 @@ export interface components {
          * @enum {string}
          */
         StatValueTypeEnum: "int" | "bool" | "decimal";
+        TeamPlayer: {
+            /** Format: uuid */
+            match_player_id: string;
+            /** Format: uuid */
+            player_id: string;
+            /** Format: uuid */
+            profile_id: string | null;
+            name: string;
+            position: string;
+            is_captain: boolean;
+        };
+        /**
+         * @description * `A` - Team A
+         *     * `B` - Team B
+         * @enum {string}
+         */
+        TeamSideEnum: "A" | "B";
         /** @description What a listing row needs: identity, position, and what can be played. */
         TurfDetail: {
             /** Format: uuid */
@@ -5944,6 +6470,369 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Squad"];
+                };
+            };
+        };
+    };
+    match_teams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchTeam"][];
+                };
+            };
+        };
+    };
+    match_teams_set: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetTeamsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SetTeamsRequest"];
+                "multipart/form-data": components["schemas"]["SetTeamsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchTeam"][];
+                };
+            };
+        };
+    };
+    match_teams_auto_balance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchTeam"][];
+                };
+            };
+        };
+    };
+    match_teams_set_captain: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetCaptainRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SetCaptainRequest"];
+                "multipart/form-data": components["schemas"]["SetCaptainRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchTeam"];
+                };
+            };
+        };
+    };
+    scorecard_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    scorecard_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedSaveScorecardRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedSaveScorecardRequest"];
+                "multipart/form-data": components["schemas"]["PatchedSaveScorecardRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    scorecard_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    scorecard_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    scorecard_dispute: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DisputeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DisputeRequest"];
+                "multipart/form-data": components["schemas"]["DisputeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    scorecard_resolve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ResolveRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ResolveRequest"];
+                "multipart/form-data": components["schemas"]["ResolveRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    scorecard_assign_scorer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignScorerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AssignScorerRequest"];
+                "multipart/form-data": components["schemas"]["AssignScorerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    motm_vote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MotmVoteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MotmVoteRequest"];
+                "multipart/form-data": components["schemas"]["MotmVoteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Scorecard"];
+                };
+            };
+        };
+    };
+    peer_ratings_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PeerRatingsRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PeerRatingsRequest"];
+                "multipart/form-data": components["schemas"]["PeerRatingsRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PeerRatingsSaved"];
+                };
+            };
+        };
+    };
+    public_scorecard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                match_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicScorecard"];
+                };
+            };
+        };
+    };
+    player_results: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                player_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResultSummary"][];
                 };
             };
         };

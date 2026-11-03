@@ -49,6 +49,12 @@ class NotificationKind(models.TextChoices):
     MATCH_INVITE_ACCEPTED = "match_invite_accepted", _("Invitation accepted")
     MATCH_INVITE_DECLINED = "match_invite_declined", _("Invitation declined")
 
+    # Phase 05 — scoring
+    SCORECARD_SUBMITTED = "scorecard_submitted", _("Scorecard needs confirming")
+    SCORECARD_DISPUTED = "scorecard_disputed", _("Scorecard disputed")
+    SCORECARD_LOCKED = "scorecard_locked", _("Scorecard final")
+    MOTM_AWARDED = "motm_awarded", _("Man of the match")
+
 
 class Notification(BaseModel):
     user = models.ForeignKey(

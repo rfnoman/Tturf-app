@@ -62,3 +62,6 @@ next-env.d.ts
 
 # Playwright/Next artifacts inside frontend
 /frontend/.next/
+
+# Scratch output from local verification runs (screenshots, snapshots).
+/.tmp/

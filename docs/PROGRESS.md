@@ -9,7 +9,7 @@ Updated by Claude Code at the end of each phase.
 | 02 Turfs & grounds | **done** | 2026-11-03 | Turfs, grounds, hours, prices, PostGIS discovery, Leaflet maps, admin review, staff |
 | 03 Bookings & cash payment | **done** | 2026-11-03 | Exclusion-constraint bookings, state machine, cash payments, reliability, Celery jobs, notifications |
 | 04 Matches, squads, joining | **done** | 2026-11-03 | Matches per booking, squads, join requests, the D1 invite chain, match board with filters |
-| 05 Scoreboard | not started | | |
+| 05 Scoreboard | **done** | 2026-11-03 | Teams + auto-balance, scorecard state machine, per-sport validators, disputes, MOTM, peer ratings, public shareable card |
 | 06 Ratings, track record, discovery | not started | | |
 | 07 Inventory & counter POS | not started | | |
 | 08 Store, orders, delivery | not started | | |
@@ -472,5 +472,84 @@ fired to the right people throughout. No console errors.
 - The match page fetches each of the reader's squads to build the invite list, which is
   a handful of extra requests for somebody in many squads. Worth one endpoint when
   Phase 06 adds player search.
+- django-storages is still not wired up (carried from Phase 02).
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 05 — Scoreboard, MOTM, peer ratings (2026-11-03)
+
+**Built**
+
+- **`apps/scoring`**: `MatchTeam` / `MatchTeamPlayer` (two sides per match, a captain
+  each), `Scorecard` (1:1 with the match; `draft → submitted → confirmed → locked`, with
+  `disputed` branching back to the scorer), `PlayerStat` (one row per player per
+  `StatDefinition`, so a new sport needs no migration), `ScorecardEvent`, `MotmVote` and
+  `PeerRating`. Self-votes and self-ratings are refused by **check constraints**, not only
+  by the service.
+- **Pluggable validators** (`apps/scoring/validators/`): a `@register(slug)` registry with
+  a generic pass (bounds from the stat definitions, and every player on the roster) that
+  runs **before** the sport-specific one, so an unknown sport is still validated. Football
+  and futsal (goals ≤ team score, assists ≤ goals, clean sheet only at nil), cricket (runs
+  and wickets reconcile with the totals), badminton (no draw, sets won ≤ the side's score).
+  Failures come back grouped by field, which is what lets the entry form show each message
+  against its own input.
+- **Services**: `set_teams`, `auto_balance_teams` (greedy by current sport rating),
+  `assign_scorer`, `save_draft` (deliberately *not* validated — a scorer filling in a phone
+  form at the ground is never blocked halfway), `submit_scorecard`, `confirm_scorecard`,
+  `dispute_scorecard`, `resolve_dispute`, `lock_scorecard`, `cast_motm_vote`,
+  `close_motm_voting` (ties broken on positive-stat contribution), `submit_peer_ratings`.
+- **Who may do what** comes from the API, never re-derived on the client: `can_edit`,
+  `can_confirm`, `can_resolve`, `motm_voting_open`, `my_motm_vote`, `my_peer_ratings`.
+  The opposing captain is resolved from the side the **scorer** played on, and either
+  captain may confirm when the scorer did not play (turf staff).
+- **Celery beat**: submitted cards auto-confirm after 24h (DOMAIN §7), MOTM voting closes
+  on the same clock, and attendance is filled from the card.
+- **Phase 05 → 06 seam**: `lock_scorecard` fires a `scorecard_locked` hook (the D25/D35
+  registry pattern again) for the rating engine to consume. A failing hook logs and leaves
+  the lock standing — the card is the record of what happened, whatever downstream does.
+- **Frontend**: the team builder (tap-to-move, auto-balance, captains), mobile-first
+  scorecard entry generated from the sport's stat definitions with big +/− steppers and
+  inline per-field errors, the confirm/dispute card for the opposing captain, the same
+  form in "resolve" mode for staff settling a dispute, the post-match sheet (one MOTM vote
+  plus anonymous 1–5 ratings), the read-only card shared by the signed-in and public
+  views, the **public shareable page** at `/scorecards/{matchId}` with a generated Open
+  Graph image, and a "recent results" track record on both profile pages.
+- **Tests**: 843 backend (119 in `apps/scoring`), 17 Vitest, 65 Playwright.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): built the teams by
+auto-balance, moved a player across, named both captains, then entered 1–3 with four goals
+against a team that scored three — rejected inline with "Team B's players have 4 goals
+between them, but the team scored 3", card still a draft. Corrected and submitted; voted
+MOTM and saved star ratings (both re-render from the server on reload). As the opposing
+captain: disputed with a reason; as the resolver: corrected the goal attribution and
+locked it — "Verified by the turf", full history trail, and the public link appeared. The
+public page opens signed-out, a card that is not locked 404s there, and the Open Graph
+image renders the score. Checked the entry screen at 390px: steppers, teams and stars all
+hold up. No console errors.
+
+**Deviations / notes**
+
+- **Live scoring (step 5b) was not built** — the phase file says not to without a
+  confirmation, and there has been none.
+- A disputed card is editable by its scorer *and* resolvable by staff. The page offers
+  **resolving** first to anyone who can do both: settling the dispute is the action that
+  ends it.
+- Peer ratings are stored but change nothing yet; Phase 06 owns the rating engine.
+- `metadataBase` is now set from `NEXT_PUBLIC_SITE_URL`, without which Next cannot build
+  the absolute Open Graph image URL that Messenger and WhatsApp need.
+
+**Two things the browser caught that the tests did not**
+
+- The team builder seeded its state from props *once*, so auto-balance changed the
+  database and nothing on screen. It now derives the saved sides every render and keeps
+  only the unsaved moves in state.
+- Validator messages rendered Decimals verbatim — "4.00 goals" reads like a rounding
+  error. `number()` normalises them.
+
+**Known gaps / follow-ups**
+
+- The Open Graph image uses the bundled font only: a Bangla team name will not render
+  until Phase 11 ships a font with it.
+- MOTM closing after 24 hours is covered by tests and the beat schedule, not by a browser
+  run — there is nothing to see for a day.
 - django-storages is still not wired up (carried from Phase 02).
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.

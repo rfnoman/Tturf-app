@@ -128,4 +128,24 @@ TEMPLATES: dict[str, Template] = {
         "body": "{sport} at {turf} on {when}. You still need {needed}.",
         "email": False,
     },
+    NotificationKind.SCORECARD_SUBMITTED: {
+        "title": "Check the score: {score}",
+        "body": "{sport} at {turf}. Confirm or dispute it — silence counts as agreement.",
+        "email": True,
+    },
+    NotificationKind.SCORECARD_DISPUTED: {
+        "title": "The {score} scorecard is disputed",
+        "body": "{sport} at {turf}. {reason}",
+        "email": True,
+    },
+    NotificationKind.SCORECARD_LOCKED: {
+        "title": "Final: {score}",
+        "body": "{sport} at {turf}. Vote for man of the match and rate the players.",
+        "email": False,
+    },
+    NotificationKind.MOTM_AWARDED: {
+        "title": "You are man of the match",
+        "body": "{sport} at {turf}, {score}. Nicely done.",
+        "email": True,
+    },
 }

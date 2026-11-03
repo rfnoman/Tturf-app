@@ -9,6 +9,9 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Absolute URLs for Open Graph images: a shared scorecard link is previewed by
+  // Messenger and WhatsApp from their own servers, where a relative path means nothing.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "TurfApp",
   description: "Book sports turfs in Bangladesh, fill your match, build your profile.",
 };

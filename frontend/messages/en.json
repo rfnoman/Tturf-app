@@ -524,7 +524,8 @@
       "request": "Asked to join",
       "invite": "Invited",
       "staff": "Added by the turf"
-    }
+    },
+    "scorecard": "Scorecard"
   },
   "squads": {
     "heading": "My squads",
@@ -577,5 +578,80 @@
     "upcomingMatches": "Upcoming matches",
     "needed": "{count, plural, =0 {Full} other {Need #}}",
     "failed": "That did not work. Please try again."
+  },
+  "scorecard": {
+    "draw": "Draw",
+    "verifiedByTurf": "Verified by the turf",
+    "motm": "Player of the match: {name}",
+    "motmShort": "Player of the match",
+    "captain": "Captain: {name}",
+    "player": "Player"
+  },
+  "scorecardPage": {
+    "heading": "Scorecard",
+    "scorer": "Scored by {name}",
+    "backToMatch": "Back to match",
+    "disputed": "This card is disputed",
+    "viewPublic": "Open shareable card",
+    "shareHint": "Anyone with the link can see this card — no sign-in needed.",
+    "history": "History"
+  },
+  "scorecardEditor": {
+    "finalScore": "Final score",
+    "playerStats": "Player stats",
+    "playerStatsHint": "Only what you actually tracked — leave the rest at zero.",
+    "saveDraft": "Save draft",
+    "saving": "Saving…",
+    "savedNote": "Draft saved",
+    "submit": "Submit for confirmation",
+    "submitting": "Submitting…",
+    "submitHint": "The other team's captain confirms it. With no reply in 24 hours it confirms itself.",
+    "resolve": "Resolve and lock",
+    "resolveHint": "Correct the numbers if you need to. Resolving confirms and locks the card.",
+    "yourCall": "Your call",
+    "yourCallHint": "You are the other team's captain — confirm the card, or say what is wrong with it.",
+    "confirm": "Confirm the card",
+    "dispute": "Dispute",
+    "disputeReason": "What is wrong?",
+    "disputePlaceholder": "e.g. the second goal was Rafi, not me",
+    "disputeHint": "A disputed card goes to the turf staff to settle.",
+    "failed": "That did not go through. Try again."
+  },
+  "teamBuilder": {
+    "heading": "Teams",
+    "body": "Tap a player to move them. Auto-balance splits the roster by rating.",
+    "autoBalance": "Auto-balance",
+    "unassigned": "Not on a team yet",
+    "count": "{count, plural, one {# player} other {# players}}",
+    "emptyTeam": "Nobody yet",
+    "makeCaptain": "Make captain",
+    "swap": "Swap",
+    "saveTeams": "Save teams",
+    "saving": "Saving…",
+    "captainHint": "Each side needs a captain: one enters the card, the other confirms it.",
+    "failed": "That did not go through. Try again."
+  },
+  "postMatch": {
+    "motmHeading": "Player of the match",
+    "motmHint": "One vote each, and not for yourself. Voting closes 24 hours after the card is submitted.",
+    "ratingsHeading": "Rate the other players",
+    "ratingsHint": "Anonymous — nobody sees who rated them.",
+    "starLabel": "Rate {name} {stars} out of 5",
+    "saveRatings": "Save ratings",
+    "saving": "Saving…",
+    "ratingsSaved": "Ratings saved",
+    "voteFailed": "Your vote did not go through. Try again.",
+    "ratingsFailed": "Those ratings did not save. Try again."
+  },
+  "publicScorecard": {
+    "tagline": "Played on TurfApp.",
+    "cta": "Find a match near you"
+  },
+  "results": {
+    "heading": "Recent results",
+    "motm": "MOTM",
+    "verified": "Verified",
+    "outcome": "{outcome, select, win {Won} loss {Lost} draw {Drew} other {Played}}",
+    "outcomeShort": "{outcome, select, win {W} loss {L} draw {D} other {·}}"
   }
 }

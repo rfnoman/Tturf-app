@@ -18,9 +18,12 @@ import { SportTabs, type SportTab } from "./sport-tabs";
 export async function PlayerProfileView({
   player,
   action,
+  footer,
 }: {
   player: PlayerCardProfile;
   action?: React.ReactNode;
+  /** Rendered at the end of the page body — the track record goes here. */
+  footer?: React.ReactNode;
 }) {
   const t = await getTranslations("profile");
   const cards = player.sport_cards;
@@ -91,6 +94,8 @@ export async function PlayerProfileView({
           <PlayerAttributes player={player} />
         </CardContent>
       </Card>
+
+      {footer}
     </div>
   );
 }
