@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 import environ
+from celery.schedules import crontab
 
 # backend/config/settings/base.py -> backend/
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -68,6 +69,7 @@ LOCAL_APPS = [
     "apps.bookings",
     "apps.matches",
     "apps.scoring",
+    "apps.ratings",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -172,6 +174,12 @@ CELERY_BEAT_SCHEDULE: dict[str, dict] = {
     "close-motm-voting": {
         "task": "scoring.close_motm",
         "schedule": 3600.0,
+    },
+    "rebuild-leaderboards": {
+        "task": "ratings.rebuild_leaderboards",
+        # Nightly at 03:00 Dhaka — the boards move once a day at most and this is the
+        # quietest hour for a job that rewrites every row.
+        "schedule": crontab(hour=3, minute=0),
     },
 }
 
@@ -324,6 +332,20 @@ PEER_RATING_MAX_PER_MATCH = 10
 SELF_ASSESSED_RATING_CAP = 75
 RATING_PROVISIONAL_MATCHES = 10
 RATING_VERIFIED_SCORECARD_WEIGHT = 1.5
+
+# Fair play (DOMAIN §8). Only things that happened count: cards a scorer recorded on a
+# locked card, and reports an admin upheld. An open report changes nothing.
+FAIR_PLAY_YELLOW_PENALTY = 2
+FAIR_PLAY_RED_PENALTY = 8
+FAIR_PLAY_UPHELD_REPORT_PENALTY = 15
+FAIR_PLAY_GOOD_THRESHOLD = 85
+FAIR_PLAY_WARNING_THRESHOLD = 60
+
+# Player search (DOMAIN §3). A deliberately small page: the ranking matters more than
+# the length of the list.
+PLAYER_SEARCH_PAGE_SIZE = 24
+PLAYER_SEARCH_DEFAULT_RADIUS_KM = 10
+LEADERBOARD_SIZE = 10
 # Provisional overall = skills x SHARE + shared attributes x SHARE (must sum to 1).
 # Phase 06's versioned engine replaces this blend.
 OVERALL_SKILL_SHARE = 0.65

@@ -65,7 +65,8 @@ test.describe("match board", () => {
     const board = page.getByTestId("match-board");
     await expect(board.locator('a[href^="/matches/"]').first()).toBeVisible();
 
-    await page.getByLabel("Sport").selectOption("badminton");
+    // By id: the "I'm free" panel on this page has a Sport select of its own.
+    await page.locator("#board-sport").selectOption("badminton");
     // Debounced; the count line is what settles last.
     await expect(page.getByText(/open match/)).toBeVisible();
     const cards = board.locator('a[href^="/matches/"]');

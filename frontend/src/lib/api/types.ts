@@ -64,6 +64,16 @@ export type PlayerStatRow = Schemas["PlayerStatRow"];
 export type ScorecardEvent = Schemas["ScorecardEvent"];
 export type ResultSummary = Schemas["ResultSummary"];
 
+export type RatingChange = Schemas["RatingChange"];
+export type TrackRecordEntry = Schemas["TrackRecordEntry"];
+export type TrackRecord = Schemas["TrackRecord"];
+export type SportTotals = Schemas["SportTotals"];
+export type FairPlay = Schemas["FairPlay"];
+export type PlayerAvailability = Schemas["PlayerAvailability"];
+export type PlayerSearchResult = Schemas["PlayerSearchResult"];
+export type ConductReport = Schemas["ConductReport"];
+export type LeaderboardEntry = Schemas["LeaderboardEntry"];
+
 /**
  * The subset of a profile a {@link PlayerCard} needs.
  *

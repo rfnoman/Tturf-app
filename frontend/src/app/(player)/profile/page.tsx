@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { PlayerProfileView } from "@/components/player/player-profile-view";
+import { PlayerRecord } from "@/components/ratings/player-record";
 import { RecentResults } from "@/components/scoring/recent-results";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +26,12 @@ export default async function MyProfilePage() {
           <Link href="/settings">{t("edit")}</Link>
         </Button>
       }
-      footer={<RecentResults playerId={String(data.id)} />}
+      footer={
+        <>
+          <PlayerRecord playerId={String(data.id)} sport={data.sport_cards[0]?.sport.slug} />
+          <RecentResults playerId={String(data.id)} />
+        </>
+      }
     />
   );
 }

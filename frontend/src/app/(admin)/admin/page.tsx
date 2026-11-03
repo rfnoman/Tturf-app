@@ -17,6 +17,9 @@ export default async function AdminPage() {
         <Button variant="outline" size="sm" asChild>
           <Link href="/admin/sports">{t("navSports")}</Link>
         </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/admin/conduct">{t("navConduct")}</Link>
+        </Button>
       </div>
     </section>
   );

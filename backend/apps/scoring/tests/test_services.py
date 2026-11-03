@@ -12,7 +12,11 @@ from apps.accounts.tests.factories import UserFactory
 from apps.core.utils import now
 from apps.matches.models import MatchStatus
 from apps.notifications.models import Notification, NotificationKind
-from apps.scoring.hooks import clear_scorecard_locked_hooks, register_scorecard_locked_hook
+from apps.scoring.hooks import (
+    clear_scorecard_locked_hooks,
+    register_scorecard_locked_hook,
+    restore_scorecard_locked_hooks,
+)
 from apps.scoring.models import (
     MatchResult,
     MatchTeamPlayer,
@@ -53,10 +57,10 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture(autouse=True)
 def no_locked_hooks():
-    """Phase 06 registers one; these tests opt in explicitly."""
-    clear_scorecard_locked_hooks()
+    """Phase 06 registers one; these tests opt in explicitly, then put it back."""
+    previous = clear_scorecard_locked_hooks()
     yield
-    clear_scorecard_locked_hooks()
+    restore_scorecard_locked_hooks(previous)
 
 
 def roster(match):

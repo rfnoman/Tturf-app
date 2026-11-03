@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { ConductReportForm } from "@/components/ratings/conduct-report-form";
+
 import { PostMatchSheet } from "./post-match";
 import { ScorecardDecision, ScorecardEditor } from "./scorecard-editor";
 import { TeamBuilder } from "./team-builder";
@@ -106,6 +108,15 @@ export default async function ScorecardPage({ params }: { params: Promise<{ matc
           match={match.data}
           scorecard={card}
           myProfileId={profile.data?.id ? String(profile.data.id) : null}
+        />
+      )}
+
+      {canRate && (
+        <ConductReportForm
+          matchId={matchId}
+          players={match.data.roster.filter(
+            (entry) => entry.profile_id && String(entry.profile_id) !== String(profile.data?.id),
+          )}
         />
       )}
 

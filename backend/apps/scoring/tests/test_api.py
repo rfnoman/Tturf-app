@@ -7,7 +7,10 @@ from rest_framework.test import APIClient
 
 from apps.accounts.tests.factories import UserFactory
 from apps.players.services import get_or_create_profile
-from apps.scoring.hooks import clear_scorecard_locked_hooks
+from apps.scoring.hooks import (
+    clear_scorecard_locked_hooks,
+    restore_scorecard_locked_hooks,
+)
 from apps.scoring.models import TeamSide
 from apps.scoring.services import (
     cast_motm_vote,
@@ -24,9 +27,10 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture(autouse=True)
 def no_locked_hooks():
-    clear_scorecard_locked_hooks()
+    """Score cards here without the rating engine running behind them."""
+    previous = clear_scorecard_locked_hooks()
     yield
-    clear_scorecard_locked_hooks()
+    restore_scorecard_locked_hooks(previous)
 
 
 @pytest.fixture

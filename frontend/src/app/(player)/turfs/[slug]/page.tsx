@@ -5,6 +5,7 @@ import { fetchClientConfig } from "@/lib/api/config-queries";
 import { getServerApiClient } from "@/lib/api/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Leaderboards } from "@/components/ratings/leaderboards";
 import { TurfMap } from "@/components/turf/turf-map";
 
 import { BookingPanel } from "./booking-panel";
@@ -123,6 +124,16 @@ export default async function TurfDetailPage({ params }: { params: Promise<{ slu
           </CardContent>
         </Card>
       </div>
+
+      {data.sports.length > 0 && (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-lg font-semibold tracking-tight">
+            {t("leaderboards", { sport: data.sports[0].name })}
+          </h2>
+          {/* The turf's main sport: a board per sport would be mostly empty rows. */}
+          <Leaderboards turfSlug={data.slug} sport={data.sports[0]} />
+        </section>
+      )}
 
       {data.latitude != null && data.longitude != null && (
         <TurfMap

@@ -51,7 +51,8 @@
     "empty": "Review queues arrive in Phase 02.",
     "forbidden": "You need platform administrator access to view this page.",
     "navSports": "Sports catalogue",
-    "navTurfs": "Turf review"
+    "navTurfs": "Turf review",
+    "navConduct": "Conduct reports"
   },
   "me": {
     "heading": "Backend session",
@@ -127,7 +128,9 @@
     "wins": "Wins",
     "losses": "Losses",
     "motm": "MOTM",
-    "noAttributes": "No attributes rated yet."
+    "noAttributes": "No attributes rated yet.",
+    "verified": "Verified",
+    "provisional": "Finding level"
   },
   "profile": {
     "edit": "Edit profile",
@@ -255,7 +258,8 @@
     "mode_group": "My squad",
     "squad": "Squad",
     "squadOpenHint": "This squad is open, so the match reaches the board and anyone can ask to join.",
-    "squadClosedHint": "This squad is closed, so the match stays private to its members."
+    "squadClosedHint": "This squad is closed, so the match stays private to its members.",
+    "leaderboards": "{sport} leaderboards"
   },
   "ownerRegister": {
     "stepCounter": "Step {current} of {total}",
@@ -478,7 +482,8 @@
     "mapHint": "{count, plural, one {# match} other {# matches}} in this area. Open one for its exact location.",
     "myMatches": "Your matches",
     "invitations": "Invitations",
-    "invitedBy": "Invited by {name}"
+    "invitedBy": "Invited by {name}",
+    "findPlayers": "Find players"
   },
   "matchPage": {
     "needed": "{count, plural, one {Need # player} other {Need # players}}",
@@ -653,5 +658,106 @@
     "verified": "Verified",
     "outcome": "{outcome, select, win {Won} loss {Lost} draw {Drew} other {Played}}",
     "outcomeShort": "{outcome, select, win {W} loss {L} draw {D} other {·}}"
+  },
+  "ratingHistory": {
+    "heading": "Rating over time",
+    "hint": "Every locked match moves it a little. Here is why.",
+    "chartLabel": "Rating from {from} to {to}",
+    "component": {
+      "stats": "stats {value}",
+      "result": "result {value}",
+      "peers": "teammates {value}"
+    },
+    "motm": "player of the match",
+    "cards": "−{points} for cards",
+    "verified": "verified by the turf",
+    "provisional": "still finding your level"
+  },
+  "trackRecord": {
+    "heading": "Track record",
+    "record": "{matches} played · {wins}W {draws}D {losses}L",
+    "motm": "{count}× MOTM",
+    "formLabel": "Recent {sport} results",
+    "grounds": "Grounds played",
+    "groundRecord": "{matches} played · {wins} won"
+  },
+  "fairPlay": {
+    "band": "{band, select, good {Good fair play} warning {Fair play warning} poor {Poor fair play} other {Fair play}}",
+    "tooltip": "{yellow} yellow, {red} red, {reports} upheld reports"
+  },
+  "playerSearch": {
+    "heading": "Find players",
+    "body": "Fill a match, or add someone to your squad.",
+    "name": "Name",
+    "namePlaceholder": "Search a name",
+    "sport": "Sport",
+    "anySport": "Any sport",
+    "area": "Area",
+    "areaPlaceholder": "e.g. Mirpur",
+    "ratingMin": "Rating from",
+    "reliabilityMin": "Reliability",
+    "freeThisWeek": "Free this week",
+    "clear": "Clear",
+    "searching": "Searching…",
+    "nobody": "Nobody matches that yet. Try widening the filters.",
+    "noArea": "Area not set",
+    "reliability": "Reliability {score}",
+    "free": "Free {when} · {area}",
+    "pickMatch": "Which match",
+    "pickSquad": "Which squad",
+    "inviteToMatch": "Invite",
+    "inviteToSquad": "To squad",
+    "invitedToMatch": "Invitation sent.",
+    "invitedToSquad": "Squad invitation sent.",
+    "inviteFailed": "That invitation did not go through."
+  },
+  "availability": {
+    "heading": "When are you free?",
+    "body": "Squads looking for a player can find you by this.",
+    "imFree": "I'm free…",
+    "close": "Close",
+    "from": "From",
+    "until": "Until",
+    "area": "Area",
+    "areaPlaceholder": "e.g. Mirpur",
+    "sport": "Sport",
+    "anySport": "Any sport",
+    "save": "Save",
+    "saving": "Saving…",
+    "withdraw": "Remove",
+    "failed": "That did not save. Try again."
+  },
+  "leaderboard": {
+    "title": "{metric, select, rating {Highest rated} motm {Most MOTM} wins {Most wins} top_stat {Top {stat}} other {Leaderboard}}",
+    "thisMonth": "This month",
+    "empty": "No standings yet — they are worked out overnight."
+  },
+  "adminConduct": {
+    "heading": "Conduct reports",
+    "body": "Nothing counts against a player until a report is upheld.",
+    "empty": "Nothing to review.",
+    "against": "Report against {name}",
+    "by": "Reported by {name}",
+    "note": "Review note",
+    "notePlaceholder": "What did you find?",
+    "uphold": "Uphold",
+    "dismiss": "Dismiss",
+    "upholdHint": "Upholding lowers their fair-play score. Dismissing leaves it untouched.",
+    "failed": "That did not go through. Try again."
+  },
+  "conduct": {
+    "open": "Report a player",
+    "heading": "Report a player",
+    "hint": "A person reads every report. Nothing counts against anybody until it is upheld.",
+    "who": "Who",
+    "what": "What happened",
+    "reason": "{reason, select, abusive {Abusive behaviour} left_early {Left the match early} no_show {Did not turn up} unsafe_play {Unsafe play} other {Something else}}",
+    "details": "Details",
+    "detailsPlaceholder": "What happened, in your words",
+    "send": "Send report",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "sent": "Report sent. An admin will look at it.",
+    "failed": "That did not send. Try again."
   }
 }

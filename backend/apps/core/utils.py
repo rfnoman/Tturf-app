@@ -35,3 +35,17 @@ def setting(name: str, default=None):
     settings, so callers never change.
     """
     return getattr(settings, name, default)
+
+
+def plain_decimal(value) -> str:
+    """Render a Decimal the way a person writes it: 2, 4.3, 100.
+
+    `str(Decimal("2.00"))` keeps the trailing zeros and `Decimal("100.00").normalize()`
+    produces `1E+2`, so neither is safe to put in front of a reader. Normalising and
+    then formatting with `f` gives the plain form in every case.
+    """
+    from decimal import Decimal
+
+    if not isinstance(value, Decimal):
+        value = Decimal(str(value))
+    return f"{value.normalize():f}"

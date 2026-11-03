@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { PlayerProfileView } from "@/components/player/player-profile-view";
+import { PlayerRecord } from "@/components/ratings/player-record";
 import { RecentResults } from "@/components/scoring/recent-results";
 
 /**
@@ -21,5 +22,15 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
 
   if (!data) notFound();
 
-  return <PlayerProfileView player={data} footer={<RecentResults playerId={String(data.id)} />} />;
+  return (
+    <PlayerProfileView
+      player={data}
+      footer={
+        <>
+          <PlayerRecord playerId={String(data.id)} sport={data.sport_cards[0]?.sport.slug} />
+          <RecentResults playerId={String(data.id)} />
+        </>
+      }
+    />
+  );
 }

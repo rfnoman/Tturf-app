@@ -10,7 +10,7 @@ Updated by Claude Code at the end of each phase.
 | 03 Bookings & cash payment | **done** | 2026-11-03 | Exclusion-constraint bookings, state machine, cash payments, reliability, Celery jobs, notifications |
 | 04 Matches, squads, joining | **done** | 2026-11-03 | Matches per booking, squads, join requests, the D1 invite chain, match board with filters |
 | 05 Scoreboard | **done** | 2026-11-03 | Teams + auto-balance, scorecard state machine, per-sport validators, disputes, MOTM, peer ratings, public shareable card |
-| 06 Ratings, track record, discovery | not started | | |
+| 06 Ratings, track record, discovery | **done** | 2026-11-03 | Pure versioned rating engine, rating history with explanations, track record, conduct reports, fair play, leaderboards, player search |
 | 07 Inventory & counter POS | not started | | |
 | 08 Store, orders, delivery | not started | | |
 | 09 Fitness layer & notifications+ | not started | | |
@@ -551,5 +551,117 @@ hold up. No console errors.
   until Phase 11 ships a font with it.
 - MOTM closing after 24 hours is covered by tests and the beat schedule, not by a browser
   run — there is nothing to see for a day.
+- django-storages is still not wired up (carried from Phase 02).
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 06 — Ratings engine, track record, discovery (2026-11-03)
+
+**Built**
+
+- **`apps/ratings/engine.py`** — pure, deterministic, no ORM. One locked match becomes a
+  0–100 performance score from three parts: **stats** against per-sport benchmarks (capped
+  at 1.5× so one lopsided scoreline cannot mint a 99), **result** shifted by how strong the
+  opposition was, and **peer ratings** when there are any. The player's rating then moves a
+  fraction of the way towards that score, scaled by `RATING_VERIFIED_SCORECARD_WEIGHT` for a
+  card the turf stands behind, and clamped (±3 settled, ±6 provisional).
+- **The weights are a table, not code** (`apps/ratings/weights.py`, `WEIGHTS_VERSION`), one
+  per sport, mapping each stat to a benchmark, a weight and the skill it feeds. A sport with
+  no table is still rated on result and peers — which is what keeps adding a sport a
+  catalogue row rather than a release.
+- **Two deliberate refusals in the engine**: a skill no stat speaks to is left exactly where
+  it is (nudging dribbling towards the overall would make "why did it change?"
+  unanswerable), and speed, agility and strength stay self-assessed because no stat in these
+  sports says anything about them. Only stamina moves, and only when minutes were recorded.
+- **`apply_locked_scorecard`** subscribes to Phase 05's `scorecard_locked` hook: it rates
+  everybody who played, writes `PlayerSkill`/`PlayerAttribute` as `computed`, fills the
+  `PlayerSportRating` counters, unlocks the sport, marks attendance, updates the track-record
+  tables and stores a `RatingChange` with the engine's explanation **and its inputs**.
+  Idempotent per `(player, match)`.
+- **Replay** (`recompute_all`, `manage.py recompute_ratings [--player] [--sport] [--dry-run]`)
+  re-runs the stored inputs rather than re-grading old matches against today's ratings
+  (D45), so it lands on exactly the numbers the incremental updates produced.
+- **Track record**: `PlayerSportStats` (career totals, stat totals and the last five
+  results) and `PlayerGroundStats` (the same per ground — "3× MOTM at Mirpur").
+- **Conduct and fair play**: `ConductReport` (roster players only, once per person per
+  match, never yourself — enforced by check constraint as well as service), an admin review
+  queue, and a fair-play score built **only** from things that happened: cards on locked
+  cards and upheld reports.
+- **Leaderboards**: a nightly Celery task writes `LeaderboardEntry` rows per sport, per
+  turf and platform-wide, monthly and all-time, for highest rated, most MOTM, most wins and
+  the sport's headline stat. Counted from `RatingChange`, which is what makes "this month at
+  Mirpur" answerable at all.
+- **Discovery**: `Availability` windows ("free Friday evening in Mirpur") and
+  `GET /players/search` with sport, position, rating band, area, reliability, where they
+  have played and when they are free — ranked by fit, not by rating alone, and respecting
+  `discoverable` (which gates search only; a direct profile link still resolves).
+- **Frontend**: the profile gained a fair-play badge, a track record with the form guide and
+  per-ground rows, and a rating chart whose every point carries the engine's own words
+  ("stats 62 · result 86 · verified by the turf · still finding your level"); a player
+  search page with filters, invite-to-match and invite-to-squad through the Phase 04 chain;
+  an "I'm free…" panel on the match board; leaderboards on the turf page; a conduct report
+  form on the post-match page; and the admin review queue.
+- **Tests**: 968 backend (100 in `apps/ratings`, 29 of them golden-value engine tests),
+  17 Vitest, 73 Playwright.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): locked the Phase 05 match
+and the three players moved 56→62, 57→52 and 50→54, each with a breakdown that explains
+itself. The profile shows the earned 62 with finishing up from the hat-trick, "1 played ·
+1W 0D 0L", the ground row, and the chart entry. Searched players, filtered to an area with
+nobody in it (empty state), then to Dhanmondi (18 results), and sent a squad invitation
+through the existing chain. Posted an availability window and removed it. The turf page
+shows "Highest rated" and "Top goals" for the month. Filed a conduct report from the
+post-match page, upheld it in the admin queue, and watched the reported player's fair play
+drop from 100 to 85. No console errors.
+
+**Weights, for review**
+
+The numbers are a first pass and are meant to be argued with — they live in one table and
+`WEIGHTS_VERSION` exists so changing them is a deliberate, replayable act. Per match, a
+"good return" benchmark and its weight:
+
+| Sport | Stat → skill | Benchmark | Weight |
+|---|---|---|---|
+| Football | goals → finishing | 1 | 30 |
+| | assists → passing | 1 | 20 |
+| | saves → goalkeeping | 3 | 20 |
+| | clean sheet → defending | 1 | 12 |
+| | yellow / red | — | −5 / −15 off the score |
+| Futsal | goals → finishing | 2 | 30 |
+| | assists → passing | 2 | 20 |
+| | saves → goalkeeping | 4 | 20 |
+| Cricket | runs → batting | 30 | 30 |
+| | wickets → bowling | 2 | 30 |
+| | catches → fielding | 1 | 15 |
+| Badminton | sets won → smash | 2 | 30 |
+| | points won → net play | 40 | 25 |
+| | aces → serve | 3 | 20 |
+| | errors | 10 | −8 off the score |
+
+Components: stats 0.45, result 0.35, peers 0.20 (renormalised when nobody rated the match);
+a match with no notable stats still scores 40, not 0; MOTM is a flat +6.
+
+**Deviations / notes**
+
+- A player's self-assessment no longer overwrites an earned rating (D44): `refresh_sport_rating`
+  stops writing `overall` once a match has been counted. Editing a skill slider used to undo
+  every match the player had earned.
+- The FIFA card now shows "Verified" and "Finding level" as two badges. They are two
+  different facts — the sport is unlocked, the rating is still settling — and merging them
+  read as though playing had achieved nothing.
+- Near/distance ranking in player search is by area, not PostGIS: a profile has an area, not
+  a point. Phase 11 can add a point if it proves worth asking for.
+
+**One thing the browser caught that the tests did not**
+
+Search results came back without their sport cards — `sport_cards` is attached by the
+profile *view*, not the serializer, so a list had none. It is now a method field on the
+search serializer, reading the relations `profile_queryset()` has already prefetched.
+
+**Known gaps / follow-ups**
+
+- Leaderboards are read from the nightly table, so a brand-new turf shows an empty board
+  until 03:00. Worth a "computed overnight" line, which the empty state now says.
+- Head-to-head records (DOMAIN §8) are not built; the per-ground table is the useful half
+  and head-to-head needs a UI question answering first.
 - django-storages is still not wired up (carried from Phase 02).
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
