@@ -101,9 +101,14 @@ class Booking(BaseModel):
     mode = models.CharField(
         _("mode"), max_length=12, choices=BookingMode.choices, default=BookingMode.INDIVIDUAL
     )
-    # Phase 04 replaces this with a FK to Squad. Kept as a nullable UUID so the column
-    # already exists and the booking flow can round-trip it in the meantime.
-    squad_id = models.UUIDField(_("squad"), null=True, blank=True)
+    squad = models.ForeignKey(
+        "matches.Squad",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="bookings",
+        help_text="Set for a group booking (DOMAIN §6).",
+    )
     visibility = models.CharField(
         _("visibility"),
         max_length=8,

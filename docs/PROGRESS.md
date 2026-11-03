@@ -8,7 +8,7 @@ Updated by Claude Code at the end of each phase.
 | 01 Accounts, sports, profiles | **done** | 2026-11-03 | Sports catalogue + proposals, player profiles, onboarding wizard, FIFA-style card, authenticated e2e |
 | 02 Turfs & grounds | **done** | 2026-11-03 | Turfs, grounds, hours, prices, PostGIS discovery, Leaflet maps, admin review, staff |
 | 03 Bookings & cash payment | **done** | 2026-11-03 | Exclusion-constraint bookings, state machine, cash payments, reliability, Celery jobs, notifications |
-| 04 Matches, squads, joining | not started | | |
+| 04 Matches, squads, joining | **done** | 2026-11-03 | Matches per booking, squads, join requests, the D1 invite chain, match board with filters |
 | 05 Scoreboard | not started | | |
 | 06 Ratings, track record, discovery | not started | | |
 | 07 Inventory & counter POS | not started | | |
@@ -397,5 +397,80 @@ Phase 02 → Phase 03 seam working with no change to `apps/turfs`. No console er
   carries every action, and a visual grid is cosmetic; worth revisiting in Phase 11.
 - Cancelling a `paid` booking does not refund the cash payment — `refund_payment` exists
   and is tested, but nothing calls it. Phase 10 owns refunds.
+- django-storages is still not wired up (carried from Phase 02).
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 04 — Matches, squads, join requests, match board (2026-11-03)
+
+**Built**
+
+- **`apps/matches`** (DOMAIN §6, DECISIONS D1 and D2):
+  - `Squad`, `SquadMembership`, `SquadInvite`, `Match`, `MatchPlayer`, `JoinRequest`,
+    `MatchInvite`. `Booking.squad` is now a real FK, replacing Phase 03's placeholder UUID.
+  - **Every booking creates exactly one match**, through a hook registry on the booking
+    lifecycle (D35) — `apps.bookings` still knows nothing about matches.
+  - **Visibility is derived** from the booking plus the squad's `accepts_public_requests`
+    (D36), and so is the organiser. Capacity is `players_per_side × 2` capped by the
+    ground, so a 7v7 format on a ground that holds 10 is a 10-player match.
+  - The **DECISIONS D1 chain** for a closed squad: a member *proposes*, the leader
+    approves, then the player accepts. An invite from the organiser skips the proposal,
+    because there is nobody left to ask. The proposed player is told nothing until the
+    leader approves.
+  - **Capacity is decided under a row lock** (D37). The losing request stays pending.
+  - A player cannot be in two matches at once, checked on request *and* on accepting an
+    invite.
+  - Celery beat: requests and invites expire at match start, and statuses advance with
+    the clock.
+- **Match board**: `GET /matches/board` with sport, area, near/radius, date, time-of-day
+  (filtered on the **Dhaka-local** hour, which is how a player thinks about "evenings"),
+  spots-left and rating-band filters. Roster size, spots left and the roster's average
+  rating are all computed in the database (D38).
+- **Frontend**: the match board with every filter and a list/map toggle; the match page
+  with the roster (linking to Phase 01 profile cards), the organiser's request queue with
+  "also add to squad", the proposal queue, and invite/leave/remove; squad list, create
+  form and squad page with the open/closed toggle; and the booking flow extended with
+  group mode and a squad picker.
+- **Tests**: 703 backend (122 in `apps/matches`), 17 Vitest, 59 Playwright.
+
+**The test matrix the phase asked for**
+
+`apps/matches/tests/test_visibility_matrix.py` asserts all four DOMAIN §6 shapes ×
+four roles (outsider, squad member, leader, booker) across *see*, *request* and *invite*,
+plus where each invitation starts in the chain. Writing it first caught my own
+misunderstanding immediately: I had assumed an **open squad's match was visible only to
+the squad**, when the flag controls who may *join*, not who may *look* — the board is
+public by definition. The code was right; the matrix was wrong, and it is now documented
+in the table.
+
+`apps/matches/tests/test_capacity_race.py` contests the last spot with real threads on
+real connections: two simultaneous approvals leave exactly one winner, and eight
+simultaneous adds against four spots leave the roster at exactly four.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): the board renders the
+brief's shape — "Banani Sports Hub · Indoor Court · Wed 4 Nov 19:00 · 5v5 · Need 9 ·
+Avg 64 · ৳2800". Filtering to badminton left the one badminton match; adding "spots ≥ 5"
+correctly emptied the board, since that match is a 2-player singles. Asked to join a
+match, and the form was replaced by "You have already asked to join". Then as the
+organiser of another match: two requests with their messages, approved one, and the page
+went 1/10 → 2/10, "Need 9" → "Need 8", queue down to one. Created an open squad through
+the UI and confirmed the leader membership and the open/closed explanation. Notifications
+fired to the right people throughout. No console errors.
+
+**Deviations / notes**
+
+- The board's map view centres on the player and the rows carry distances; it does not
+  pin individual matches, because the board payload deliberately carries no coordinates.
+  Phase 06's player/match search is the right place to revisit that.
+- "Invite a player" offers the reader's squad-mates who are not already playing. Full
+  player search is Phase 06, as the phase file says.
+- `MatchPlayer.attended` exists and is unused until Phase 05 fills it from the scorecard.
+
+**Known gaps / follow-ups**
+
+- A squad has no crest upload yet (the field exists); and no squad-level match history
+  page — Phase 06's track record is the natural home.
+- The match page fetches each of the reader's squads to build the invite list, which is
+  a handful of extra requests for somebody in many squads. Worth one endpoint when
+  Phase 06 adds player search.
 - django-storages is still not wired up (carried from Phase 02).
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.

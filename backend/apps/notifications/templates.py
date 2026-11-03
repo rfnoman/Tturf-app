@@ -68,4 +68,64 @@ TEMPLATES: dict[str, Template] = {
         "body": "{ground} at {when}.",
         "email": False,
     },
+    NotificationKind.SQUAD_INVITE: {
+        "title": "{inviter} invited you to {squad}",
+        "body": "Accept to start getting their match invitations.",
+        "email": True,
+    },
+    NotificationKind.SQUAD_JOINED: {
+        "title": "{player} joined {squad}",
+        "body": "",
+        "email": False,
+    },
+    NotificationKind.MATCH_ADDED: {
+        "title": "You are in: {sport} at {turf}",
+        "body": "{ground} on {when}. Drop out from the match page if you cannot make it.",
+        "email": False,
+    },
+    NotificationKind.MATCH_REMOVED: {
+        "title": "Taken off the {sport} match at {turf}",
+        "body": "{ground} on {when}.",
+        "email": False,
+    },
+    NotificationKind.MATCH_PLAYER_LEFT: {
+        "title": "{player} dropped out at {turf}",
+        "body": "{when}. You still need {needed}.",
+        "email": False,
+    },
+    NotificationKind.MATCH_JOIN_REQUEST: {
+        "title": "{player} wants to join your {sport} match",
+        "body": "{turf} on {when}. You still need {needed}.",
+        "email": True,
+    },
+    NotificationKind.MATCH_JOIN_APPROVED: {
+        "title": "You are in: {sport} at {turf}",
+        "body": "{ground} on {when}. See you there.",
+        "email": True,
+    },
+    NotificationKind.MATCH_JOIN_DECLINED: {
+        "title": "Not this time: {sport} at {turf}",
+        "body": "{when}. Have a look at the board for other matches.",
+        "email": False,
+    },
+    NotificationKind.MATCH_INVITE: {
+        "title": "Invitation: {sport} at {turf}",
+        "body": "{ground} on {when}. Accept from the match page.",
+        "email": True,
+    },
+    NotificationKind.MATCH_INVITE_PROPOSED: {
+        "title": "{proposer} suggested {player}",
+        "body": "For {sport} at {turf} on {when}. Approve to send them the invitation.",
+        "email": True,
+    },
+    NotificationKind.MATCH_INVITE_ACCEPTED: {
+        "title": "{player} is in",
+        "body": "{sport} at {turf} on {when}. You still need {needed}.",
+        "email": False,
+    },
+    NotificationKind.MATCH_INVITE_DECLINED: {
+        "title": "{player} cannot make it",
+        "body": "{sport} at {turf} on {when}. You still need {needed}.",
+        "email": False,
+    },
 }

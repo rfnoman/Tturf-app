@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { Ground, Slot } from "@/lib/api/types";
+import type { Ground, Slot, SquadSummary } from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,10 +30,12 @@ export function BookingPanel({
   grounds,
   horizonDays,
   cancellationFreeHours,
+  squads,
 }: {
   grounds: Ground[];
   horizonDays: number;
   cancellationFreeHours: number;
+  squads: SquadSummary[];
 }) {
   const t = useTranslations("turfs");
   const api = useApiClient();
@@ -47,6 +49,8 @@ export function BookingPanel({
   // previous ground's slots are never shown under the new ground's heading.
   const [loaded, setLoaded] = useState<{ key: string; slots: Slot[] }>();
   const [formatId, setFormatId] = useState<string>();
+  const [mode, setMode] = useState<"individual" | "group">("individual");
+  const [squadId, setSquadId] = useState(squads[0]?.id ?? "");
   const [visibility, setVisibility] = useState<"public" | "private">("public");
   const [notes, setNotes] = useState("");
   const [booking, setBooking] = useState(false);
@@ -102,7 +106,10 @@ export function BookingPanel({
         ground_id: groundId,
         sport_format_id: format.id,
         start: chosen.start,
-        visibility,
+        mode,
+        // A group booking's visibility comes from the squad's open/closed flag
+        // (DOMAIN §6), so sending one here would be ignored.
+        ...(mode === "group" ? { squad_id: squadId } : { visibility }),
         notes,
       } as never,
     });
@@ -202,24 +209,73 @@ export function BookingPanel({
             </div>
           )}
 
-          <div className="flex flex-col gap-1.5">
-            <Label className="text-xs">{t("visibility")}</Label>
-            <div className="flex flex-wrap gap-2">
-              {(["public", "private"] as const).map((option) => (
-                <Button
-                  key={option}
-                  type="button"
-                  size="xs"
-                  variant={visibility === option ? "default" : "outline"}
-                  aria-pressed={visibility === option}
-                  onClick={() => setVisibility(option)}
-                >
-                  {t(`visibility_${option}`)}
-                </Button>
-              ))}
+          {squads.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs">{t("mode")}</Label>
+              <div className="flex flex-wrap gap-2">
+                {(["individual", "group"] as const).map((option) => (
+                  <Button
+                    key={option}
+                    type="button"
+                    size="xs"
+                    variant={mode === option ? "default" : "outline"}
+                    aria-pressed={mode === option}
+                    onClick={() => setMode(option)}
+                  >
+                    {t(`mode_${option}`)}
+                  </Button>
+                ))}
+              </div>
             </div>
-            <p className="text-muted-foreground text-xs">{t(`visibilityHint_${visibility}`)}</p>
-          </div>
+          )}
+
+          {mode === "group" && squads.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="squad" className="text-xs">
+                {t("squad")}
+              </Label>
+              <select
+                id="squad"
+                value={squadId}
+                onChange={(event) => setSquadId(event.target.value)}
+                className="border-input bg-background h-8 w-fit rounded-lg border px-2 text-sm"
+              >
+                {squads.map((squad) => (
+                  <option key={squad.id} value={squad.id}>
+                    {squad.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-muted-foreground text-xs">
+                {t(
+                  squads.find((s) => s.id === squadId)?.accepts_public_requests
+                    ? "squadOpenHint"
+                    : "squadClosedHint",
+                )}
+              </p>
+            </div>
+          )}
+
+          {mode === "individual" && (
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs">{t("visibility")}</Label>
+              <div className="flex flex-wrap gap-2">
+                {(["public", "private"] as const).map((option) => (
+                  <Button
+                    key={option}
+                    type="button"
+                    size="xs"
+                    variant={visibility === option ? "default" : "outline"}
+                    aria-pressed={visibility === option}
+                    onClick={() => setVisibility(option)}
+                  >
+                    {t(`visibility_${option}`)}
+                  </Button>
+                ))}
+              </div>
+              <p className="text-muted-foreground text-xs">{t(`visibilityHint_${visibility}`)}</p>
+            </div>
+          )}
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="booking-notes" className="text-xs">

@@ -16,9 +16,10 @@ export default async function TurfDetailPage({ params }: { params: Promise<{ slu
   const { slug } = await params;
 
   const api = await getServerApiClient();
-  const [turf, config] = await Promise.all([
+  const [turf, config, squads] = await Promise.all([
     api.GET("/api/v1/turfs/{slug}", { params: { path: { slug } } }),
     fetchClientConfig(),
+    api.GET("/api/v1/squads"),
   ]);
 
   if (!turf.data) notFound();
@@ -60,6 +61,7 @@ export default async function TurfDetailPage({ params }: { params: Promise<{ slu
             grounds={data.grounds}
             horizonDays={config.booking_horizon_days}
             cancellationFreeHours={data.cancellation_free_hours}
+            squads={squads.data?.results ?? []}
           />
         </CardContent>
       </Card>

@@ -1367,6 +1367,363 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Invitations awaiting me */
+        get: operations["my_invites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/squad-invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Squad invitations awaiting me */
+        get: operations["my_squad_invites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/join-requests/{request_id}/decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide a join request
+         * @description The organiser approving or declining one request.
+         */
+        post: operations["join_requests_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/join-requests/{request_id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Withdraw my join request */
+        post: operations["join_requests_withdraw"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/match-invites/{invite_id}/decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or reject a proposed player
+         * @description The leader deciding a proposal (DECISIONS D1).
+         */
+        post: operations["match_invites_decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/match-invites/{invite_id}/respond": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept or decline an invitation
+         * @description The invited player accepting or declining.
+         */
+        post: operations["match_invites_respond"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/squad-invites/{invite_id}/respond": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept or decline a squad invitation */
+        post: operations["squad_invites_respond"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/board": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The match board
+         * @description Upcoming matches open to requests, with spots left and the roster's average rating. Matches you are already in are excluded.
+         */
+        get: operations["matches_board"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My upcoming matches */
+        get: operations["matches_mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One match */
+        get: operations["matches_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{id}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Invite a player
+         * @description A member of a **closed** squad can only propose: the leader approves, then the player accepts (DECISIONS D1). The organiser's invite skips the proposal step.
+         */
+        post: operations["matches_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Drop out of a match */
+        post: operations["matches_leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{id}/remove-player": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Remove a player (organiser) */
+        post: operations["matches_remove_player"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/matches/{id}/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask to join */
+        post: operations["matches_request_join"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/squads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My squads */
+        get: operations["squads_list"];
+        put?: never;
+        /** Create a squad */
+        post: operations["squads_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/squads/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One squad */
+        get: operations["squads_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update a squad */
+        patch: operations["squads_update"];
+        trace?: never;
+    };
+    "/api/v1/squads/{slug}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Invite a player to the squad */
+        post: operations["squads_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/squads/{slug}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Leave a squad */
+        post: operations["squads_leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/squads/{slug}/remove-member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Remove a member (leader) */
+        post: operations["squads_remove_member"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/squads/{slug}/transfer-leadership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hand over leadership */
+        post: operations["squads_transfer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1464,6 +1821,11 @@ export interface components {
             /** Format: uuid */
             ground_id: string;
             /**
+             * Format: uuid
+             * @description Required when `mode` is `group`; the squad you are booking for.
+             */
+            squad_id?: string | null;
+            /**
              * Format: date-time
              * @description The slot's start, exactly as the availability endpoint reported it.
              */
@@ -1479,6 +1841,11 @@ export interface components {
         BookingCreateRequest: {
             /** Format: uuid */
             ground_id: string;
+            /**
+             * Format: uuid
+             * @description Required when `mode` is `group`; the squad you are booking for.
+             */
+            squad_id?: string | null;
             /**
              * Format: date-time
              * @description The slot's start, exactly as the availability endpoint reported it.
@@ -1582,6 +1949,18 @@ export interface components {
             ends_at: string;
             reason?: string;
         };
+        DecideRequest: {
+            approve: boolean;
+        };
+        DecideRequestRequest: {
+            approve: boolean;
+            /**
+             * @description Leader only; keeps the player around.
+             * @default false
+             */
+            add_to_squad: boolean;
+            note?: string;
+        };
         Ground: {
             /** Format: uuid */
             readonly id: string;
@@ -1635,6 +2014,39 @@ export interface components {
             postgis: string | null;
             version: string;
         };
+        InvitePlayerRequest: {
+            /**
+             * Format: uuid
+             * @description The player's profile id.
+             */
+            player_id: string;
+            message?: string;
+        };
+        JoinRequest: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly player_name: string;
+            /** Format: uuid */
+            readonly player_profile_id: string | null;
+            readonly message: string;
+            readonly status: components["schemas"]["JoinRequestStatusEnum"];
+            /** Note */
+            readonly decision_note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        JoinRequestCreateRequest: {
+            message?: string;
+        };
+        /**
+         * @description * `pending` - Pending
+         *     * `approved` - Approved
+         *     * `declined` - Declined
+         *     * `withdrawn` - Withdrawn
+         *     * `expired` - Expired
+         * @enum {string}
+         */
+        JoinRequestStatusEnum: "pending" | "approved" | "declined" | "withdrawn" | "expired";
         MarkPaidRequest: {
             /**
              * Format: decimal
@@ -1649,6 +2061,112 @@ export interface components {
         MarkedRead: {
             marked: number;
         };
+        /** @description The match page: roster, and — for the organiser — the decision queues. */
+        MatchDetail: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly turf_name: string;
+            readonly turf_slug: string;
+            readonly area: string;
+            readonly ground_name: string;
+            readonly sport: components["schemas"]["SportSummary"];
+            readonly sport_format: components["schemas"]["SportFormat"];
+            /** Format: date-time */
+            readonly starts_at: string;
+            /** Format: date-time */
+            readonly ends_at: string;
+            /** Format: decimal */
+            readonly price: string;
+            /** @description players_per_side x 2, capped by the ground's max_players — a 7v7 format on a ground that holds 10 is a 10-player match. */
+            readonly capacity: number;
+            readonly roster_count: number;
+            readonly needed: number;
+            readonly visibility: components["schemas"]["MatchVisibilityEnum"];
+            readonly status: components["schemas"]["MatchStatusEnum"];
+            readonly squad: components["schemas"]["SquadSummary"];
+            /** Format: double */
+            readonly average_rating: number | null;
+            /** Format: double */
+            readonly distance_km: number | null;
+            readonly notes: string;
+            /** Format: uuid */
+            readonly booking_id: string;
+            readonly roster: components["schemas"]["RosterPlayer"][];
+            readonly organiser_name: string;
+            readonly is_organiser: boolean;
+            readonly is_on_roster: boolean;
+            readonly can_request: boolean;
+            readonly cannot_request_reason: string;
+            /** Format: uuid */
+            readonly my_invite_id: string | null;
+            readonly pending_requests: components["schemas"]["JoinRequest"][];
+            readonly live_invites: components["schemas"]["MatchInvite"][];
+        };
+        MatchInvite: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly invited_player_name: string;
+            /** @default  */
+            readonly invited_by_name: string;
+            readonly message: string;
+            readonly status: components["schemas"]["MatchInviteStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `proposed` - Proposed, awaiting the leader
+         *     * `leader_approved` - Awaiting the player
+         *     * `accepted` - Accepted
+         *     * `declined` - Declined
+         *     * `rejected` - Rejected by the leader
+         *     * `cancelled` - Cancelled
+         *     * `expired` - Expired
+         * @enum {string}
+         */
+        MatchInviteStatusEnum: "proposed" | "leader_approved" | "accepted" | "declined" | "rejected" | "cancelled" | "expired";
+        /**
+         * @description * `upcoming` - Upcoming
+         *     * `in_progress` - In progress
+         *     * `finished` - Finished
+         *     * `cancelled` - Cancelled
+         * @enum {string}
+         */
+        MatchStatusEnum: "upcoming" | "in_progress" | "finished" | "cancelled";
+        /** @description A match board card (DOMAIN §6). */
+        MatchSummary: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly turf_name: string;
+            readonly turf_slug: string;
+            readonly area: string;
+            readonly ground_name: string;
+            readonly sport: components["schemas"]["SportSummary"];
+            readonly sport_format: components["schemas"]["SportFormat"];
+            /** Format: date-time */
+            readonly starts_at: string;
+            /** Format: date-time */
+            readonly ends_at: string;
+            /** Format: decimal */
+            readonly price: string;
+            /** @description players_per_side x 2, capped by the ground's max_players — a 7v7 format on a ground that holds 10 is a 10-player match. */
+            readonly capacity: number;
+            readonly roster_count: number;
+            readonly needed: number;
+            readonly visibility: components["schemas"]["MatchVisibilityEnum"];
+            readonly status: components["schemas"]["MatchStatusEnum"];
+            readonly squad: components["schemas"]["SquadSummary"];
+            /** Format: double */
+            readonly average_rating: number | null;
+            /** Format: double */
+            readonly distance_km: number | null;
+        };
+        /**
+         * @description * `board` - On the match board
+         *     * `private` - Invite only
+         *     * `squad` - Squad only
+         * @enum {string}
+         */
+        MatchVisibilityEnum: "board" | "private" | "squad";
         NoteRequest: {
             note?: string;
         };
@@ -1679,9 +2197,21 @@ export interface components {
          *     * `booking_no_show` - Marked as a no-show
          *     * `booking_completed` - Booking completed
          *     * `booking_reminder` - Booking reminder
+         *     * `squad_invite` - Squad invitation
+         *     * `squad_joined` - Someone joined your squad
+         *     * `match_added` - Added to a match
+         *     * `match_removed` - Removed from a match
+         *     * `match_player_left` - A player dropped out
+         *     * `match_join_request` - Someone wants to join
+         *     * `match_join_approved` - You are in
+         *     * `match_join_declined` - Request declined
+         *     * `match_invite` - Match invitation
+         *     * `match_invite_proposed` - A player was proposed
+         *     * `match_invite_accepted` - Invitation accepted
+         *     * `match_invite_declined` - Invitation declined
          * @enum {string}
          */
-        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder";
+        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined";
         /** @description The wizard payload. Field-level validation only; rules live in the service. */
         OnboardingRequest: {
             display_name?: string;
@@ -1905,6 +2435,21 @@ export interface components {
             previous?: string | null;
             results: components["schemas"]["SportProposal"][];
         };
+        PaginatedSquadSummaryList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["SquadSummary"][];
+        };
         PaginatedTurfMembershipList: {
             /** @example 123 */
             count: number;
@@ -2047,6 +2592,17 @@ export interface components {
             attributes?: {
                 [key: string]: number;
             };
+        };
+        PatchedSquadWriteRequest: {
+            name?: string;
+            description?: string;
+            area?: string;
+            /**
+             * Open squad
+             * @description Open: squad matches reach the match board and anyone may request to join. Closed: squad only, and members propose players for the leader to approve.
+             */
+            accepts_public_requests?: boolean;
+            sport_ids?: string[];
         };
         PatchedTurfPhotoRequest: {
             /** Format: binary */
@@ -2314,8 +2870,30 @@ export interface components {
             readonly created_at: string;
             readonly age: number | null;
         };
+        RemovePlayerRequest: {
+            /**
+             * Format: uuid
+             * @description The player's profile id.
+             */
+            player_id: string;
+        };
         ReviewDecisionRequest: {
             reason?: string;
+        };
+        /** @description A roster entry carrying enough profile to render the Phase 01 card. */
+        RosterPlayer: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            player_id: string;
+            /** Format: uuid */
+            profile_id: string | null;
+            name: string;
+            photo_url: string;
+            area: string;
+            source: string;
+            overall: number | null;
+            is_provisional: boolean;
         };
         /** @description One slot from ``apps.turfs.availability``. */
         Slot: {
@@ -2447,6 +3025,96 @@ export interface components {
             name: string;
             slug: string;
             readonly icon: string;
+        };
+        Squad: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            readonly slug: string;
+            readonly area: string;
+            /**
+             * Open squad
+             * @description Open: squad matches reach the match board and anyone may request to join. Closed: squad only, and members propose players for the leader to approve.
+             */
+            readonly accepts_public_requests: boolean;
+            readonly leader_name: string;
+            readonly member_count: number;
+            readonly description: string;
+            readonly sports: components["schemas"]["SportSummary"][];
+            readonly members: components["schemas"]["SquadMember"][];
+            readonly my_role: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        SquadInvite: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly squad: components["schemas"]["SquadSummary"];
+            /** @default  */
+            readonly invited_by_name: string;
+            readonly message: string;
+            readonly status: components["schemas"]["SquadInviteStatusEnum"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `pending` - Pending
+         *     * `accepted` - Accepted
+         *     * `declined` - Declined
+         *     * `cancelled` - Cancelled
+         * @enum {string}
+         */
+        SquadInviteStatusEnum: "pending" | "accepted" | "declined" | "cancelled";
+        SquadMember: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly player_id: string;
+            /** Format: uuid */
+            readonly profile_id: string | null;
+            readonly name: string;
+            readonly role: components["schemas"]["SquadRoleEnum"];
+            readonly status: components["schemas"]["SquadMembershipStatusEnum"];
+            /** Format: date-time */
+            readonly joined_at: string | null;
+        };
+        /**
+         * @description * `active` - Active
+         *     * `left` - Left
+         *     * `removed` - Removed
+         * @enum {string}
+         */
+        SquadMembershipStatusEnum: "active" | "left" | "removed";
+        /**
+         * @description * `leader` - Leader
+         *     * `member` - Member
+         * @enum {string}
+         */
+        SquadRoleEnum: "leader" | "member";
+        SquadSummary: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            readonly slug: string;
+            readonly area: string;
+            /**
+             * Open squad
+             * @description Open: squad matches reach the match board and anyone may request to join. Closed: squad only, and members propose players for the leader to approve.
+             */
+            readonly accepts_public_requests: boolean;
+            readonly leader_name: string;
+            readonly member_count: number;
+        };
+        SquadWriteRequest: {
+            name: string;
+            description?: string;
+            area?: string;
+            /**
+             * Open squad
+             * @description Open: squad matches reach the match board and anyone may request to join. Closed: squad only, and members propose players for the leader to approve.
+             */
+            accepts_public_requests?: boolean;
+            sport_ids?: string[];
         };
         StaffInviteRequest: {
             role: components["schemas"]["StaffInviteRoleEnum"];
@@ -2687,6 +3355,11 @@ export interface components {
             /** Format: uuid */
             ground_id: string;
             /**
+             * Format: uuid
+             * @description Required when `mode` is `group`; the squad you are booking for.
+             */
+            squad_id?: string | null;
+            /**
              * Format: date-time
              * @description The slot's start, exactly as the availability endpoint reported it.
              */
@@ -2705,6 +3378,11 @@ export interface components {
         WalkInBookingRequest: {
             /** Format: uuid */
             ground_id: string;
+            /**
+             * Format: uuid
+             * @description Required when `mode` is `group`; the squad you are booking for.
+             */
+            squad_id?: string | null;
             /**
              * Format: date-time
              * @description The slot's start, exactly as the availability endpoint reported it.
@@ -4717,6 +5395,555 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Booking"];
+                };
+            };
+        };
+    };
+    my_invites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchInvite"][];
+                };
+            };
+        };
+    };
+    my_squad_invites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SquadInvite"][];
+                };
+            };
+        };
+    };
+    join_requests_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecideRequestRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DecideRequestRequest"];
+                "multipart/form-data": components["schemas"]["DecideRequestRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinRequest"];
+                };
+            };
+        };
+    };
+    join_requests_withdraw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinRequest"];
+                };
+            };
+        };
+    };
+    match_invites_decide: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecideRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DecideRequest"];
+                "multipart/form-data": components["schemas"]["DecideRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchInvite"];
+                };
+            };
+        };
+    };
+    match_invites_respond: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecideRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DecideRequest"];
+                "multipart/form-data": components["schemas"]["DecideRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchInvite"];
+                };
+            };
+        };
+    };
+    squad_invites_respond: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecideRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["DecideRequest"];
+                "multipart/form-data": components["schemas"]["DecideRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SquadInvite"];
+                };
+            };
+        };
+    };
+    matches_board: {
+        parameters: {
+            query?: {
+                /** @description Exact area. */
+                area?: string;
+                /** @description YYYY-MM-DD, Dhaka time. */
+                date?: string;
+                /** @description `latitude,longitude`. */
+                near?: string;
+                /** @description At least this many spots left. */
+                needed_min?: number;
+                radius_km?: number;
+                rating_max?: number;
+                rating_min?: number;
+                /** @description Sport slug. */
+                sport?: string;
+                /** @description HH:MM, Dhaka time. */
+                time_from?: string;
+                /** @description HH:MM, Dhaka time. */
+                time_to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchSummary"][];
+                };
+            };
+        };
+    };
+    matches_mine: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchSummary"][];
+                };
+            };
+        };
+    };
+    matches_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this match. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchDetail"];
+                };
+            };
+        };
+    };
+    matches_invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this match. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvitePlayerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["InvitePlayerRequest"];
+                "multipart/form-data": components["schemas"]["InvitePlayerRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchInvite"];
+                };
+            };
+        };
+    };
+    matches_leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this match. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchDetail"];
+                };
+            };
+        };
+    };
+    matches_remove_player: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this match. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemovePlayerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RemovePlayerRequest"];
+                "multipart/form-data": components["schemas"]["RemovePlayerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MatchDetail"];
+                };
+            };
+        };
+    };
+    matches_request_join: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this match. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["JoinRequestCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["JoinRequestCreateRequest"];
+                "multipart/form-data": components["schemas"]["JoinRequestCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JoinRequest"];
+                };
+            };
+        };
+    };
+    squads_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSquadSummaryList"];
+                };
+            };
+        };
+    };
+    squads_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SquadWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SquadWriteRequest"];
+                "multipart/form-data": components["schemas"]["SquadWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Squad"];
+                };
+            };
+        };
+    };
+    squads_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Squad"];
+                };
+            };
+        };
+    };
+    squads_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedSquadWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedSquadWriteRequest"];
+                "multipart/form-data": components["schemas"]["PatchedSquadWriteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Squad"];
+                };
+            };
+        };
+    };
+    squads_invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvitePlayerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["InvitePlayerRequest"];
+                "multipart/form-data": components["schemas"]["InvitePlayerRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SquadInvite"];
+                };
+            };
+        };
+    };
+    squads_leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    squads_remove_member: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemovePlayerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RemovePlayerRequest"];
+                "multipart/form-data": components["schemas"]["RemovePlayerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Squad"];
+                };
+            };
+        };
+    };
+    squads_transfer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RemovePlayerRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RemovePlayerRequest"];
+                "multipart/form-data": components["schemas"]["RemovePlayerRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Squad"];
                 };
             };
         };

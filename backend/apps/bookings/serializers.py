@@ -86,6 +86,11 @@ class BookingSerializer(serializers.ModelSerializer):
 
 class BookingCreateSerializer(serializers.Serializer):
     ground_id = serializers.UUIDField()
+    squad_id = serializers.UUIDField(
+        required=False,
+        allow_null=True,
+        help_text="Required when `mode` is `group`; the squad you are booking for.",
+    )
     start = serializers.DateTimeField(
         help_text="The slot's start, exactly as the availability endpoint reported it."
     )

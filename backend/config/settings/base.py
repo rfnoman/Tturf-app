@@ -66,6 +66,7 @@ LOCAL_APPS = [
     "apps.notifications",
     "apps.payments",
     "apps.bookings",
+    "apps.matches",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -153,6 +154,15 @@ CELERY_BEAT_SCHEDULE: dict[str, dict] = {
         # Every five minutes. Completion only has to beat the player noticing.
         "schedule": 300.0,
     },
+    "expire-pending-match-requests": {
+        "task": "matches.expire_pending",
+        # Requests and invites expire at match start (DOMAIN §6).
+        "schedule": 120.0,
+    },
+    "advance-match-statuses": {
+        "task": "matches.advance_statuses",
+        "schedule": 120.0,
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -238,6 +248,14 @@ SPECTACULAR_SETTINGS = {
         "PlayerGenderEnum": "apps.players.models.PLAYER_GENDER_CHOICES",
         "PlayerPreferredSideEnum": "apps.players.models.PLAYER_PREFERRED_SIDE_CHOICES",
         "NotificationKindEnum": "apps.notifications.models.NotificationKind.choices",
+        "MatchStatusEnum": "apps.matches.models.MatchStatus.choices",
+        "MatchVisibilityEnum": "apps.matches.models.MatchVisibility.choices",
+        "JoinRequestStatusEnum": "apps.matches.models.JOIN_REQUEST_STATUS_CHOICES",
+        "MatchInviteStatusEnum": "apps.matches.models.MATCH_INVITE_STATUS_CHOICES",
+        "SquadInviteStatusEnum": "apps.matches.models.SQUAD_INVITE_STATUS_CHOICES",
+        "SquadRoleEnum": "apps.matches.models.SQUAD_ROLE_CHOICES",
+        "SquadMembershipStatusEnum": "apps.matches.models.SQUAD_MEMBERSHIP_STATUS_CHOICES",
+        "MatchPlayerSourceEnum": "apps.matches.models.MATCH_PLAYER_SOURCE_CHOICES",
     },
 }
 
