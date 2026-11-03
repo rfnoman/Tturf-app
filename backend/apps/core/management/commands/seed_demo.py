@@ -116,6 +116,7 @@ class Command(BaseCommand):
         self.seed_turfs()
         self.seed_bookings()
         self.seed_squads_and_matches()
+        self.seed_inventory()
         self.stdout.write(self.style.SUCCESS("Demo data seeded."))
 
     def seed_platform_admin(self, email: str) -> None:
@@ -439,3 +440,74 @@ class Command(BaseCommand):
             f"Squad {squad.name} ({squad.member_count} members), "
             f"{Match.objects.count()} match(es), {asked} join request(s)"
         )
+
+    def seed_inventory(self) -> None:
+        """Stock the platform warehouse and every turf's counter (Phase 07).
+
+        Quantities go in through `receive_stock` rather than straight onto the row: the
+        ledger is the record, and a seed that wrote `on_hand` directly would start every
+        development database with an inconsistency.
+        """
+        from apps.inventory.catalogue import (
+            PLATFORM_PRODUCTS,
+            TURF_PRODUCTS,
+            sync_categories,
+        )
+        from apps.inventory.models import OwnerType, Product, ProductCategory
+        from apps.inventory.services import (
+            get_or_create_item,
+            location_for_turf,
+            receive_stock,
+            warehouse,
+        )
+        from apps.sports.models import Sport
+
+        categories = sync_categories(ProductCategory)
+        sports = {sport.slug: sport for sport in Sport.objects.all()}
+
+        def upsert(spec: dict, *, turf=None) -> Product:
+            fields = {
+                "owner_type": OwnerType.TURF if turf else OwnerType.PLATFORM,
+                "turf": turf,
+                "category": categories[spec["category"]],
+                "name": spec["name"],
+                "base_price": price_decimal(spec["base_price"]),
+                "kind": spec.get("kind", "sale"),
+                "perishable": spec.get("perishable", False),
+                "tags": spec.get("tags", []),
+                "serving_size": spec.get("serving_size", ""),
+                "calories": spec.get("calories"),
+                "protein_g": spec.get("protein_g"),
+                "carbs_g": spec.get("carbs_g"),
+                "fat_g": spec.get("fat_g"),
+                "sugar_g": spec.get("sugar_g"),
+                "caffeine_mg": spec.get("caffeine_mg"),
+            }
+            if spec.get("rental_price_per_match"):
+                fields["rental_price_per_match"] = price_decimal(spec["rental_price_per_match"])
+            if spec.get("deposit"):
+                fields["deposit"] = price_decimal(spec["deposit"])
+
+            product, _ = Product.objects.update_or_create(
+                turf=turf, slug=spec["slug"], defaults=fields
+            )
+            if spec.get("sports"):
+                product.sports.set([sports[slug] for slug in spec["sports"] if slug in sports])
+            return product
+
+        store = warehouse()
+        for spec in PLATFORM_PRODUCTS:
+            item = get_or_create_item(location=store, product=upsert(spec))
+            if item.on_hand == 0:
+                receive_stock(item=item, quantity=100, note="Opening stock")
+
+        shelves = 0
+        for turf in Turf.objects.filter(status=Turf.Status.APPROVED):
+            location = location_for_turf(turf)
+            for spec in TURF_PRODUCTS:
+                item = get_or_create_item(location=location, product=upsert(spec, turf=turf))
+                if item.on_hand == 0:
+                    receive_stock(item=item, quantity=spec.get("on_hand", 12), note="Opening stock")
+                shelves += 1
+
+        self.stdout.write(f"{Product.objects.count()} product(s), {shelves} turf shelf item(s)")

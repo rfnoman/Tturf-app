@@ -18,28 +18,10 @@ from django.db import connections
 from apps.accounts.tests.factories import UserFactory
 from apps.matches.models import JoinRequest, MatchPlayer
 from apps.matches.services import add_player, decide_join_request, request_to_join
-from apps.sports.catalogue import sync_catalogue
-from apps.turfs.catalogue import sync_amenities
 
 from .factories import make_match
 
 pytestmark = pytest.mark.django_db(transaction=True)
-
-
-@pytest.fixture(autouse=True)
-def seeded_catalogue():
-    """`transaction=True` truncates the tables, taking the seeded catalogue with it."""
-    sync_catalogue()
-    sync_amenities()
-
-
-@pytest.fixture(scope="module", autouse=True)
-def restore_catalogue_for_the_rest_of_the_session(django_db_setup, django_db_blocker):
-    """Put the migration-seeded data back once this module is done."""
-    yield
-    with django_db_blocker.unblock():
-        sync_catalogue()
-        sync_amenities()
 
 
 def run_concurrently(targets):
