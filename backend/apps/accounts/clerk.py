@@ -157,3 +157,39 @@ def _verify_authorized_party(claims: dict[str, Any]) -> None:
     allowed = [party.rstrip("/") for party in settings.CLERK_AUTHORIZED_PARTIES if party]
     if allowed and azp.rstrip("/") not in allowed:
         raise ClerkTokenError(f"Authorized party {azp!r} is not allowed.")
+
+
+BACKEND_API_BASE_URL = "https://api.clerk.com/v1"
+BACKEND_API_TIMEOUT_SECONDS = 5
+
+
+def fetch_clerk_user(clerk_id: str) -> dict[str, Any] | None:
+    """Read one user from Clerk's Backend API, or ``None`` if it cannot be read.
+
+    Needed because a **session token carries no identity claims** — only ``sub``,
+    ``sid``, ``iss`` and friends. The webhook is the normal way names and emails arrive,
+    but it can be unconfigured (there is no public URL in local development), late, or
+    have failed, which would leave the account nameless everywhere in the UI.
+
+    Returns ``None`` rather than raising: this runs on the authentication path, and a
+    Clerk outage must not sign everybody out.
+    """
+    secret = settings.CLERK_SECRET_KEY
+    if not secret:
+        return None
+
+    try:
+        response = requests.get(
+            f"{BACKEND_API_BASE_URL}/users/{clerk_id}",
+            headers={"Authorization": f"Bearer {secret}"},
+            timeout=BACKEND_API_TIMEOUT_SECONDS,
+        )
+        response.raise_for_status()
+        payload = response.json()
+    except (requests.RequestException, ValueError) as exc:
+        logger.warning(
+            "Could not read user from Clerk's Backend API: %s", exc, extra={"clerk_id": clerk_id}
+        )
+        return None
+
+    return payload if isinstance(payload, dict) else None

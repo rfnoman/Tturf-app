@@ -11,7 +11,8 @@
     "owner": "Turf owner",
     "admin": "Admin",
     "profile": "Profile",
-    "debug": "Debug"
+    "debug": "Debug",
+    "settings": "Settings"
   },
   "auth": {
     "signIn": "Sign in",
@@ -40,7 +41,8 @@
   "admin": {
     "heading": "Platform admin",
     "empty": "Review queues arrive in Phase 02.",
-    "forbidden": "You need platform administrator access to view this page."
+    "forbidden": "You need platform administrator access to view this page.",
+    "navSports": "Sports catalogue"
   },
   "me": {
     "heading": "Backend session",
@@ -63,5 +65,115 @@
     "loading": "Loading…",
     "notSet": "Not set",
     "retry": "Try again"
+  },
+  "onboarding": {
+    "stepCounter": "Step {current} of {total}",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "submitting": "Saving…",
+    "submitFailed": "Could not save your profile. Check the form and try again.",
+    "capNote": "Self-assessed ratings are capped at {cap} and shown as unverified until you play a match.",
+    "summary": "You will play:",
+    "noSports": "The sports catalogue is empty. An admin needs to add a sport first.",
+    "basics": {
+      "heading": "Tell us about you",
+      "body": "Only your name is required. Everything else helps us match you with the right games."
+    },
+    "sports": {
+      "heading": "What do you play?",
+      "body": "Pick every sport you want on your profile. You can add more later."
+    },
+    "skills": {
+      "heading": "Rate yourself",
+      "body": "Rough is fine — your real rating comes from matches you play."
+    },
+    "attributes": {
+      "heading": "Your physical attributes",
+      "body": "These are shared across every sport, so they show on all your cards."
+    },
+    "fields": {
+      "displayName": "Display name",
+      "area": "Area",
+      "areaPlaceholder": "e.g. Dhanmondi",
+      "dateOfBirth": "Date of birth",
+      "heightCm": "Height (cm)",
+      "weightKg": "Weight (kg)",
+      "weightHint": "Optional. Used only to estimate calories burned.",
+      "preferredSide": "Preferred foot / hand",
+      "bio": "Short bio",
+      "positions": "Positions"
+    },
+    "sides": {
+      "left": "Left",
+      "right": "Right",
+      "both": "Both"
+    }
+  },
+  "playerCard": {
+    "ariaLabel": "{name}'s {sport} card",
+    "overall": "Overall",
+    "unverified": "Unverified",
+    "matches": "Matches",
+    "wins": "Wins",
+    "losses": "Losses",
+    "motm": "MOTM",
+    "noAttributes": "No attributes rated yet."
+  },
+  "profile": {
+    "edit": "Edit profile",
+    "reliability": "Reliability {score}",
+    "sportCount": "{count, plural, one {# sport} other {# sports}}",
+    "noSports": "No sports on this profile yet.",
+    "attributesHeading": "Physical attributes",
+    "attributesHint": "Shared across every sport (DOMAIN §3), so they appear on all cards."
+  },
+  "settings": {
+    "heading": "Settings",
+    "body": "Your profile, what others can see, and how we estimate your calories.",
+    "basics": "Basics",
+    "displayName": "Display name",
+    "area": "Area",
+    "weight": "Weight (kg)",
+    "weightHint": "Optional. Used only to estimate calories burned; without it we assume {fallback} kg and mark the estimate.",
+    "bio": "Short bio",
+    "privacy": "Privacy",
+    "discoverable": "Appear in player search",
+    "discoverableHint": "Turn this off to stay out of search results. Anyone with a direct link to your profile can still open it.",
+    "attributes": "Physical attributes",
+    "attributesHint": "Self-assessed values are capped at {cap} until matches confirm them.",
+    "sports": "My sports",
+    "sportsHint": "Removing a sport you have already played only hides the card; the history stays.",
+    "add": "Add",
+    "remove": "Remove",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "saved": "Saved.",
+    "saveFailed": "Could not save. Please try again."
+  },
+  "adminSports": {
+    "heading": "Sports",
+    "body": "Review proposals from turf owners and keep the catalogue free of duplicates.",
+    "empty": "No sport proposals yet.",
+    "proposedBy": "Proposed by {name}",
+    "approve": "Approve",
+    "approveHint": "Approving creates the sport but leaves it inactive until you add its formats, skills and stat definitions in the Django admin.",
+    "merge": "Merge",
+    "mergeTarget": "Merge into…",
+    "reject": "Reject",
+    "note": "Review note",
+    "notePlaceholder": "Note for the proposer (required to reject)",
+    "mergedInto": "Merged into {sport}.",
+    "actionFailed": "That action failed. Reload and try again.",
+    "catalogue": "Catalogue",
+    "catalogueMeta": "{formats} formats · {skills} skills · {stats} stats",
+    "inactive": "inactive",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "merged": "Merged",
+      "rejected": "Rejected"
+    },
+    "createdSport": "Created the sport “{sport}”."
   }
 }

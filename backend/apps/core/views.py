@@ -8,6 +8,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .utils import setting
+
 
 class HealthView(APIView):
     """Liveness/readiness probe: reports database and PostGIS availability."""
@@ -51,3 +53,58 @@ class HealthView(APIView):
             status.HTTP_200_OK if database == "ok" else status.HTTP_503_SERVICE_UNAVAILABLE
         )
         return Response(payload, status=http_status)
+
+
+class ClientConfigView(APIView):
+    """Configurable business rules the frontend needs to render correct controls.
+
+    CLAUDE.md forbids hard-coding these rules, and that has to hold on both sides of the
+    wire: an onboarding slider whose ceiling is a literal would silently disagree with
+    the server's ``SELF_ASSESSED_RATING_CAP`` the moment someone changed it. Serving them
+    from here means ``apps/core/utils.setting`` stays the single source, so when the
+    ``PlatformSetting`` model arrives the frontend inherits database-backed values with
+    no change.
+
+    Public on purpose: these are UI constants, not secrets.
+    """
+
+    authentication_classes: list = []
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        operation_id="client_config",
+        summary="Client configuration",
+        description="Business rules and limits the UI needs. Safe to cache for minutes.",
+        responses={
+            200: inline_serializer(
+                name="ClientConfig",
+                fields={
+                    "rating_min": serializers.IntegerField(),
+                    "rating_max": serializers.IntegerField(),
+                    "self_assessed_rating_cap": serializers.IntegerField(),
+                    "onboarding_default_rating": serializers.IntegerField(),
+                    "rating_provisional_matches": serializers.IntegerField(),
+                    "default_player_weight_kg": serializers.IntegerField(),
+                    "booking_horizon_days": serializers.IntegerField(),
+                    "turf_delivery_cutoff_hours": serializers.IntegerField(),
+                    "currency": serializers.CharField(),
+                    "time_zone": serializers.CharField(),
+                },
+            )
+        },
+    )
+    def get(self, request):
+        return Response(
+            {
+                "rating_min": 1,
+                "rating_max": 99,
+                "self_assessed_rating_cap": setting("SELF_ASSESSED_RATING_CAP"),
+                "onboarding_default_rating": setting("ONBOARDING_DEFAULT_RATING"),
+                "rating_provisional_matches": setting("RATING_PROVISIONAL_MATCHES"),
+                "default_player_weight_kg": setting("DEFAULT_PLAYER_WEIGHT_KG"),
+                "booking_horizon_days": setting("BOOKING_HORIZON_DAYS"),
+                "turf_delivery_cutoff_hours": setting("TURF_DELIVERY_CUTOFF_HOURS"),
+                "currency": "BDT",
+                "time_zone": settings.TIME_ZONE,
+            }
+        )

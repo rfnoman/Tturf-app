@@ -5,7 +5,7 @@ Updated by Claude Code at the end of each phase.
 | Phase | Status | Date | Notes |
 |---|---|---|---|
 | 00 Foundation | **done** (auth flow pending Clerk keys) | 2026-11-03 | Monorepo, Django 6.1 + PostGIS, Clerk JWT auth + webhook, Next.js 16 shell, CI |
-| 01 Accounts, sports, profiles | not started | | |
+| 01 Accounts, sports, profiles | **done** | 2026-11-03 | Sports catalogue + proposals, player profiles, onboarding wizard, FIFA-style card, authenticated e2e |
 | 02 Turfs & grounds | not started | | |
 | 03 Bookings & cash payment | not started | | |
 | 04 Matches, squads, joining | not started | | |
@@ -108,3 +108,96 @@ Updated by Claude Code at the end of each phase.
   (`@clerk/testing`) — a natural addition in Phase 01 once onboarding exists.
 - Media uploads still use local `FileSystemStorage`; Phase 02 introduces the
   django-storages abstraction as its phase file requires.
+
+### Phase 01 — Accounts, sports catalogue, player profiles (2026-11-03)
+
+**Built**
+
+- **`apps/sports`** — the admin-curated catalogue (DOMAIN §2):
+  - `Attribute` (the four shared physical attributes), `Sport` (slug, icon, `met_value`,
+    `positions`), `SportFormat` (`players_per_side`, plus a `capacity` property Phase 04
+    turns into `Match.capacity`), `SportAttributeWeight`, `SportSkill`, `StatDefinition`,
+    `SportProposal`.
+  - Catalogue data lives in `apps/sports/catalogue.py` as plain dicts with one
+    `sync_catalogue()`; the data migration `0002_seed_catalogue` and `seed_demo` both call
+    it, so a fresh database is usable immediately and a catalogue edit needs no migration.
+    Seeded: Football (5v5/7v7/9v9/11v11), Futsal, Cricket (box/nets/T20), Badminton
+    (singles/doubles) — 11 formats, 20 skills, 25 stat definitions, 16 attribute weights,
+    with the stat sets DOMAIN §7 names and `minutes_played` on every sport.
+  - `SportProposal` state machine in `services.py`, one function per transition:
+    `approve` (creates the sport, **inactive** until an admin adds its formats, skills and
+    stats — it would otherwise reach onboarding empty), `merge`, `reject` (reason required).
+    `unique_sport_slug` walks past collisions so approving "Kabaddi" twice cannot 500.
+  - API: `GET /sports` (whole catalogue, unpaginated — one call feeds the wizard),
+    `GET /sports/{slug}`, `GET /attributes`, `POST|GET /sport-proposals`, and
+    `GET /admin/sport-proposals` with `approve` / `merge` / `reject` actions.
+  - Django admin with inlines for every child model, plus the DOMAIN §2 actions, including
+    an intermediate page for "merge into…".
+- **`apps/players`** (new app — D19) — the profile (DOMAIN §3):
+  - `PlayerProfile` (1:1 `User`), `PlayerSport` (positions, `is_verified`, `self_assessed`,
+    `is_hidden`), `PlayerAttribute`, `PlayerSkill`, `PlayerSportRating` (overall,
+    `is_provisional`, and the track-record counters Phase 06 will fill).
+  - Services: `complete_onboarding`, `add_player_sport`, `remove_player_sport`,
+    `set_player_attributes`, `set_player_skills`, `compute_overall`, `refresh_sport_rating`,
+    `update_profile`. **Self-assessed values are capped at `SELF_ASSESSED_RATING_CAP` in
+    the service**, not the serializer, so a seed command or Celery task gets the same
+    guarantee. Removing a sport with history only hides it.
+  - API: `GET|PATCH /me/profile`, `POST /me/onboarding`, `POST /me/sports`,
+    `DELETE /me/sports/{slug}`, `GET /players/{id}`. The public serializer drops
+    `date_of_birth`, `weight_kg` and `discoverable`, exposing a derived `age` instead.
+- **`GET /api/v1/config`** (D20) — the configurable rules the UI needs.
+- **Frontend**: four-step onboarding wizard; a reusable `PlayerSportCardView` (built for
+  the Phase 04 match board, Phase 05 scorecards and Phase 06 search, so it takes only data
+  and fetches nothing); profile page with one tab per sport; settings page (discoverable
+  toggle, weight with its calorie note, re-assessment, add/remove sports); admin
+  sport-proposal queue. 130 message keys in `en.json`/`bn.json` at parity, with the
+  short high-traffic strings already in Bangla.
+- **Tests**: 268 backend (up from 68), 17 Vitest, 15 Playwright across desktop and mobile.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): a new account is forced
+to `/onboarding`; sliders cap at 75 *read from `/api/v1/config`*; finishing lands on the
+card (Football 56 / Badminton 52, both "Unverified"); settings persist; a direct
+`/players/{id}` link resolves with `discoverable=false` and shows no owner-only action;
+admin approve created an inactive "Kabaddi" with 0 formats/skills/stats and merge pointed
+"Soccer" at Football; no console errors; no horizontal overflow at 390px; Bangla renders.
+
+**Bugs found and fixed along the way**
+
+- **Reserved `LogRecord` keys** — `extra={"created": ...}` and `extra={"name": ...}` make
+  `logging` raise `KeyError: "Attempt to overwrite 'created' in LogRecord"`. Present in
+  Phase 00's `sync_user_from_clerk` too, and invisible under the test settings (the root
+  logger has no handlers and sits at WARNING, so `logger.info` returns before the record
+  is built) — it crashed `seed_demo` instead. Guarded by `apps/core/tests/test_logging.py`,
+  which ASTs every `extra={...}` in the codebase.
+- **Nameless accounts** (D21) — Clerk session tokens carry no identity claims, confirmed
+  against the live instance (`azp,exp,fva,iat,iss,nbf,sid,sts,sub,v`). Every account showed
+  as "Player" until a webhook that local development never receives. Now backfilled once
+  from Clerk's Backend API.
+- **`me.common.yes` never resolved** — `getTranslations("me")` scopes every lookup, so
+  `t("common.yes")` on `/me` looked for `me.common.yes`. A Phase 00 bug that only fired on
+  the branch rendering an empty name. Guarded by `src/i18n/__tests__/message-usage.test.ts`,
+  which statically resolves every literal `t("…")` against `en.json`.
+- **Routers added trailing slashes**, unlike every Phase 00 URL. `SimpleRouter(trailing_slash=False)`.
+- **`JSONField` generated `unknown`** in the OpenAPI schema, making `Sport.positions`
+  unusable from TypeScript. Declared explicitly as `ListField(child=CharField())`.
+- **An approved proposal said "Merged into X"** when it had *created* X.
+
+**Deviations / notes**
+
+- `apps/players` is a new app not in CLAUDE.md's repository layout (D19).
+- `@clerk/testing` added as a dev dependency for authenticated e2e (D23) — the Phase 00
+  follow-up, now done. `pillow` added for `PlayerProfile.photo`.
+- `next build` run against a live `next dev` server leaves the dev server serving stale
+  output; restart it after a build.
+
+**Known gaps / follow-ups**
+
+- Catalogue strings (sport names, skill labels, positions) come from the database and are
+  English in both locales. Phase 11 needs a translation strategy for them.
+- `PlayerProfile.photo` uploads still use local `FileSystemStorage`; Phase 02 introduces
+  django-storages as its phase file requires.
+- The plural message `profile.sportCount` is an English template in `bn.json`, so Bangla
+  reads "৩ sports". Phase 11.
+- `SportProposal` creation is open to any authenticated user; Phase 02 narrows it to owners
+  as the phase file says.
+- e2e is still not wired into CI; it needs `CLERK_SECRET_KEY` as a repository secret.

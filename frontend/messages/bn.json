@@ -11,7 +11,8 @@
     "owner": "Turf owner",
     "admin": "Admin",
     "profile": "প্রোফাইল",
-    "debug": "Debug"
+    "debug": "Debug",
+    "settings": "সেটিংস"
   },
   "auth": {
     "signIn": "সাইন ইন",
@@ -40,7 +41,8 @@
   "admin": {
     "heading": "Platform admin",
     "empty": "Review queues arrive in Phase 02.",
-    "forbidden": "You need platform administrator access to view this page."
+    "forbidden": "You need platform administrator access to view this page.",
+    "navSports": "খেলার ক্যাটালগ"
   },
   "me": {
     "heading": "Backend session",
@@ -63,5 +65,115 @@
     "loading": "Loading…",
     "notSet": "Not set",
     "retry": "Try again"
+  },
+  "onboarding": {
+    "stepCounter": "ধাপ {current} / {total}",
+    "back": "পেছনে",
+    "next": "পরবর্তী",
+    "finish": "সম্পন্ন করুন",
+    "submitting": "সংরক্ষণ হচ্ছে…",
+    "submitFailed": "Could not save your profile. Check the form and try again.",
+    "capNote": "Self-assessed ratings are capped at {cap} and shown as unverified until you play a match.",
+    "summary": "আপনি খেলবেন:",
+    "noSports": "The sports catalogue is empty. An admin needs to add a sport first.",
+    "basics": {
+      "heading": "আপনার সম্পর্কে বলুন",
+      "body": "Only your name is required. Everything else helps us match you with the right games."
+    },
+    "sports": {
+      "heading": "আপনি কী খেলেন?",
+      "body": "Pick every sport you want on your profile. You can add more later."
+    },
+    "skills": {
+      "heading": "নিজেকে রেটিং দিন",
+      "body": "Rough is fine — your real rating comes from matches you play."
+    },
+    "attributes": {
+      "heading": "আপনার শারীরিক সক্ষমতা",
+      "body": "These are shared across every sport, so they show on all your cards."
+    },
+    "fields": {
+      "displayName": "প্রদর্শিত নাম",
+      "area": "এলাকা",
+      "areaPlaceholder": "e.g. Dhanmondi",
+      "dateOfBirth": "জন্মতারিখ",
+      "heightCm": "উচ্চতা (সেমি)",
+      "weightKg": "ওজন (কেজি)",
+      "weightHint": "Optional. Used only to estimate calories burned.",
+      "preferredSide": "পছন্দের পা / হাত",
+      "bio": "সংক্ষিপ্ত পরিচিতি",
+      "positions": "পজিশন"
+    },
+    "sides": {
+      "left": "বাম",
+      "right": "ডান",
+      "both": "দুটোই"
+    }
+  },
+  "playerCard": {
+    "ariaLabel": "{name}'s {sport} card",
+    "overall": "ওভারঅল",
+    "unverified": "অযাচাইকৃত",
+    "matches": "ম্যাচ",
+    "wins": "জয়",
+    "losses": "পরাজয়",
+    "motm": "MOTM",
+    "noAttributes": "No attributes rated yet."
+  },
+  "profile": {
+    "edit": "প্রোফাইল সম্পাদনা",
+    "reliability": "নির্ভরযোগ্যতা {score}",
+    "sportCount": "{count, plural, one {# sport} other {# sports}}",
+    "noSports": "No sports on this profile yet.",
+    "attributesHeading": "শারীরিক সক্ষমতা",
+    "attributesHint": "Shared across every sport (DOMAIN §3), so they appear on all cards."
+  },
+  "settings": {
+    "heading": "সেটিংস",
+    "body": "Your profile, what others can see, and how we estimate your calories.",
+    "basics": "মূল তথ্য",
+    "displayName": "প্রদর্শিত নাম",
+    "area": "এলাকা",
+    "weight": "ওজন (কেজি)",
+    "weightHint": "Optional. Used only to estimate calories burned; without it we assume {fallback} kg and mark the estimate.",
+    "bio": "সংক্ষিপ্ত পরিচিতি",
+    "privacy": "গোপনীয়তা",
+    "discoverable": "Appear in player search",
+    "discoverableHint": "Turn this off to stay out of search results. Anyone with a direct link to your profile can still open it.",
+    "attributes": "শারীরিক সক্ষমতা",
+    "attributesHint": "Self-assessed values are capped at {cap} until matches confirm them.",
+    "sports": "আমার খেলা",
+    "sportsHint": "Removing a sport you have already played only hides the card; the history stays.",
+    "add": "যোগ করুন",
+    "remove": "সরান",
+    "save": "পরিবর্তন সংরক্ষণ",
+    "saving": "সংরক্ষণ হচ্ছে…",
+    "saved": "সংরক্ষিত।",
+    "saveFailed": "Could not save. Please try again."
+  },
+  "adminSports": {
+    "heading": "খেলাধুলা",
+    "body": "Review proposals from turf owners and keep the catalogue free of duplicates.",
+    "empty": "No sport proposals yet.",
+    "proposedBy": "Proposed by {name}",
+    "approve": "অনুমোদন",
+    "approveHint": "Approving creates the sport but leaves it inactive until you add its formats, skills and stat definitions in the Django admin.",
+    "merge": "একত্র করুন",
+    "mergeTarget": "Merge into…",
+    "reject": "বাতিল",
+    "note": "পর্যালোচনার নোট",
+    "notePlaceholder": "Note for the proposer (required to reject)",
+    "mergedInto": "Merged into {sport}.",
+    "actionFailed": "That action failed. Reload and try again.",
+    "catalogue": "ক্যাটালগ",
+    "catalogueMeta": "{formats} formats · {skills} skills · {stats} stats",
+    "inactive": "নিষ্ক্রিয়",
+    "status": {
+      "pending": "অপেক্ষমাণ",
+      "approved": "অনুমোদিত",
+      "merged": "একত্রিত",
+      "rejected": "বাতিল"
+    },
+    "createdSport": "সৃষ্ট খেলা: {sport}."
   }
 }

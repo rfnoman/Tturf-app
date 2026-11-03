@@ -60,6 +60,8 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "apps.core",
     "apps.accounts",
+    "apps.sports",
+    "apps.players",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -251,6 +253,12 @@ MOTM_VOTE_WINDOW_HOURS = 24
 SELF_ASSESSED_RATING_CAP = 75
 RATING_PROVISIONAL_MATCHES = 10
 RATING_VERIFIED_SCORECARD_WEIGHT = 1.5
+# Provisional overall = skills x SHARE + shared attributes x SHARE (must sum to 1).
+# Phase 06's versioned engine replaces this blend.
+OVERALL_SKILL_SHARE = 0.65
+OVERALL_ATTRIBUTE_SHARE = 0.35
+# Onboarding sliders start here, so a player who skips them is mid-range, not a 1.
+ONBOARDING_DEFAULT_RATING = 50
 
 # Store / delivery (DECISIONS D5)
 TURF_DELIVERY_CUTOFF_HOURS = 16

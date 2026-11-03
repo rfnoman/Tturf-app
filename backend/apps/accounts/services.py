@@ -8,6 +8,7 @@ from typing import Any
 from django.db import transaction
 from django.utils import timezone
 
+from .clerk import fetch_clerk_user
 from .models import User
 
 logger = logging.getLogger(__name__)
@@ -19,16 +20,46 @@ def get_or_create_user_from_claims(claims: dict[str, Any]) -> User:
     The webhook is the primary sync path, but it can be late, unconfigured, or have
     failed. Creating on first authenticated call means a signed-in user is never left
     without a row.
+
+    A session token carries **no identity claims** (only ``sub``, ``sid``, ``iss`` and
+    friends), so a row created here starts with no name or email. Rather than leave the
+    account showing as "Player" everywhere until a webhook arrives — which never happens
+    in local development, where Clerk has no public URL to call — the profile is
+    backfilled once from Clerk's Backend API. Only for a row that has never been synced,
+    so this costs at most one request per account, and never on the hot path afterwards.
     """
     clerk_id = claims["sub"]
-    user, created = User.objects.get_or_create(
-        clerk_id=clerk_id,
-        defaults={"last_synced_at": timezone.now()},
-    )
+    user, created = User.objects.get_or_create(clerk_id=clerk_id)
     if created:
         user.set_unusable_password()
         user.save(update_fields=["password"])
         logger.info("Created user from session token", extra={"clerk_id": clerk_id})
+
+    if user.last_synced_at is None:
+        backfill_user_from_clerk_api(user)
+
+    return user
+
+
+def backfill_user_from_clerk_api(user: User) -> User:
+    """Fill a never-synced account's name, email and avatar from Clerk.
+
+    ``last_synced_at`` is stamped even when the read fails, so an unreachable Clerk API
+    costs one attempt rather than one per request. A later webhook still corrects
+    everything.
+    """
+    payload = fetch_clerk_user(user.clerk_id)
+    fields = user_fields_from_clerk_payload(payload) if payload else {}
+    fields["last_synced_at"] = timezone.now()
+
+    for field, value in fields.items():
+        setattr(user, field, value)
+    user.save(update_fields=[*fields, "updated_at"])
+
+    logger.info(
+        "Backfilled user from Clerk's Backend API",
+        extra={"clerk_id": user.clerk_id, "found": bool(payload)},
+    )
     return user
 
 
@@ -83,7 +114,8 @@ def sync_user_from_clerk(data: dict[str, Any]) -> User:
 
     logger.info(
         "Synced user from Clerk webhook",
-        extra={"clerk_id": clerk_id, "created": created},
+        # "created" is a reserved LogRecord attribute and would raise on INFO.
+        extra={"clerk_id": clerk_id, "is_new": created},
     )
     return user
 
