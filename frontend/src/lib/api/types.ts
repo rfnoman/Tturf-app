@@ -72,6 +72,13 @@ export type FairPlay = Schemas["FairPlay"];
 export type PlayerAvailability = Schemas["PlayerAvailability"];
 export type PlayerSearchResult = Schemas["PlayerSearchResult"];
 export type ConductReport = Schemas["ConductReport"];
+
+export type Product = Schemas["Product"];
+export type ProductCategory = Schemas["ProductCategory"];
+export type StockItem = Schemas["StockItem"];
+export type StockMovement = Schemas["StockMovement"];
+export type CounterSale = Schemas["CounterSale"];
+export type Rental = Schemas["Rental"];
 export type LeaderboardEntry = Schemas["LeaderboardEntry"];
 
 /**

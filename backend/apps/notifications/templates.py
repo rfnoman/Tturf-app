@@ -148,4 +148,19 @@ TEMPLATES: dict[str, Template] = {
         "body": "{sport} at {turf}, {score}. Nicely done.",
         "email": True,
     },
+    NotificationKind.STOCK_LOW: {
+        "title": "{product} is running low",
+        "body": "{available} left at {turf}. Worth restocking before the evening rush.",
+        "email": False,
+    },
+    NotificationKind.RENTAL_OUT: {
+        "title": "{product} is out",
+        "body": "{quantity} taken by {player} at {turf}.",
+        "email": False,
+    },
+    NotificationKind.RENTAL_OVERDUE: {
+        "title": "{product} has not come back",
+        "body": "{quantity} taken by {player} at {turf} and still out.",
+        "email": False,
+    },
 }

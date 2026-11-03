@@ -25,11 +25,18 @@ async function bookFirstFreeSlot(page: Page, slug: string): Promise<string> {
   await page.goto(`/turfs/${slug}`);
   await page.getByLabel("Date").fill(dhakaDate(1));
 
-  // Only available slots are enabled, so this picks one that is genuinely free.
-  const slot = page
-    .getByRole("button", { name: /৳/ })
-    .and(page.locator(":not([disabled])"))
-    .first();
+  // A turf has several grounds, and a run that books every slot on one of them must not
+  // break the next run: take the first ground that still has something free.
+  const open = page.locator("[data-slot-start][data-slot-available='true']");
+  const grounds = await page.locator("#ground option").count();
+  for (let index = 0; index < grounds; index += 1) {
+    const value = await page.locator("#ground option").nth(index).getAttribute("value");
+    await page.locator("#ground").selectOption(value);
+    if ((await open.count()) > 0) break;
+  }
+
+  const slot = open.first();
+  await expect(slot).toBeVisible();
   await slot.click();
   await page.getByRole("button", { name: /^Book for/ }).click();
 

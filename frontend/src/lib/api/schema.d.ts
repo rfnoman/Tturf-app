@@ -2187,10 +2187,415 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/product-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Product categories */
+        get: operations["product_categories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/turfs/{slug}/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A turf's products
+         * @description What a turf sells, for anybody looking at the turf (Phase 08 reads this).
+         */
+        get: operations["turf_products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/store/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Platform products
+         * @description The platform catalogue — the store's own shelf.
+         */
+        get: operations["platform_products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Products at my turf
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        get: operations["my_products_list"];
+        put?: never;
+        /**
+         * Add a product
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        post: operations["my_products_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/products/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Retire a product
+         * @description Deactivated rather than deleted: past sales point at it.
+         */
+        delete: operations["my_products_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a product
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        patch: operations["my_products_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/stock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Stock at my turf
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        get: operations["my_stock_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/stock/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Set this location's price or threshold
+         * @description Finding one stock item at the caller's turf.
+         *
+         *     A mixin rather than a base view: inheriting a view would inherit its HTTP methods
+         *     too, and `receive` would then also answer PATCH — which drf-spectacular rightly
+         *     reports as four operations sharing one id.
+         */
+        patch: operations["my_stock_update"];
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/stock/{item_id}/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Receive stock
+         * @description Finding one stock item at the caller's turf.
+         *
+         *     A mixin rather than a base view: inheriting a view would inherit its HTTP methods
+         *     too, and `receive` would then also answer PATCH — which drf-spectacular rightly
+         *     reports as four operations sharing one id.
+         */
+        post: operations["my_stock_receive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/stock/{item_id}/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Adjust stock, with a reason
+         * @description Finding one stock item at the caller's turf.
+         *
+         *     A mixin rather than a base view: inheriting a view would inherit its HTTP methods
+         *     too, and `receive` would then also answer PATCH — which drf-spectacular rightly
+         *     reports as four operations sharing one id.
+         */
+        post: operations["my_stock_adjust"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/stock/{item_id}/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The movement log
+         * @description Finding one stock item at the caller's turf.
+         *
+         *     A mixin rather than a base view: inheriting a view would inherit its HTTP methods
+         *     too, and `receive` would then also answer PATCH — which drf-spectacular rightly
+         *     reports as four operations sharing one id.
+         */
+        get: operations["my_stock_movements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/stock-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Everything that moved at my turf
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        get: operations["my_stock_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/counter-sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Today's counter sales
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        get: operations["counter_sales_list"];
+        put?: never;
+        /**
+         * Ring up a sale
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        post: operations["counter_sale_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/counter-sales/{sale_id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Void a sale
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        post: operations["counter_sale_void"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/rentals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Rentals at my turf
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        get: operations["rentals_list"];
+        put?: never;
+        /**
+         * Hand gear over
+         * @description A turf from the URL, with this reader's role checked once.
+         */
+        post: operations["rental_out"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/rentals/{rental_id}/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Gear came back
+         * @description Finding one rental at the caller's turf — a mixin, for the reason above.
+         */
+        post: operations["rental_return"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/rentals/{rental_id}/lost": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Gear did not come back
+         * @description Finding one rental at the caller's turf — a mixin, for the reason above.
+         */
+        post: operations["rental_lost"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/warehouse/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Platform products */
+        get: operations["warehouse_products_list"];
+        put?: never;
+        /** Add a platform product */
+        post: operations["warehouse_products_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/warehouse/stock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Warehouse stock */
+        get: operations["warehouse_stock"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/warehouse/stock/{item_id}/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Receive warehouse stock */
+        post: operations["warehouse_stock_receive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AdjustStockRequest: {
+            delta: number;
+            reason: string;
+        };
         Amenity: {
             /** Format: uuid */
             readonly id: string;
@@ -2278,6 +2683,8 @@ export interface components {
              */
             readonly was_late_cancel: boolean;
             readonly player_name: string;
+            /** Format: uuid */
+            readonly player_profile_id: string | null;
             /** Walk-in phone */
             readonly booked_for_phone: string;
             readonly notes: string;
@@ -2455,6 +2862,65 @@ export interface components {
         ConductReportStatusEnum: "open" | "upheld" | "dismissed";
         ConductReviewRequest: {
             uphold: boolean;
+            note?: string;
+        };
+        CounterSale: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly turf: string;
+            readonly staff_name: string;
+            readonly customer_phone: string;
+            /**
+             * Format: uuid
+             * @description Attached when the sale belongs to a game being played.
+             */
+            readonly booking: string | null;
+            readonly lines: components["schemas"]["CounterSaleLine"][];
+            /** Format: decimal */
+            readonly total: string;
+            /** Format: decimal */
+            readonly cash_received: string;
+            /** Format: decimal */
+            readonly change_due: string;
+            readonly status: components["schemas"]["CounterSaleStatusEnum"];
+            readonly note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        CounterSaleLine: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly product: string;
+            readonly product_name: string;
+            readonly quantity: number;
+            /**
+             * Format: decimal
+             * @description Copied at the time of sale: a later price change must not rewrite history.
+             */
+            readonly unit_price: string;
+            /** Format: decimal */
+            readonly line_total: string;
+        };
+        CounterSaleLineWriteRequest: {
+            /** Format: uuid */
+            product_id: string;
+            quantity: number;
+        };
+        /**
+         * @description * `completed` - Completed
+         *     * `voided` - Voided
+         * @enum {string}
+         */
+        CounterSaleStatusEnum: "completed" | "voided";
+        CounterSaleWriteRequest: {
+            lines: components["schemas"]["CounterSaleLineWriteRequest"][];
+            /** Format: decimal */
+            cash_received?: string;
+            customer_phone?: string;
+            /** Format: uuid */
+            booking_id?: string | null;
             note?: string;
         };
         DecideRequest: {
@@ -2781,9 +3247,26 @@ export interface components {
          *     * `scorecard_disputed` - Scorecard disputed
          *     * `scorecard_locked` - Scorecard final
          *     * `motm_awarded` - Man of the match
+         *     * `stock_low` - Stock running low
+         *     * `rental_out` - Gear taken out
+         *     * `rental_overdue` - Gear not returned
          * @enum {string}
          */
-        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined" | "scorecard_submitted" | "scorecard_disputed" | "scorecard_locked" | "motm_awarded";
+        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined" | "scorecard_submitted" | "scorecard_disputed" | "scorecard_locked" | "motm_awarded" | "stock_low" | "rental_out" | "rental_overdue";
+        /** @description The nutrition panel, kept together so the UI can hide it in one go. */
+        Nutrition: {
+            serving_size: string;
+            calories: number | null;
+            /** Format: decimal */
+            protein_g: string | null;
+            /** Format: decimal */
+            carbs_g: string | null;
+            /** Format: decimal */
+            fat_g: string | null;
+            /** Format: decimal */
+            sugar_g: string | null;
+            caffeine_mg: number | null;
+        };
         /** @description The wizard payload. Field-level validation only; rules live in the service. */
         OnboardingRequest: {
             display_name?: string;
@@ -3149,6 +3632,63 @@ export interface components {
             /** @description e.g. Peak, Off-peak, Night. */
             label?: string;
         };
+        /** @description What an owner may set. `owner_type` and `turf` come from the URL, never the body. */
+        PatchedProductWriteRequest: {
+            category?: string;
+            name?: string;
+            description?: string;
+            /** Image */
+            image_url?: string;
+            kind?: components["schemas"]["ProductKindEnum"];
+            /**
+             * Price
+             * Format: decimal
+             * @description BDT. A stock item may override it for one location.
+             */
+            base_price?: string;
+            /** Format: decimal */
+            rental_price_per_match?: string | null;
+            /**
+             * Format: decimal
+             * @description Held against a rental and returned with the gear.
+             */
+            deposit?: string;
+            /** @description DOMAIN §9: a turf's perishables are pickup only, never delivered. */
+            perishable?: boolean;
+            sku?: string;
+            /** @description Scanned at the counter. */
+            barcode?: string;
+            serving_size?: string;
+            calories?: number | null;
+            /**
+             * Protein (g)
+             * Format: decimal
+             */
+            protein_g?: string | null;
+            /**
+             * Carbs (g)
+             * Format: decimal
+             */
+            carbs_g?: string | null;
+            /**
+             * Fat (g)
+             * Format: decimal
+             */
+            fat_g?: string | null;
+            /**
+             * Sugar (g)
+             * Format: decimal
+             */
+            sugar_g?: string | null;
+            /** Caffeine (mg) */
+            caffeine_mg?: number | null;
+            /** @description Any of: hydration, recovery, pre_match, protein, low_sugar, vegan, gear. */
+            tags?: unknown;
+            /** @description Sport slugs. */
+            sports?: string[];
+            /** Active */
+            is_active?: boolean;
+        };
         /** @description PATCH /me/profile. Attributes may be re-assessed from the settings page. */
         PatchedProfileUpdateRequest: {
             /** @description Shown on the match board and scorecards. Defaults to the Clerk name. */
@@ -3203,6 +3743,12 @@ export interface components {
              */
             accepts_public_requests?: boolean;
             sport_ids?: string[];
+        };
+        /** @description The two things a turf sets per location, rather than per product. */
+        PatchedStockItemWriteRequest: {
+            /** Format: decimal */
+            price_override?: string | null;
+            low_stock_threshold?: number;
         };
         PatchedTurfPhotoRequest: {
             /** Format: binary */
@@ -3523,6 +4069,131 @@ export interface components {
             /** @description e.g. Peak, Off-peak, Night. */
             label?: string;
         };
+        /** @description A product as everybody reads it, with its nutrition grouped. */
+        Product: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Owner */
+            readonly owner_type: components["schemas"]["ProductOwnerEnum"];
+            /**
+             * Format: uuid
+             * @description Null for the platform catalogue.
+             */
+            readonly turf: string | null;
+            readonly turf_name: string | null;
+            readonly category: components["schemas"]["ProductCategory"];
+            readonly name: string;
+            readonly slug: string;
+            readonly description: string;
+            /**
+             * Image
+             * Format: uri
+             */
+            readonly image_url: string;
+            readonly kind: components["schemas"]["ProductKindEnum"];
+            /**
+             * Price
+             * Format: decimal
+             * @description BDT. A stock item may override it for one location.
+             */
+            readonly base_price: string;
+            /** Format: decimal */
+            readonly rental_price_per_match: string | null;
+            /**
+             * Format: decimal
+             * @description Held against a rental and returned with the gear.
+             */
+            readonly deposit: string;
+            /** @description DOMAIN §9: a turf's perishables are pickup only, never delivered. */
+            readonly perishable: boolean;
+            readonly sku: string;
+            /** @description Scanned at the counter. */
+            readonly barcode: string;
+            readonly nutrition: components["schemas"]["Nutrition"];
+            readonly tags: string[];
+            readonly sports: string[];
+            /** Active */
+            readonly is_active: boolean;
+        };
+        ProductCategory: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly slug: string;
+            readonly label: string;
+            readonly icon: string;
+            readonly order: number;
+            /** Consumable */
+            readonly is_consumable: boolean;
+        };
+        /**
+         * @description * `sale` - For sale
+         *     * `rental` - For rent
+         * @enum {string}
+         */
+        ProductKindEnum: "sale" | "rental";
+        /**
+         * @description * `platform` - Platform
+         *     * `turf` - Turf
+         * @enum {string}
+         */
+        ProductOwnerEnum: "platform" | "turf";
+        /** @description What an owner may set. `owner_type` and `turf` come from the URL, never the body. */
+        ProductWriteRequest: {
+            category: string;
+            name: string;
+            description?: string;
+            /** Image */
+            image_url?: string;
+            kind?: components["schemas"]["ProductKindEnum"];
+            /**
+             * Price
+             * Format: decimal
+             * @description BDT. A stock item may override it for one location.
+             */
+            base_price: string;
+            /** Format: decimal */
+            rental_price_per_match?: string | null;
+            /**
+             * Format: decimal
+             * @description Held against a rental and returned with the gear.
+             */
+            deposit?: string;
+            /** @description DOMAIN §9: a turf's perishables are pickup only, never delivered. */
+            perishable?: boolean;
+            sku?: string;
+            /** @description Scanned at the counter. */
+            barcode?: string;
+            serving_size?: string;
+            calories?: number | null;
+            /**
+             * Protein (g)
+             * Format: decimal
+             */
+            protein_g?: string | null;
+            /**
+             * Carbs (g)
+             * Format: decimal
+             */
+            carbs_g?: string | null;
+            /**
+             * Fat (g)
+             * Format: decimal
+             */
+            fat_g?: string | null;
+            /**
+             * Sugar (g)
+             * Format: decimal
+             */
+            sugar_g?: string | null;
+            /** Caffeine (mg) */
+            caffeine_mg?: number | null;
+            /** @description Any of: hydration, recovery, pre_match, protein, low_sugar, vegan, gear. */
+            tags?: unknown;
+            /** @description Sport slugs. */
+            sports?: string[];
+            /** Active */
+            is_active?: boolean;
+        };
         /**
          * @description What other players may see: no contact details, no exact date of birth.
          *
@@ -3627,6 +4298,10 @@ export interface components {
          * @enum {string}
          */
         ReasonEnum: "abusive" | "left_early" | "no_show" | "unsafe_play" | "other";
+        ReceiveStockRequest: {
+            quantity: number;
+            note?: string;
+        };
         RemovePlayerRequest: {
             /**
              * Format: uuid
@@ -3634,6 +4309,66 @@ export interface components {
              */
             player_id: string;
         };
+        RentOutRequest: {
+            /** Format: uuid */
+            product_id: string;
+            /**
+             * Format: uuid
+             * @description The player's profile id (D39).
+             */
+            player_id: string;
+            /** @default 1 */
+            quantity: number;
+            /** Format: uuid */
+            match_id?: string | null;
+            /** Format: uuid */
+            booking_id?: string | null;
+        };
+        Rental: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly turf: string;
+            /** Format: uuid */
+            readonly match: string | null;
+            /** Format: uuid */
+            readonly booking: string | null;
+            /** Format: uuid */
+            readonly product: string;
+            readonly product_name: string;
+            readonly player_name: string;
+            readonly quantity: number;
+            readonly status: components["schemas"]["RentalStatusEnum"];
+            readonly status_label: string;
+            /**
+             * Rental price
+             * Format: decimal
+             */
+            readonly price: string;
+            /** Format: decimal */
+            readonly deposit: string;
+            /**
+             * Format: decimal
+             * @description Damage or loss, settled against the deposit.
+             */
+            readonly charges: string;
+            /**
+             * Taken out at
+             * Format: date-time
+             */
+            readonly out_at: string | null;
+            /** Format: date-time */
+            readonly returned_at: string | null;
+            readonly note: string;
+        };
+        /**
+         * @description * `reserved` - Reserved
+         *     * `out` - Out
+         *     * `returned` - Returned
+         *     * `lost` - Not returned
+         * @enum {string}
+         */
+        RentalStatusEnum: "reserved" | "out" | "returned" | "lost";
         ResolveRequest: {
             team_a_score?: number;
             team_b_score?: number;
@@ -3773,6 +4508,10 @@ export interface components {
             assignments: {
                 [key: string]: "A" | "B";
             };
+        };
+        SettleRentalRequest: {
+            /** Format: decimal */
+            charges?: string;
         };
         /** @description One slot from ``apps.turfs.availability``. */
         Slot: {
@@ -4061,6 +4800,53 @@ export interface components {
          * @enum {string}
          */
         StatValueTypeEnum: "int" | "bool" | "decimal";
+        StockItem: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly product: components["schemas"]["Product"];
+            readonly on_hand: number;
+            readonly reserved: number;
+            readonly available: number;
+            /** Format: decimal */
+            readonly price: string;
+            /**
+             * Price at this location
+             * Format: decimal
+             */
+            readonly price_override: string | null;
+            /** @description At or below this, the owner is told to restock. */
+            readonly low_stock_threshold: number;
+            readonly is_low: boolean;
+        };
+        StockMovement: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly type: components["schemas"]["StockMovementTypeEnum"];
+            readonly type_label: string;
+            readonly product_name: string;
+            /** Quantity change */
+            readonly qty_delta: number;
+            /** Reserved change */
+            readonly reserved_delta: number;
+            /** @description What caused it, e.g. "counter_sale:3f2b…" or "order:9c1a…". */
+            readonly reference: string;
+            readonly actor_name: string;
+            readonly note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `purchase` - Stock received
+         *     * `sale` - Sold (online)
+         *     * `counter_sale` - Sold at the counter
+         *     * `reservation` - Reserved
+         *     * `release` - Reservation released
+         *     * `rental_out` - Rented out
+         *     * `rental_return` - Rental returned
+         *     * `adjustment` - Adjusted
+         * @enum {string}
+         */
+        StockMovementTypeEnum: "purchase" | "sale" | "counter_sale" | "reservation" | "release" | "rental_out" | "rental_return" | "adjustment";
         TeamPlayer: {
             /** Format: uuid */
             match_player_id: string;
@@ -4280,6 +5066,9 @@ export interface components {
             readonly is_active: boolean;
             /** Format: date-time */
             readonly created_at: string;
+        };
+        VoidSaleRequest: {
+            reason?: string;
         };
         /** @description Staff booking on behalf of someone at the counter. */
         WalkInBooking: {
@@ -7514,6 +8303,609 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeaderboardEntry"][];
+                };
+            };
+        };
+    };
+    product_categories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCategory"][];
+                };
+            };
+        };
+    };
+    turf_products: {
+        parameters: {
+            query?: {
+                category?: string;
+                /** @description sale | rental */
+                kind?: string;
+                tag?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"][];
+                };
+            };
+        };
+    };
+    platform_products: {
+        parameters: {
+            query?: {
+                category?: string;
+                sport?: string;
+                tag?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"][];
+                };
+            };
+        };
+    };
+    my_products_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"][];
+                };
+            };
+        };
+    };
+    my_products_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ProductWriteRequest"];
+                "multipart/form-data": components["schemas"]["ProductWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+        };
+    };
+    my_products_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    my_products_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedProductWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedProductWriteRequest"];
+                "multipart/form-data": components["schemas"]["PatchedProductWriteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+        };
+    };
+    my_stock_list: {
+        parameters: {
+            query?: {
+                /** @description Only what needs restocking. */
+                low?: boolean;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockItem"][];
+                };
+            };
+        };
+    };
+    my_stock_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedStockItemWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedStockItemWriteRequest"];
+                "multipart/form-data": components["schemas"]["PatchedStockItemWriteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockItem"];
+                };
+            };
+        };
+    };
+    my_stock_receive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReceiveStockRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ReceiveStockRequest"];
+                "multipart/form-data": components["schemas"]["ReceiveStockRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockItem"];
+                };
+            };
+        };
+    };
+    my_stock_adjust: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdjustStockRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AdjustStockRequest"];
+                "multipart/form-data": components["schemas"]["AdjustStockRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockItem"];
+                };
+            };
+        };
+    };
+    my_stock_movements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMovement"][];
+                };
+            };
+        };
+    };
+    my_stock_log: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockMovement"][];
+                };
+            };
+        };
+    };
+    counter_sales_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CounterSale"][];
+                };
+            };
+        };
+    };
+    counter_sale_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CounterSaleWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CounterSaleWriteRequest"];
+                "multipart/form-data": components["schemas"]["CounterSaleWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CounterSale"];
+                };
+            };
+            /** @description No response body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    counter_sale_void: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sale_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["VoidSaleRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["VoidSaleRequest"];
+                "multipart/form-data": components["schemas"]["VoidSaleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CounterSale"];
+                };
+            };
+        };
+    };
+    rentals_list: {
+        parameters: {
+            query?: {
+                /** @description reserved | out | returned | lost */
+                status?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rental"][];
+                };
+            };
+        };
+    };
+    rental_out: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RentOutRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["RentOutRequest"];
+                "multipart/form-data": components["schemas"]["RentOutRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rental"];
+                };
+            };
+            /** @description No response body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    rental_return: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rental_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SettleRentalRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SettleRentalRequest"];
+                "multipart/form-data": components["schemas"]["SettleRentalRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rental"];
+                };
+            };
+        };
+    };
+    rental_lost: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rental_id: string;
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SettleRentalRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SettleRentalRequest"];
+                "multipart/form-data": components["schemas"]["SettleRentalRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rental"];
+                };
+            };
+        };
+    };
+    warehouse_products_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"][];
+                };
+            };
+        };
+    };
+    warehouse_products_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ProductWriteRequest"];
+                "multipart/form-data": components["schemas"]["ProductWriteRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Product"];
+                };
+            };
+        };
+    };
+    warehouse_stock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockItem"][];
+                };
+            };
+        };
+    };
+    warehouse_stock_receive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReceiveStockRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ReceiveStockRequest"];
+                "multipart/form-data": components["schemas"]["ReceiveStockRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StockItem"];
                 };
             };
         };

@@ -11,7 +11,7 @@ Updated by Claude Code at the end of each phase.
 | 04 Matches, squads, joining | **done** | 2026-11-03 | Matches per booking, squads, join requests, the D1 invite chain, match board with filters |
 | 05 Scoreboard | **done** | 2026-11-03 | Teams + auto-balance, scorecard state machine, per-sport validators, disputes, MOTM, peer ratings, public shareable card |
 | 06 Ratings, track record, discovery | **done** | 2026-11-03 | Pure versioned rating engine, rating history with explanations, track record, conduct reports, fair play, leaderboards, player search |
-| 07 Inventory & counter POS | not started | | |
+| 07 Inventory & counter POS | **done** | 2026-11-04 | Product catalogue, stock ledger, counter POS, rentals, low-stock alerts, warehouse |
 | 08 Store, orders, delivery | not started | | |
 | 09 Fitness layer & notifications+ | not started | | |
 | 10 Online payments & ledger | not started | | |
@@ -664,4 +664,94 @@ search serializer, reading the relations `profile_queryset()` has already prefet
 - Head-to-head records (DOMAIN §8) are not built; the per-ground table is the useful half
   and head-to-head needs a UI question answering first.
 - django-storages is still not wired up (carried from Phase 02).
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 07 — Inventory, rentals and the counter (2026-11-04)
+
+**Built**
+
+- **`apps/inventory`** is shaped around one idea: **`StockItem` is a cache of
+  `StockMovement`.** Every quantity change happens in a service, inside a transaction,
+  with the row locked, and always alongside the movement that explains it. Views,
+  serializers and the admin never touch `on_hand` or `reserved` — the admin's quantity
+  fields are read-only and the movement log is append-only there too.
+- **Models**: `ProductCategory` (seeded by migration), `Product` (platform- or
+  turf-owned, sale or rental, nutrition panel, fitness tags, sport relevance, barcode),
+  `StockLocation` (the warehouse, or a turf), `StockItem` (`on_hand`, `reserved`,
+  per-location price override, low-stock threshold), `StockMovement`, `CounterSale` +
+  `CounterSaleLine`, `Rental`.
+- **Database-level guards**: stock and reservations cannot go negative, `reserved` can
+  never exceed `on_hand`, a product's owner and turf must agree, and a location is either
+  the warehouse or a turf. The services check the same things and raise a readable error
+  first; the constraints are there for everything that is not a service.
+- **Services**: `receive_stock`, `adjust_stock(reason)` (a reason is required — an
+  unexplained adjustment is indistinguishable from a bug), `reserve` / `release` /
+  `commit_sale` for the Phase 08 store, `record_counter_sale`, `void_counter_sale`,
+  `rent_out`, `return_rental`, `mark_rental_lost`, and low-stock notifications to the
+  turf's staff.
+- **Rented gear stays `on_hand` and becomes `reserved`**: it is still the turf's and it
+  is coming back, but it cannot be rented to two teams at once. Gear that never comes
+  back leaves stock through an adjustment and keeps the deposit.
+- **API**: a turf's own products and stock under `/me/turfs/{slug}/…` (owners write,
+  cashiers sell), the counter, the rentals board, the platform warehouse for admins, and
+  the public reads Phase 08 needs — `GET /turfs/{slug}/products` and `GET /store/products`.
+  Out-of-stock answers **409**, not 400: nothing is wrong with the request, somebody else
+  simply got there first.
+- **Frontend**: the owner's inventory screen (shelf, inline receive and adjust, movement
+  log, add-product form that shows nutrition only for food and drink), a tablet-friendly
+  **counter POS** (category grid, tap-to-add, running total, cash received → change due,
+  void), the rentals board, and the admin warehouse.
+- **Seeds**: realistic Dhaka prices — water ৳25, electrolyte ৳70, banana ৳15, cha ৳20,
+  bibs ৳150/match with a ৳500 deposit — stocked through `receive_stock` so even the demo
+  database starts with a ledger that reconciles.
+- **Tests**: 1051 backend (68 in `apps/inventory`), 17 Vitest, 81 Playwright.
+
+**The two tests that matter**
+
+`test_the_ledger_always_reconciles` does everything a turf can do to one product — sells,
+adjusts, reserves, releases, commits, receives, rents out, takes back, writes one off —
+then replays the movements and compares them with the cached columns. If a service ever
+changes a quantity without writing its line, that test fails.
+
+`test_concurrency.py` contests stock with real threads on real connections: three threads
+reaching for the last two items leave exactly two reservations, ten threads against four
+items leave four, and four cashiers selling the last bottle leave one sale and three
+refusals. The ledger still reconciles afterwards.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): rang up three waters at
+Dhanmondi — ৳75 total, ৳25 change from ৳100 — and the shelf went 48 → 45 with the ledger
+agreeing. Handed out a set of bibs (৳500 held, available 4 → 3) and took them back. Counted
+the shelf down with "a crate went missing" as the reason, which logged the adjustment and
+sent the owner a low-stock notification saying "3 left at Dhanmondi Arena". Checked the
+warehouse screen and the POS at tablet width. No console errors.
+
+**Deviations / notes**
+
+- The counter caps each tap at what is on the shelf, so a cashier cannot ring up more than
+  exists. The API refuses it anyway; finding out at "Take payment" is the wrong moment.
+- A product is retired by deactivation, never deleted: past sales point at it.
+- `Booking` now exposes `player_profile_id`. The staff screens act on a person — renting
+  gear out, attaching a sale — and a name is not an identifier (D39).
+- Two e2e helpers now pick the first ground that still has a free slot rather than the
+  default one. Repeated local runs had booked a ground out for a day, which broke tests
+  that were not about that at all.
+
+**One trap removed**
+
+Tests that run with `django_db(transaction=True)` truncate the migration-seeded tables, and
+each such module had been re-seeding the catalogues it happened to know about. Adding
+product categories made that fail everywhere at once. There is now one `conftest.py` that
+re-seeds all of it around any transactional test, so the next one inherits the fix instead
+of rediscovering it.
+
+**Known gaps / follow-ups**
+
+- `apps/bookings/tests/test_concurrency.py` flaked once in a full run under load (barrier
+  timeout) and passed on its own and on every re-run. Worth watching; the barrier timeouts
+  may need raising if it recurs in CI.
+- Barcode scanning is a field on the product and a search path in the API, but the POS has
+  no scanner input yet — it needs a device to test against.
+- Rentals can be attached to a match or a booking, but the board only offers today's
+  bookings; attaching to a match wants the Phase 04 match picker.
+- django-storages is still not wired up, so product images are URLs rather than uploads.
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.

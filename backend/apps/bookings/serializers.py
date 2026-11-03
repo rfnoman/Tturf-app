@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from apps.payments.serializers import PaymentSerializer
@@ -40,6 +41,9 @@ class BookingSerializer(serializers.ModelSerializer):
     starts_at = serializers.DateTimeField(read_only=True)
     ends_at = serializers.DateTimeField(read_only=True)
     player_name = serializers.CharField(read_only=True)
+    # The turf's staff screens act on a person — renting gear out, attaching a counter
+    # sale — and a name is not an identifier. Profile ids are what the API speaks (D39).
+    player_profile_id = serializers.SerializerMethodField()
     events = BookingEventSerializer(many=True, read_only=True)
     payments = PaymentSerializer(many=True, read_only=True)
     # Staff need to know which of their players is which; the booker's own view uses it
@@ -74,6 +78,7 @@ class BookingSerializer(serializers.ModelSerializer):
             "cancel_reason",
             "was_late_cancel",
             "player_name",
+            "player_profile_id",
             "booked_for_phone",
             "notes",
             "cancellation_free_hours",
@@ -82,6 +87,11 @@ class BookingSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = fields
+
+    @extend_schema_field(serializers.UUIDField(allow_null=True))
+    def get_player_profile_id(self, obj):
+        profile = getattr(obj.booked_by, "player_profile", None)
+        return profile.id if profile else None
 
 
 class BookingCreateSerializer(serializers.Serializer):

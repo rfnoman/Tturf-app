@@ -70,6 +70,7 @@ LOCAL_APPS = [
     "apps.matches",
     "apps.scoring",
     "apps.ratings",
+    "apps.inventory",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -264,6 +265,12 @@ SPECTACULAR_SETTINGS = {
         "StatValueTypeEnum": "apps.sports.models.STAT_VALUE_TYPE_CHOICES",
         "StatScopeEnum": "apps.sports.models.STAT_SCOPE_CHOICES",
         "PlayerGenderEnum": "apps.players.models.PLAYER_GENDER_CHOICES",
+        "ProductKindEnum": "apps.inventory.models.PRODUCT_KIND_CHOICES",
+        "ProductOwnerEnum": "apps.inventory.models.PRODUCT_OWNER_CHOICES",
+        "StockLocationKindEnum": "apps.inventory.models.STOCK_LOCATION_KIND_CHOICES",
+        "StockMovementTypeEnum": "apps.inventory.models.STOCK_MOVEMENT_TYPE_CHOICES",
+        "CounterSaleStatusEnum": "apps.inventory.models.COUNTER_SALE_STATUS_CHOICES",
+        "RentalStatusEnum": "apps.inventory.models.RENTAL_STATUS_CHOICES",
         "PlayerPreferredSideEnum": "apps.players.models.PLAYER_PREFERRED_SIDE_CHOICES",
         "NotificationKindEnum": "apps.notifications.models.NotificationKind.choices",
         "MatchStatusEnum": "apps.matches.models.MatchStatus.choices",

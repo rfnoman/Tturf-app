@@ -72,9 +72,20 @@ test.describe("turf detail", () => {
     );
     await page.getByLabel("Date").fill(tomorrow);
 
+    // A turf has several grounds and repeated runs can book one of them out for a day,
+    // so this picks the first ground that actually has a slot rather than assuming the
+    // default one does.
+    const open = page.locator("[data-slot-start][data-slot-available='true']");
+    const grounds = await page.locator("#ground option").count();
+    for (let index = 0; index < grounds; index += 1) {
+      const value = await page.locator("#ground option").nth(index).getAttribute("value");
+      await page.locator("#ground").selectOption(value);
+      if ((await open.count()) > 0) break;
+    }
+
     // Selected on the data hook, not on the text: once a slot is picked, the review
     // panel adds a "Book for ৳…" button that a price-based locator also matches.
-    const slot = page.locator("[data-slot-start][data-slot-available='true']").first();
+    const slot = open.first();
     await expect(slot).toBeVisible();
     await slot.click();
     await expect(slot).toHaveAttribute("aria-pressed", "true");

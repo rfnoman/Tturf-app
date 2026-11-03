@@ -55,6 +55,11 @@ class NotificationKind(models.TextChoices):
     SCORECARD_LOCKED = "scorecard_locked", _("Scorecard final")
     MOTM_AWARDED = "motm_awarded", _("Man of the match")
 
+    # Phase 07 — inventory
+    STOCK_LOW = "stock_low", _("Stock running low")
+    RENTAL_OUT = "rental_out", _("Gear taken out")
+    RENTAL_OVERDUE = "rental_overdue", _("Gear not returned")
+
 
 class Notification(BaseModel):
     user = models.ForeignKey(

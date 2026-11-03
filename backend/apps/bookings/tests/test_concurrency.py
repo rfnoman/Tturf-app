@@ -18,41 +18,12 @@ from psycopg.types.range import TimestamptzRange
 from apps.accounts.tests.factories import UserFactory
 from apps.bookings.models import ACTIVE_BOOKING_STATUSES, Booking, BookingStatus
 from apps.bookings.services import SlotTakenError, create_booking
-from apps.sports.catalogue import sync_catalogue
-from apps.turfs.catalogue import sync_amenities
 
 from .factories import bookable_ground, next_slot_start
 
 #: Real threads need real connections, so these cannot run inside the usual per-test
 #: transaction.
 pytestmark = pytest.mark.django_db(transaction=True)
-
-
-@pytest.fixture(autouse=True)
-def seeded_catalogue():
-    """Re-seed the catalogue this module needs.
-
-    `transaction=True` makes Django **truncate** the tables around each test, which
-    takes the migration-seeded sports catalogue and amenities with it. Django's
-    `serialized_rollback` would restore them, but only when the test database was
-    created in this run — and the project runs with `--reuse-db`, so it usually was not.
-    Re-seeding explicitly works either way.
-    """
-    sync_catalogue()
-    sync_amenities()
-
-
-@pytest.fixture(scope="module", autouse=True)
-def restore_catalogue_for_the_rest_of_the_session(django_db_setup, django_db_blocker):
-    """Put the migration-seeded data back once this module is done.
-
-    Without this, every test that runs *after* these — in any app — finds an empty
-    catalogue, because the last truncation has no transaction to roll back into.
-    """
-    yield
-    with django_db_blocker.unblock():
-        sync_catalogue()
-        sync_amenities()
 
 
 def test_two_threads_booking_the_same_slot_leave_exactly_one_winner():
