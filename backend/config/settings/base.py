@@ -63,6 +63,9 @@ LOCAL_APPS = [
     "apps.sports",
     "apps.players",
     "apps.turfs",
+    "apps.notifications",
+    "apps.payments",
+    "apps.bookings",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -136,8 +139,21 @@ CELERY_TIMEZONE = "UTC"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 10 * 60
 
-# Periodic tasks. Phases 03+ register hold expiry, auto-confirm, vote close and reminders.
-CELERY_BEAT_SCHEDULE: dict[str, dict] = {}
+# Periodic tasks. Phase 03 registers reservation expiry and booking completion; later
+# phases add vote close and reminders.
+CELERY_BEAT_SCHEDULE: dict[str, dict] = {
+    "expire-overdue-bookings": {
+        "task": "bookings.expire_overdue",
+        # Every minute: an expiry deadline is only useful if the slot is actually
+        # released close to it, so somebody else can take it.
+        "schedule": 60.0,
+    },
+    "complete-finished-bookings": {
+        "task": "bookings.complete_finished",
+        # Every five minutes. Completion only has to beat the player noticing.
+        "schedule": 300.0,
+    },
+}
 
 # ---------------------------------------------------------------------------
 # Password validation (Clerk owns authentication; these apply to Django admin users)
@@ -202,6 +218,27 @@ SPECTACULAR_SETTINGS = {
     "SCHEMA_PATH_PREFIX": "/api/v1",
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,
+    # Several apps have a `status` field with different choices, and drf-spectacular
+    # would otherwise mint names like `Status4eaEnum`. Naming them here keeps the
+    # generated TypeScript readable and, more importantly, stable: an auto-resolved
+    # name changes whenever another `status` field is added anywhere.
+    "ENUM_NAME_OVERRIDES": {
+        "BookingStatusEnum": "apps.bookings.models.BookingStatus.choices",
+        "BookingModeEnum": "apps.bookings.models.BookingMode.choices",
+        "BookingVisibilityEnum": "apps.bookings.models.BookingVisibility.choices",
+        "PaymentStatusEnum": "apps.payments.models.PaymentStatus.choices",
+        "PaymentMethodEnum": "apps.payments.models.PaymentMethod.choices",
+        "TurfStatusEnum": "apps.turfs.models.TURF_STATUS_CHOICES",
+        "TurfMembershipStatusEnum": "apps.turfs.models.TURF_MEMBERSHIP_STATUS_CHOICES",
+        "TurfMembershipRoleEnum": "apps.turfs.models.TURF_MEMBERSHIP_ROLE_CHOICES",
+        "GroundSurfaceEnum": "apps.turfs.models.GROUND_SURFACE_CHOICES",
+        "SportProposalStatusEnum": "apps.sports.models.SPORT_PROPOSAL_STATUS_CHOICES",
+        "StatValueTypeEnum": "apps.sports.models.STAT_VALUE_TYPE_CHOICES",
+        "StatScopeEnum": "apps.sports.models.STAT_SCOPE_CHOICES",
+        "PlayerGenderEnum": "apps.players.models.PLAYER_GENDER_CHOICES",
+        "PlayerPreferredSideEnum": "apps.players.models.PLAYER_PREFERRED_SIDE_CHOICES",
+        "NotificationKindEnum": "apps.notifications.models.NotificationKind.choices",
+    },
 }
 
 # ---------------------------------------------------------------------------

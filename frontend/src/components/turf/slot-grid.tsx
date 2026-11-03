@@ -55,6 +55,11 @@ export function SlotGrid({
           <button
             key={slot.start}
             type="button"
+            // A stable hook for tests and for Phase 04's deep links into a slot. The
+            // visible text is all prices and times, which match each other far too
+            // easily to select on.
+            data-slot-start={slot.start}
+            data-slot-available={slot.available ? "true" : "false"}
             disabled={!interactive}
             aria-pressed={interactive ? isSelected : undefined}
             onClick={() => onSelect?.(slot)}

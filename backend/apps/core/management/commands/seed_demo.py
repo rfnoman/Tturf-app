@@ -3,7 +3,8 @@
 Every phase extends this command with its own section (PLAN.md definition of done), so
 a single `manage.py seed_demo` run always produces a complete, demo-able dataset.
 Phase 00 seeded a platform admin; Phase 01 added the sports catalogue and onboarded demo
-players; Phase 02 adds five approved Dhaka turfs with grounds, hours and prices.
+players; Phase 02 added five approved Dhaka turfs; Phase 03 adds bookings across the
+state machine so every screen has something to show.
 """
 
 from __future__ import annotations
@@ -113,6 +114,7 @@ class Command(BaseCommand):
         self.seed_sports_catalogue()
         self.seed_demo_players()
         self.seed_turfs()
+        self.seed_bookings()
         self.stdout.write(self.style.SUCCESS("Demo data seeded."))
 
     def seed_platform_admin(self, email: str) -> None:
@@ -280,3 +282,101 @@ class Command(BaseCommand):
                 f"Turf {turf.name} ({turf.area}): "
                 f"{turf.grounds.count()} ground(s), status {turf.status}"
             )
+
+    def seed_bookings(self) -> None:
+        """One booking in each interesting state, so no screen starts empty.
+
+        Built through the services, so the demo data is also a smoke test of the state
+        machine: a transition that stopped working would fail the seed.
+        """
+        from datetime import timedelta
+
+        from psycopg.types.range import TimestamptzRange
+
+        from apps.bookings.models import Booking, BookingStatus
+        from apps.bookings.services import (
+            cancel_booking,
+            complete_booking,
+            confirm_booking,
+            create_booking,
+            mark_paid,
+        )
+        from apps.core.utils import DHAKA, now
+        from apps.turfs.models import Ground, TurfMembership
+
+        if Booking.objects.exists():
+            self.stdout.write("Bookings already seeded; leaving them alone.")
+            return
+
+        User = get_user_model()
+        players = list(User.objects.filter(clerk_id__startswith="seed_player_"))
+        grounds = list(
+            Ground.objects.filter(is_active=True).select_related("turf").order_by("turf__name")
+        )
+        if not players or not grounds:
+            return
+
+        def slot(ground, *, days_ahead: int, hour: int):
+            """A slot start aligned to the top of a Dhaka hour, as availability offers."""
+            moment = (now() + timedelta(days=days_ahead)).astimezone(DHAKA)
+            return moment.replace(hour=hour, minute=0, second=0, microsecond=0)
+
+        def staff_for(turf):
+            membership = turf.memberships.filter(
+                status=TurfMembership.Status.ACTIVE, role=TurfMembership.Role.OWNER
+            ).first()
+            return membership.user if membership else None
+
+        # Players cycle so every ground gets a booking: there are more grounds than demo
+        # players, and `zip` would stop at the shorter list and leave states uncovered.
+        from itertools import cycle, islice
+
+        pairs = list(zip(islice(cycle(players), len(grounds)), grounds, strict=False))
+
+        made = []
+        for index, (player, ground) in enumerate(pairs):
+            sport_format = ground.sport_formats.first()
+            if sport_format is None:
+                continue
+            try:
+                booking = create_booking(
+                    user=player,
+                    ground=ground,
+                    # A different day each time: one player cannot hold two slots at once.
+                    start=slot(ground, days_ahead=index + 1, hour=19),
+                    sport_format=sport_format,
+                    notes="Seeded demo booking",
+                )
+            except Exception as exc:
+                self.stdout.write(self.style.WARNING(f"Skipped a demo booking: {exc}"))
+                continue
+            made.append((booking, staff_for(ground.turf)))
+
+        # Walk the first few through the state machine so every screen has content.
+        for position, (booking, staff) in enumerate(made):
+            if position == 0:
+                continue  # left `reserved`, so the pending-confirmation queue is not empty
+            confirm_booking(booking=booking, actor=staff, note="Seeded")
+            if position == 1:
+                continue  # left `confirmed`, awaiting payment at the counter
+            mark_paid(booking=booking, actor=staff)
+            if position == 2:
+                continue  # left `paid`
+            if position == 3:
+                # Backdate it so completion is legal, then close it out.
+                Booking.objects.filter(pk=booking.pk).update(
+                    time_range=TimestamptzRange(
+                        now() - timedelta(hours=3), now() - timedelta(hours=2)
+                    )
+                )
+                booking.refresh_from_db()
+                complete_booking(booking=booking)
+            else:
+                cancel_booking(
+                    booking=booking, actor=staff, reason="Seeded cancellation", by_staff=True
+                )
+
+        counts = {
+            status: Booking.objects.filter(status=status).count() for status in BookingStatus.values
+        }
+        self.stdout.write("Bookings: " + ", ".join(f"{n} {s}" for s, n in counts.items() if n))

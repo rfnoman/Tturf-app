@@ -7,7 +7,7 @@
     "home": "Home",
     "play": "Play",
     "turfs": "Turfs",
-    "myBookings": "My bookings",
+    "myBookings": "Bookings",
     "owner": "Turf owner",
     "admin": "Admin",
     "profile": "Profile",
@@ -216,7 +216,6 @@
     "noSlots": "The turf is closed on this date.",
     "noGrounds": "No bookable grounds yet.",
     "selectedSlot": "{time} · ৳{price}",
-    "bookingSoon": "Booking arrives in Phase 03",
     "openingHours": "Opening hours",
     "closed": "Closed",
     "amenities": "Amenities",
@@ -235,7 +234,21 @@
       "4": "Friday",
       "5": "Saturday",
       "6": "Sunday"
-    }
+    },
+    "visibility": "Who can join?",
+    "visibility_public": "Looking for players",
+    "visibility_private": "Private game",
+    "visibilityHint_public": "Your match appears on the board so other players can ask to join.",
+    "visibilityHint_private": "Only people you invite can join.",
+    "notes": "Anything the turf should know?",
+    "notesPlaceholder": "Optional",
+    "payCash": "You pay cash at the turf.",
+    "cancellationPolicy": "Free cancellation up to {hours}h before kick-off.",
+    "confirmBooking": "Book for ৳{price}",
+    "booking": "Booking…",
+    "bookingFailed": "Could not book that slot. Please try again.",
+    "slotJustTaken": "Someone just took that slot. Pick another one.",
+    "format": "Format"
   },
   "ownerRegister": {
     "stepCounter": "Step {current} of {total}",
@@ -333,7 +346,8 @@
       "4": "Fri",
       "5": "Sat",
       "6": "Sun"
-    }
+    },
+    "viewBookings": "Bookings"
   },
   "adminTurfs": {
     "heading": "Turfs",
@@ -358,5 +372,73 @@
       "suspended": "Suspended",
       "draft": "Draft"
     }
+  },
+  "notifications": {
+    "heading": "Notifications",
+    "ariaLabel": "{count, plural, =0 {Notifications} one {# unread notification} other {# unread notifications}}",
+    "empty": "Nothing yet.",
+    "loading": "Loading…",
+    "markAllRead": "Mark all read",
+    "seeAll": "See all notifications"
+  },
+  "myBookings": {
+    "heading": "My bookings",
+    "body": "Everything you have booked, and everything you have played.",
+    "filter": "Filter",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "empty_upcoming": "Nothing booked yet.",
+    "empty_past": "No past bookings.",
+    "findTurf": "Find a turf"
+  },
+  "bookingDetail": {
+    "actions": "Actions",
+    "timeline": "Timeline",
+    "details": "Details",
+    "confirm": "Confirm booking",
+    "markPaid": "Mark paid (৳{price})",
+    "noShow": "Mark no-show",
+    "cancel": "Cancel booking",
+    "cancelReason": "Reason",
+    "cancelReasonPlaceholder": "Reason (optional)",
+    "failed": "That did not work. Please try again.",
+    "awaitingConfirmation": "The turf has not confirmed yet. If nobody confirms in time the slot is released and you are told.",
+    "player": "Player",
+    "phone": "Phone",
+    "visibility": "Visibility",
+    "visibility_public": "Looking for players",
+    "visibility_private": "Private",
+    "payment": "Payment",
+    "paidAmount": "৳{amount} received",
+    "payAtTurf": "Cash at the turf",
+    "cancellationPolicy": "Cancellation",
+    "freeUntil": "Free up to {hours}h before",
+    "notes": "Notes",
+    "autoConfirmed": "Auto-confirmed",
+    "myBookings": "My bookings",
+    "viewTurf": "View turf"
+  },
+  "turfCalendar": {
+    "body": "Today's bookings, the confirmation queue, and walk-ins.",
+    "manageTurf": "Manage turf",
+    "day": "Bookings",
+    "date": "Date",
+    "noBookings": "Nothing booked for this day.",
+    "pending": "{count, plural, one {# booking needs confirmation} other {# bookings need confirmation}}",
+    "pendingHint": "Confirm before the deadline or the slot is released automatically.",
+    "expires": "expires",
+    "confirm": "Confirm",
+    "decline": "Decline",
+    "declinedByTurf": "Declined by the turf",
+    "markPaid": "Mark paid",
+    "noShow": "No-show",
+    "failed": "That did not work. Please try again.",
+    "walkIn": "Walk-in booking",
+    "walkInHint": "For someone at the counter with no account. Confirmed straight away.",
+    "ground": "Ground",
+    "time": "Start time",
+    "customerName": "Name",
+    "customerPhone": "Phone",
+    "book": "Book"
   }
 }

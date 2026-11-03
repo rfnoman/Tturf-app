@@ -194,6 +194,10 @@ class TurfDetailSerializer(TurfSummarySerializer):
             "grounds",
             "operating_hours",
         ]
+        # Response-only, like GroundSerializer: writes go through TurfWriteSerializer.
+        # Declaring it makes model-default fields required in the generated response
+        # type rather than `number | undefined` on every client read.
+        read_only_fields = fields
 
 
 class OwnerTurfSerializer(TurfDetailSerializer):

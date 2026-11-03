@@ -411,3 +411,11 @@ class PriceRule(BaseModel):
         end = self.end_time.hour * 60 + self.end_time.minute
         span = (end - start) if end > start else (24 * 60 - start + end)
         return (days, span)
+
+
+#: Importable aliases for `SPECTACULAR_SETTINGS["ENUM_NAME_OVERRIDES"]`, which resolves
+#: a dotted path and so cannot reach a TextChoices nested inside a model.
+TURF_STATUS_CHOICES = Turf.Status.choices
+TURF_MEMBERSHIP_STATUS_CHOICES = TurfMembership.Status.choices
+TURF_MEMBERSHIP_ROLE_CHOICES = TurfMembership.Role.choices
+GROUND_SURFACE_CHOICES = Ground.Surface.choices

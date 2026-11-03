@@ -31,6 +31,9 @@ export default async function ManageTurfPage({ params }: { params: Promise<{ slu
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/owner/${turf.data.slug}/bookings`}>{t("viewBookings")}</Link>
+          </Button>
           {turf.data.status === "approved" && (
             <Button variant="outline" size="sm" asChild>
               <Link href={`/turfs/${turf.data.slug}`}>{t("viewPublic")}</Link>

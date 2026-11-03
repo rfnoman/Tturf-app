@@ -40,6 +40,12 @@ export type Availability = Schemas["Availability"];
 export type Slot = Schemas["Slot"];
 export type PriceCoverageGap = Schemas["PriceCoverageGap"];
 
+export type Booking = Schemas["Booking"];
+export type BookingEvent = Schemas["BookingEvent"];
+export type BookingStatus = Schemas["BookingStatusEnum"];
+export type Payment = Schemas["Payment"];
+export type Notification = Schemas["Notification"];
+
 /**
  * The subset of a profile a {@link PlayerCard} needs.
  *

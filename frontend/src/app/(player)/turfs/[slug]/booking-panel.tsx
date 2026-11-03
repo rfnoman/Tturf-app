@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -17,15 +18,26 @@ function dhakaDate(offsetDays = 0): string {
 }
 
 /**
- * Ground picker + date picker + slot grid.
+ * Ground picker, date picker, slot grid, and the booking review step.
  *
- * Phase 03 turns a selected slot into a booking; until then selecting one just
- * highlights it, so the plumbing (which ground, which slot, what price) is already in
- * place and tested by the time bookings land.
+ * Selecting a slot opens a review panel rather than booking straight away: the player
+ * needs to see the price, the cancellation policy and that payment is cash at the turf
+ * before they commit. A **409** from the API is the expected outcome of two players
+ * pressing Book at the same moment, so it is handled as "pick another slot" rather than
+ * as an error.
  */
-export function BookingPanel({ grounds, horizonDays }: { grounds: Ground[]; horizonDays: number }) {
+export function BookingPanel({
+  grounds,
+  horizonDays,
+  cancellationFreeHours,
+}: {
+  grounds: Ground[];
+  horizonDays: number;
+  cancellationFreeHours: number;
+}) {
   const t = useTranslations("turfs");
   const api = useApiClient();
+  const router = useRouter();
 
   const [groundId, setGroundId] = useState(grounds[0]?.id ?? "");
   const [date, setDate] = useState(dhakaDate());
@@ -34,6 +46,11 @@ export function BookingPanel({ grounds, horizonDays }: { grounds: Ground[]; hori
   // set — which keeps setState out of the effect body and, more usefully, means the
   // previous ground's slots are never shown under the new ground's heading.
   const [loaded, setLoaded] = useState<{ key: string; slots: Slot[] }>();
+  const [formatId, setFormatId] = useState<string>();
+  const [visibility, setVisibility] = useState<"public" | "private">("public");
+  const [notes, setNotes] = useState("");
+  const [booking, setBooking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const key = `${groundId}|${date}`;
   const loading = loaded?.key !== key;
@@ -50,6 +67,8 @@ export function BookingPanel({ grounds, horizonDays }: { grounds: Ground[]; hori
       if (!cancelled) {
         setLoaded({ key: `${groundId}|${date}`, slots: data?.slots ?? [] });
         setSelected(undefined);
+        setFormatId(undefined);
+        setError(null);
       }
     })();
 
@@ -63,6 +82,43 @@ export function BookingPanel({ grounds, horizonDays }: { grounds: Ground[]; hori
   }
 
   const chosen = slots.find((slot) => slot.start === selected);
+  const ground = grounds.find((item) => item.id === groundId);
+  // A ground can host several formats (5v5 and 7v7 on the same pitch); the player picks
+  // when there is a choice, and the first is assumed when there is not.
+  const formats = ground?.sport_formats ?? [];
+  const format = formats.find((item) => item.id === formatId) ?? formats[0];
+
+  async function confirmBooking() {
+    if (!chosen || !format) return;
+    setBooking(true);
+    setError(null);
+
+    const {
+      data,
+      response,
+      error: apiError,
+    } = await api.POST("/api/v1/bookings", {
+      body: {
+        ground_id: groundId,
+        sport_format_id: format.id,
+        start: chosen.start,
+        visibility,
+        notes,
+      } as never,
+    });
+
+    setBooking(false);
+
+    if (apiError || !data) {
+      // 409 means somebody was simply faster — the slot grid is reloaded so the player
+      // can see what is still open rather than being told to try again blindly.
+      setError(response?.status === 409 ? t("slotJustTaken") : t("bookingFailed"));
+      setLoaded(undefined);
+      return;
+    }
+
+    router.push(`/bookings/${data.id}`);
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -102,21 +158,88 @@ export function BookingPanel({ grounds, horizonDays }: { grounds: Ground[]; hori
         <SlotGrid slots={slots} selected={selected} onSelect={(slot) => setSelected(slot.start)} />
       )}
 
-      {chosen && (
-        <div className="bg-muted/40 flex flex-wrap items-center justify-between gap-2 rounded-lg border p-3 text-sm">
-          <span>
-            {t("selectedSlot", {
-              time: new Intl.DateTimeFormat("en-GB", {
-                timeZone: "Asia/Dhaka",
-                hour: "2-digit",
-                minute: "2-digit",
-              }).format(new Date(chosen.start)),
-              price: chosen.price ?? "—",
-            })}
-          </span>
-          {/* Phase 03 replaces this with the real booking action. */}
-          <Button size="sm" disabled>
-            {t("bookingSoon")}
+      {error && (
+        <p role="alert" className="text-destructive text-sm">
+          {error}
+        </p>
+      )}
+
+      {chosen && format && (
+        <div className="bg-muted/40 flex flex-col gap-3 rounded-lg border p-4 text-sm">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <span className="font-medium">
+              {t("selectedSlot", {
+                time: new Intl.DateTimeFormat("en-GB", {
+                  timeZone: "Asia/Dhaka",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }).format(new Date(chosen.start)),
+                price: chosen.price ?? "—",
+              })}
+            </span>
+            <span className="text-muted-foreground text-xs">
+              {ground?.name} · {format.name}
+            </span>
+          </div>
+
+          {formats.length > 1 && (
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-xs">{t("format")}</Label>
+              <div className="flex flex-wrap gap-2">
+                {formats.map((option) => (
+                  <Button
+                    key={option.id}
+                    type="button"
+                    size="xs"
+                    variant={format?.id === option.id ? "default" : "outline"}
+                    aria-pressed={format?.id === option.id}
+                    onClick={() => setFormatId(option.id)}
+                  >
+                    {option.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs">{t("visibility")}</Label>
+            <div className="flex flex-wrap gap-2">
+              {(["public", "private"] as const).map((option) => (
+                <Button
+                  key={option}
+                  type="button"
+                  size="xs"
+                  variant={visibility === option ? "default" : "outline"}
+                  aria-pressed={visibility === option}
+                  onClick={() => setVisibility(option)}
+                >
+                  {t(`visibility_${option}`)}
+                </Button>
+              ))}
+            </div>
+            <p className="text-muted-foreground text-xs">{t(`visibilityHint_${visibility}`)}</p>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="booking-notes" className="text-xs">
+              {t("notes")}
+            </Label>
+            <Input
+              id="booking-notes"
+              value={notes}
+              onChange={(event) => setNotes(event.target.value)}
+              maxLength={500}
+              placeholder={t("notesPlaceholder")}
+            />
+          </div>
+
+          <p className="text-muted-foreground text-xs">
+            {t("payCash")} {t("cancellationPolicy", { hours: cancellationFreeHours })}
+          </p>
+
+          <Button size="sm" className="self-start" disabled={booking} onClick={confirmBooking}>
+            {booking ? t("booking") : t("confirmBooking", { price: chosen.price ?? "—" })}
           </Button>
         </div>
       )}

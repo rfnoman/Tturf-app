@@ -33,7 +33,7 @@ turf-app/
       players/        PlayerProfile, per-sport ratings, onboarding (DECISIONS D19)
       sports/         Sport catalogue, attributes, skills, stat definitions
       turfs/          Turf, Ground, pricing, hours, staff membership, availability
-      bookings/       Booking, slot availability, cash payment states
+      bookings/       Booking (+exclusion constraint), state machine, Celery jobs
       matches/        Match, Squad, JoinRequest, Invite, match board
       scoring/        Teams, scorecard, player stats, MOTM, peer ratings
       ratings/        Rating engine, track record, leaderboards, conduct
