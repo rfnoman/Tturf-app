@@ -19,7 +19,12 @@ export default defineConfig({
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
   webServer: {
-    command: process.env.CI ? "npm run build && npm run start" : "npm run dev",
+    // Always test the production build, never `next dev`. Turbopack's dev client boots
+    // through its HMR WebSocket, and where that connection cannot be established the
+    // page renders server-side but never hydrates — which looks exactly like a broken
+    // component. `next start` has no such dependency, so results are deterministic and
+    // identical to CI. Set PLAYWRIGHT_BASE_URL to point at an already-running server.
+    command: "npm run build && npm run start",
     url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
