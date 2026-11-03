@@ -41,24 +41,46 @@ To go back to Node 20: `brew unlink node@24 && brew link --overwrite node@20`.
 
 ## Setup
 
+First time only:
+
 ```bash
-# 1. Infrastructure (Postgres + PostGIS, Redis)
-docker compose up -d
-
-# 2. Backend
-cd backend
-cp .env.example .env          # then fill in the Clerk values below
-uv sync
-uv run python manage.py migrate
-uv run python manage.py seed_demo
-uv run python manage.py runserver        # http://127.0.0.1:8000
-
-# 3. Frontend (new terminal)
-cd frontend
-cp .env.local.example .env.local         # then fill in the Clerk values below
-npm install
-npm run dev                              # http://localhost:3000
+cd backend  && cp .env.example .env && uv sync && cd ..
+cd frontend && cp .env.local.example .env.local && npm install && cd ..
 ```
+
+Then fill in the Clerk values (next section) and run everything with one command:
+
+```bash
+./scripts/dev.sh
+```
+
+That starts Colima if Docker is down, brings up Postgres and Redis and waits for them
+to report healthy, applies migrations, then runs Django, the Celery worker+beat and
+Next.js together with each service's output prefixed and mirrored to `.logs/`. Ctrl+C
+stops everything it started; the containers are left running on purpose.
+
+```bash
+./scripts/dev.sh --backend       # API only
+./scripts/dev.sh --no-worker     # skip Celery (nothing schedules work until Phase 03)
+./scripts/dev.sh --no-infra      # Postgres and Redis are already up
+./scripts/dev.sh --help          # all options
+docker compose down              # stop the containers too
+```
+
+<details>
+<summary>Running the pieces by hand instead</summary>
+
+```bash
+docker compose up -d                                   # postgres + redis
+cd backend  && uv run python manage.py migrate
+cd backend  && uv run python manage.py runserver       # http://127.0.0.1:8000
+cd backend  && uv run celery -A config worker -B -l info
+cd frontend && npm run dev                             # http://localhost:3000
+```
+
+</details>
+
+Seed demo data once the database is up: `cd backend && uv run python manage.py seed_demo`.
 
 Ports: the containers publish **55432** (Postgres) and **56379** (Redis) rather than the
 defaults, because a native Postgres and Redis already occupy 5432/6379 on this machine

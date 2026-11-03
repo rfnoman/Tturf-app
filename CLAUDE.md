@@ -86,6 +86,9 @@ turf-app/
 
 ## Commands
 ```
+./scripts/dev.sh                          # everything: infra + migrate + api + worker + web
+./scripts/dev.sh --backend                # API only (see --help for more)
+
 docker compose up -d                      # postgres (55432) + redis (56379)
 cd backend && uv run python manage.py runserver
 cd backend && uv run python manage.py seed_demo

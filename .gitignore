@@ -52,6 +52,9 @@ next-env.d.ts
 /frontend/playwright/.cache/
 /frontend/coverage/
 
+# ---- Dev runner ----
+/.logs/
+
 # ---- Editors ----
 .idea/
 .vscode/*
