@@ -56,6 +56,14 @@ export type SquadSummary = Schemas["SquadSummary"];
 export type SquadMember = Schemas["SquadMember"];
 export type SquadInvite = Schemas["SquadInvite"];
 
+export type Scorecard = Schemas["Scorecard"];
+export type PublicScorecard = Schemas["PublicScorecard"];
+export type MatchTeam = Schemas["MatchTeam"];
+export type TeamPlayer = Schemas["TeamPlayer"];
+export type PlayerStatRow = Schemas["PlayerStatRow"];
+export type ScorecardEvent = Schemas["ScorecardEvent"];
+export type ResultSummary = Schemas["ResultSummary"];
+
 /**
  * The subset of a profile a {@link PlayerCard} needs.
  *

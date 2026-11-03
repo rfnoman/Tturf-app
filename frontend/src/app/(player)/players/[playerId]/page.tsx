@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { PlayerProfileView } from "@/components/player/player-profile-view";
+import { RecentResults } from "@/components/scoring/recent-results";
 
 /**
  * Another player's public card.
@@ -20,5 +21,5 @@ export default async function PlayerPage({ params }: { params: Promise<{ playerI
 
   if (!data) notFound();
 
-  return <PlayerProfileView player={data} />;
+  return <PlayerProfileView player={data} footer={<RecentResults playerId={String(data.id)} />} />;
 }

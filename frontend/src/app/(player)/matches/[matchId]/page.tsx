@@ -105,6 +105,12 @@ export default async function MatchPage({ params }: { params: Promise<{ matchId:
       )}
 
       <div className="flex flex-wrap gap-2">
+        {/* Only players and the organiser: reading the card creates it in draft. */}
+        {(data.is_on_roster || data.is_organiser) && (
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/matches/${data.id}/scorecard`}>{t("scorecard")}</Link>
+          </Button>
+        )}
         <Button variant="outline" size="sm" asChild>
           <Link href={`/turfs/${data.turf_slug}`}>{t("viewTurf")}</Link>
         </Button>
