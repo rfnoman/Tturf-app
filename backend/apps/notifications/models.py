@@ -35,6 +35,20 @@ class NotificationKind(models.TextChoices):
     BOOKING_COMPLETED = "booking_completed", _("Booking completed")
     BOOKING_REMINDER = "booking_reminder", _("Booking reminder")
 
+    # Phase 04 — squads and matches
+    SQUAD_INVITE = "squad_invite", _("Squad invitation")
+    SQUAD_JOINED = "squad_joined", _("Someone joined your squad")
+    MATCH_ADDED = "match_added", _("Added to a match")
+    MATCH_REMOVED = "match_removed", _("Removed from a match")
+    MATCH_PLAYER_LEFT = "match_player_left", _("A player dropped out")
+    MATCH_JOIN_REQUEST = "match_join_request", _("Someone wants to join")
+    MATCH_JOIN_APPROVED = "match_join_approved", _("You are in")
+    MATCH_JOIN_DECLINED = "match_join_declined", _("Request declined")
+    MATCH_INVITE = "match_invite", _("Match invitation")
+    MATCH_INVITE_PROPOSED = "match_invite_proposed", _("A player was proposed")
+    MATCH_INVITE_ACCEPTED = "match_invite_accepted", _("Invitation accepted")
+    MATCH_INVITE_DECLINED = "match_invite_declined", _("Invitation declined")
+
 
 class Notification(BaseModel):
     user = models.ForeignKey(

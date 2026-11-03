@@ -60,6 +60,16 @@ the entry, mark it `REVISED`, and tell Claude Code which phases to adjust.
 | D33 | Who a walk-in booking belongs to | **The staff member's account**, with the customer's name and phone on the booking. There is no account to attach it to, and the cashier is the right person to receive its notifications — they are the one who has to tell the customer. Visibility is forced to `private`: a counter booking is not looking for players. | Phase 03, 04 |
 | D34 | Enum names in the generated schema | **Explicit `ENUM_NAME_OVERRIDES`.** Several apps have a `status` field with different choices, and drf-spectacular otherwise mints names like `Status4eaEnum` that change whenever another `status` field is added anywhere — churning the generated TypeScript on unrelated edits. Nested `TextChoices` cannot be reached by a dotted path, so each model exposes a module-level `*_CHOICES` alias. | All phases |
 
+## Phase 04 additions
+
+| ID | Question | Decision | Affects |
+|---|---|---|---|
+| D35 | How does a booking get a match? | **A hook registry on the booking lifecycle**, the same pattern as Phase 02's availability (D25). `Match` holds the FK to `Booking`, so `apps.bookings` must not import `apps.matches`; instead it fires `booking_created` and `booking_transitioned`, and `MatchesConfig.ready()` subscribes. The create hook runs **inside** the booking transaction on purpose — a booking with no match is not a state the rest of the app knows how to handle, so a failure there should roll the booking back. | Phase 03, 04+ |
+| D36 | Match visibility | **Derived on creation from the booking and the squad, never set by hand** (DOMAIN §6): individual+public and group+open become `board`; individual+private becomes `private`; group+closed becomes `squad`. Storing it as an independent field would let it drift from the booking the first time one is edited. The *organiser* is derived the same way — squad leader, else booker. | Phase 04+ |
+| D37 | Capacity under contention | **`select_for_update` on the match, counted inside the lock.** Two approvals for the last spot must not both succeed, and no amount of `if match.is_full` before the write prevents that. The losing request stays `pending` rather than being auto-declined, so the organiser sees why nothing happened instead of a request vanishing. | Phase 04+ |
+| D38 | The board's average rating | **A correlated subquery**, not a join. Joining `PlayerSportRating` multiplies the roster rows and silently corrupts the `spots_left` count computed alongside it. A match whose roster is entirely unrated stays **visible** under a rating filter — a brand-new player's match is exactly what somebody browsing the board wants to find, and hiding it would make the app useless to the people it most needs. | Phase 04, 06 |
+| D39 | Naming a player in an API request | **By `PlayerProfile` id**, never the account id. The account id is not exposed anywhere in the API, and the profile id is what every card, roster row and search result already carries. | Phase 04+ |
+
 ### D9 — phone sign-in for Bangladesh (+880)
 
 Resolved from Clerk's current documentation. What is **confirmed**:

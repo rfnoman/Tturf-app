@@ -34,7 +34,7 @@ turf-app/
       sports/         Sport catalogue, attributes, skills, stat definitions
       turfs/          Turf, Ground, pricing, hours, staff membership, availability
       bookings/       Booking (+exclusion constraint), state machine, Celery jobs
-      matches/        Match, Squad, JoinRequest, Invite, match board
+      matches/        Match, Squad, JoinRequest, MatchInvite, match board
       scoring/        Teams, scorecard, player stats, MOTM, peer ratings
       ratings/        Rating engine, track record, leaderboards, conduct
       inventory/      Product, StockLocation, StockMovement, rentals, POS

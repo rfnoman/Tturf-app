@@ -35,6 +35,7 @@ from apps.players.services import get_or_create_profile
 from apps.turfs.availability import get_availability
 from apps.turfs.models import Ground, Turf, TurfMembership
 
+from .hooks import booking_created, booking_transitioned
 from .models import (
     ACTIVE_BOOKING_STATUSES,
     Booking,
@@ -199,6 +200,7 @@ def create_booking(
     notes: str = "",
     booked_for_name: str = "",
     booked_for_phone: str = "",
+    squad=None,
     actor=None,
 ) -> Booking:
     """Book a slot, applying DECISIONS D3 to decide whether it confirms immediately.
@@ -241,6 +243,17 @@ def create_booking(
     if clash:
         raise ValidationError({"start": "You already have a booking at that time."})
 
+    if mode == BookingMode.GROUP:
+        if squad is None:
+            raise ValidationError({"squad": "Choose a squad for a group booking."})
+        # Only somebody actually in the squad may book in its name.
+        from apps.matches.services import is_squad_member
+
+        if not is_squad_member(squad=squad, user=user):
+            raise ValidationError({"squad": "You are not in that squad."})
+    elif squad is not None:
+        raise ValidationError({"squad": "Only a group booking has a squad."})
+
     auto = should_auto_confirm(user=user, turf=turf)
     status = BookingStatus.CONFIRMED if auto else BookingStatus.RESERVED
 
@@ -259,6 +272,7 @@ def create_booking(
                 mode=mode,
                 visibility=visibility,
                 notes=notes.strip(),
+                squad=squad,
                 status=status,
                 auto_confirmed=auto,
                 confirmed_at=now() if auto else None,
@@ -280,6 +294,10 @@ def create_booking(
         actor=actor or user,
         note="Auto-confirmed" if auto else "Awaiting confirmation",
     )
+
+    # Phase 04 creates the match here. Inside the transaction on purpose: a booking with
+    # no match is not a state the rest of the app knows how to handle.
+    booking_created(booking=booking, squad=squad)
 
     if auto:
         _notify_player(booking, NotificationKind.BOOKING_CONFIRMED)
@@ -324,6 +342,7 @@ def confirm_booking(*, booking: Booking, actor=None, note: str = "") -> Booking:
         actor=actor,
         note=note,
     )
+    booking_transitioned(booking=booking, from_status=previous)
     _notify_player(booking, NotificationKind.BOOKING_CONFIRMED)
     return booking
 
@@ -347,6 +366,7 @@ def expire_booking(*, booking: Booking) -> Booking:
         to_status=booking.status,
         note="Not confirmed before the deadline",
     )
+    booking_transitioned(booking=booking, from_status=previous)
     _notify_player(booking, NotificationKind.BOOKING_EXPIRED)
     logger.info("Booking expired", extra={"booking": str(booking.id)})
     return booking
@@ -400,6 +420,7 @@ def cancel_booking(
         actor=actor,
         note=("Late cancellation. " + booking.cancel_reason).strip(),
     )
+    booking_transitioned(booking=booking, from_status=previous)
 
     if late:
         adjust_reliability(
@@ -434,6 +455,7 @@ def mark_paid(*, booking: Booking, actor=None, amount=None) -> Booking:
     booking.save(update_fields=["status", "updated_at"])
 
     record_event(booking=booking, from_status=previous, to_status=booking.status, actor=actor)
+    booking_transitioned(booking=booking, from_status=previous)
     _notify_player(booking, NotificationKind.BOOKING_PAID)
     return booking
 
@@ -469,6 +491,7 @@ def mark_no_show(*, booking: Booking, actor=None, note: str = "") -> Booking:
         actor=actor,
         note=note,
     )
+    booking_transitioned(booking=booking, from_status=previous)
     adjust_reliability(
         profile=get_or_create_profile(booking.booked_by),
         delta=int(settings.RELIABILITY_NO_SHOW_DELTA),
@@ -494,6 +517,7 @@ def complete_booking(*, booking: Booking, actor=None) -> Booking:
     booking.save(update_fields=["status", "updated_at"])
 
     record_event(booking=booking, from_status=previous, to_status=booking.status, actor=actor)
+    booking_transitioned(booking=booking, from_status=previous)
     adjust_reliability(
         profile=get_or_create_profile(booking.booked_by),
         delta=int(settings.RELIABILITY_COMPLETED_MATCH_DELTA),

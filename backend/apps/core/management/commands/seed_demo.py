@@ -115,6 +115,7 @@ class Command(BaseCommand):
         self.seed_demo_players()
         self.seed_turfs()
         self.seed_bookings()
+        self.seed_squads_and_matches()
         self.stdout.write(self.style.SUCCESS("Demo data seeded."))
 
     def seed_platform_admin(self, email: str) -> None:
@@ -380,3 +381,61 @@ class Command(BaseCommand):
             status: Booking.objects.filter(status=status).count() for status in BookingStatus.values
         }
         self.stdout.write("Bookings: " + ", ".join(f"{n} {s}" for s, n in counts.items() if n))
+
+    def seed_squads_and_matches(self) -> None:
+        """A squad and a few join requests, so the board and the queues are not empty."""
+        from apps.matches.models import JoinRequest, Match, Squad
+        from apps.matches.services import (
+            make_or_get_squad_membership,
+            request_to_join,
+        )
+
+        User = get_user_model()
+        players = list(User.objects.filter(clerk_id__startswith="seed_player_"))
+        if len(players) < 2:
+            return
+
+        leader, *members = players
+        squad = Squad.objects.filter(slug="dhanmondi-ballers").first()
+        if squad is None:
+            from apps.matches.services import create_squad
+
+            squad = create_squad(
+                leader=leader,
+                name="Dhanmondi Ballers",
+                area="Dhanmondi",
+                accepts_public_requests=True,
+                description="Open squad, evening five-a-side. Everyone welcome.",
+            )
+            squad.slug = "dhanmondi-ballers"
+            squad.save(update_fields=["slug"])
+        for member in members:
+            make_or_get_squad_membership(squad=squad, player=member)
+
+        # A couple of join requests against open board matches, so the organiser's
+        # approval queue has something in it.
+        board = list(
+            Match.objects.filter(visibility="board", status="upcoming").select_related("booking")[
+                :2
+            ]
+        )
+        asked = 0
+        for match in board:
+            for candidate in players:
+                if match.players.filter(player=candidate).exists():
+                    continue
+                if JoinRequest.objects.filter(match=match, player=candidate).exists():
+                    continue
+                try:
+                    request_to_join(
+                        match=match, user=candidate, message="Can I join? I play up front."
+                    )
+                except Exception:
+                    continue
+                asked += 1
+                break
+
+        self.stdout.write(
+            f"Squad {squad.name} ({squad.member_count} members), "
+            f"{Match.objects.count()} match(es), {asked} join request(s)"
+        )

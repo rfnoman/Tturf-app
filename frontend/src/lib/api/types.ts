@@ -46,6 +46,16 @@ export type BookingStatus = Schemas["BookingStatusEnum"];
 export type Payment = Schemas["Payment"];
 export type Notification = Schemas["Notification"];
 
+export type MatchSummary = Schemas["MatchSummary"];
+export type MatchDetail = Schemas["MatchDetail"];
+export type RosterPlayer = Schemas["RosterPlayer"];
+export type JoinRequest = Schemas["JoinRequest"];
+export type MatchInvite = Schemas["MatchInvite"];
+export type Squad = Schemas["Squad"];
+export type SquadSummary = Schemas["SquadSummary"];
+export type SquadMember = Schemas["SquadMember"];
+export type SquadInvite = Schemas["SquadInvite"];
+
 /**
  * The subset of a profile a {@link PlayerCard} needs.
  *
