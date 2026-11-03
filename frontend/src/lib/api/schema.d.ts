@@ -24,6 +24,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client configuration
+         * @description Business rules and limits the UI needs. Safe to cache for minutes.
+         */
+        get: operations["client_config"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -64,16 +84,670 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/attributes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Shared player attributes
+         * @description The shared attributes, in display order.
+         */
+        get: operations["attributes_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sports catalogue
+         * @description Every active sport with its formats, skills, attribute weights and scorecard stat definitions. One call is enough to render onboarding.
+         */
+        get: operations["sports_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sports/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One sport, by slug */
+        get: operations["sports_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sport-proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My sport proposals
+         * @description Anyone authenticated may propose for now; Phase 02 narrows this to turf owners.
+         */
+        get: operations["sport_proposals_list"];
+        put?: never;
+        /**
+         * Propose a sport
+         * @description Anyone authenticated may propose for now; Phase 02 narrows this to turf owners.
+         */
+        post: operations["sport_proposals_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/sport-proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Sport proposal review queue */
+        get: operations["admin_sport_proposals_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/sport-proposals/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One sport proposal */
+        get: operations["admin_sport_proposals_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/sport-proposals/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a proposal (creates the sport) */
+        post: operations["admin_sport_proposals_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/sport-proposals/{id}/merge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Merge a proposal into an existing sport */
+        post: operations["admin_sport_proposals_merge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/sport-proposals/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject a proposal */
+        post: operations["admin_sport_proposals_reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My player profile
+         * @description Creates the profile on first access, so this never 404s.
+         */
+        get: operations["my_profile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update my player profile
+         * @description The signed-in player's own profile.
+         */
+        patch: operations["my_profile_update"];
+        trace?: never;
+    };
+    "/api/v1/me/onboarding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete onboarding
+         * @description Finish onboarding: basic info, shared attributes and the chosen sports.
+         */
+        post: operations["my_onboarding"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/sports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add or update one of my sports
+         * @description Add a sport to my profile, or remove one, after onboarding.
+         */
+        post: operations["my_sports_add"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/sports/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove one of my sports
+         * @description A sport with match history is hidden rather than deleted, so scorecards and ratings stay intact (DOMAIN §3).
+         */
+        delete: operations["my_sports_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/players/{player_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A player's public profile
+         * @description Another player's public card.
+         *
+         *     ``discoverable`` gates *search* only — a direct link still resolves (DOMAIN §3).
+         */
+        get: operations["players_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Attribute: {
+            /** Format: uuid */
+            readonly id: string;
+            key: string;
+            label: string;
+            description?: string;
+            /** Display order */
+            order?: number;
+        };
+        /** @enum {unknown} */
+        BlankEnum: "";
+        ClientConfig: {
+            rating_min: number;
+            rating_max: number;
+            self_assessed_rating_cap: number;
+            onboarding_default_rating: number;
+            rating_provisional_matches: number;
+            default_player_weight_kg: number;
+            booking_horizon_days: number;
+            turf_delivery_cutoff_hours: number;
+            currency: string;
+            time_zone: string;
+        };
+        /**
+         * @description * `male` - Male
+         *     * `female` - Female
+         *     * `other` - Other
+         *     * `undisclosed` - Prefer not to say
+         * @enum {string}
+         */
+        GenderEnum: "male" | "female" | "other" | "undisclosed";
         Health: {
             status: string;
             database: string;
             postgis: string | null;
             version: string;
         };
+        /** @description The wizard payload. Field-level validation only; rules live in the service. */
+        OnboardingRequest: {
+            display_name?: string;
+            /** Format: date */
+            date_of_birth?: string | null;
+            gender?: components["schemas"]["GenderEnum"] | components["schemas"]["BlankEnum"];
+            height_cm?: number;
+            /** Format: decimal */
+            weight_kg?: string;
+            area?: string;
+            preferred_side?: components["schemas"]["PreferredSideEnum"] | components["schemas"]["BlankEnum"];
+            bio?: string;
+            discoverable?: boolean;
+            attributes?: {
+                [key: string]: number;
+            };
+            sports: components["schemas"]["OnboardingSportRequest"][];
+        };
+        OnboardingSportRequest: {
+            sport: string;
+            positions?: string[];
+            skills?: {
+                [key: string]: number;
+            };
+        };
+        PaginatedSportProposalList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["SportProposal"][];
+        };
+        /** @description PATCH /me/profile. Attributes may be re-assessed from the settings page. */
+        PatchedProfileUpdateRequest: {
+            /** @description Shown on the match board and scorecards. Defaults to the Clerk name. */
+            display_name?: string;
+            /**
+             * Format: binary
+             * @description Overrides the Clerk avatar when set.
+             */
+            photo?: string | null;
+            /** Format: date */
+            date_of_birth?: string | null;
+            gender?: components["schemas"]["GenderEnum"] | components["schemas"]["BlankEnum"];
+            /** Height (cm) */
+            height_cm?: number | null;
+            /**
+             * Weight (kg)
+             * Format: decimal
+             * @description Optional. Used only for calorie estimates; without it 70 kg is assumed and the estimate is flagged.
+             */
+            weight_kg?: string | null;
+            /** @description Neighbourhood, e.g. Dhanmondi. Used to suggest nearby turfs and matches. */
+            area?: string;
+            /** Preferred foot / hand */
+            preferred_side?: components["schemas"]["PreferredSideEnum"] | components["schemas"]["BlankEnum"];
+            bio?: string;
+            /** @description Appear in player search. A direct profile link still works (DOMAIN §3). */
+            discoverable?: boolean;
+            attributes?: {
+                [key: string]: number;
+            };
+        };
+        /** @description Flattened for the card: the UI wants a key, a label and a number. */
+        PlayerAttribute: {
+            key: string;
+            label: string;
+            value: number;
+            source: string;
+        };
+        /** @description The public player card (DOMAIN §3). */
+        PlayerProfile: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            /** @description Shown on the match board and scorecards. Defaults to the Clerk name. */
+            readonly display_name: string;
+            readonly photo_url: string;
+            /** Format: date */
+            readonly date_of_birth: string | null;
+            readonly gender: components["schemas"]["GenderEnum"];
+            /** Height (cm) */
+            readonly height_cm: number | null;
+            /**
+             * Weight (kg)
+             * Format: decimal
+             * @description Only used for calorie estimates (DOMAIN §10). Optional; a default of DEFAULT_PLAYER_WEIGHT_KG is used and the estimate flagged when it is unset.
+             */
+            readonly weight_kg: string | null;
+            readonly weight_is_estimated: boolean;
+            /** @description Neighbourhood, e.g. Dhanmondi. Used to suggest nearby turfs and matches. */
+            readonly area: string;
+            /** Preferred foot / hand */
+            readonly preferred_side: components["schemas"]["PreferredSideEnum"];
+            readonly bio: string;
+            /** @description Appear in player search. A direct profile link still works (DOMAIN §3). */
+            readonly discoverable: boolean;
+            /**
+             * Reliability
+             * @description 0–100. Drops on no-shows and late cancels, recovers on completed matches.
+             */
+            readonly reliability_score: number;
+            readonly onboarding_completed: boolean;
+            readonly attributes: components["schemas"]["PlayerAttribute"][];
+            readonly sport_cards: components["schemas"]["PlayerSportCard"][];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        PlayerSkill: {
+            key: string;
+            label: string;
+            value: number;
+            source: string;
+            counts_toward_overall: boolean;
+        };
+        PlayerSport: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly sport: components["schemas"]["SportSummary"];
+            readonly positions: string[];
+            /**
+             * Verified
+             * @description True once the player has completed a locked match of this sport.
+             */
+            readonly is_verified: boolean;
+            /**
+             * Hidden
+             * @description Player removed this sport. History is kept; the card is not shown.
+             */
+            readonly is_hidden: boolean;
+        };
+        /**
+         * @description One FIFA-style card: a sport, the overall, positions and the six key skills.
+         *
+         *     Assembled in ``selectors.player_sport_cards`` rather than read off a single model,
+         *     because a card spans ``PlayerSport``, ``PlayerSportRating`` and ``PlayerSkill``.
+         */
+        PlayerSportCard: {
+            sport: components["schemas"]["SportSummary"];
+            positions: string[];
+            overall: number;
+            is_provisional: boolean;
+            is_verified: boolean;
+            matches_played: number;
+            wins: number;
+            draws: number;
+            losses: number;
+            motm_awards: number;
+            skills: components["schemas"]["PlayerSkill"][];
+        };
+        PlayerSportWriteRequest: {
+            sport: string;
+            positions?: string[];
+            skills?: {
+                [key: string]: number;
+            };
+        };
+        /**
+         * @description * `left` - Left
+         *     * `right` - Right
+         *     * `both` - Both
+         * @enum {string}
+         */
+        PreferredSideEnum: "left" | "right" | "both";
+        /**
+         * @description What other players may see: no contact details, no exact date of birth.
+         *
+         *     Age is derived instead of exposing the date itself, and ``discoverable`` is dropped
+         *     because it is nobody else's business.
+         */
+        PublicPlayerProfile: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            /** @description Shown on the match board and scorecards. Defaults to the Clerk name. */
+            readonly display_name: string;
+            readonly photo_url: string;
+            readonly gender: components["schemas"]["GenderEnum"];
+            /** Height (cm) */
+            readonly height_cm: number | null;
+            /** @description Neighbourhood, e.g. Dhanmondi. Used to suggest nearby turfs and matches. */
+            readonly area: string;
+            /** Preferred foot / hand */
+            readonly preferred_side: components["schemas"]["PreferredSideEnum"];
+            readonly bio: string;
+            /**
+             * Reliability
+             * @description 0–100. Drops on no-shows and late cancels, recovers on completed matches.
+             */
+            readonly reliability_score: number;
+            readonly onboarding_completed: boolean;
+            readonly attributes: components["schemas"]["PlayerAttribute"][];
+            readonly sport_cards: components["schemas"]["PlayerSportCard"][];
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly age: number | null;
+        };
+        /**
+         * @description * `player` - Per player
+         *     * `team` - Per team
+         * @enum {string}
+         */
+        ScopeEnum: "player" | "team";
+        /** @description The full catalogue entry: one request feeds the whole onboarding wizard. */
+        Sport: {
+            /** Format: uuid */
+            readonly id: string;
+            name: string;
+            slug: string;
+            description?: string;
+            /** @description Short emoji or icon key the frontend maps to an illustration. */
+            icon?: string;
+            /**
+             * Format: decimal
+             * @description Metabolic equivalent of task; calories = MET x weight_kg x hours.
+             */
+            met_value?: string;
+            readonly positions: string[];
+            /** Active */
+            is_active?: boolean;
+            /** Display order */
+            order?: number;
+            readonly formats: components["schemas"]["SportFormat"][];
+            readonly skills: components["schemas"]["SportSkill"][];
+            readonly attribute_weights: components["schemas"]["SportAttributeWeight"][];
+            readonly stat_definitions: components["schemas"]["StatDefinition"][];
+        };
+        SportAttributeWeight: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly attribute: components["schemas"]["Attribute"];
+            /**
+             * Format: decimal
+             * @description Relative weight; the rating engine normalises across the sport's set.
+             */
+            weight?: string;
+        };
+        SportFormat: {
+            /** Format: uuid */
+            readonly id: string;
+            name: string;
+            slug: string;
+            /** @description Match capacity is players_per_side x 2 unless the ground caps it lower. */
+            players_per_side: number;
+            readonly capacity: number;
+            /** Display order */
+            order?: number;
+        };
+        SportProposal: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Proposed name */
+            name: string;
+            description?: string;
+            readonly status: components["schemas"]["StatusEnum"];
+            readonly merged_into: components["schemas"]["SportSummary"];
+            readonly review_note: string;
+            /** Format: date-time */
+            readonly reviewed_at: string | null;
+            readonly proposed_by_name: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /** @description Admins may tidy the name and set the MET value as they approve. */
+        SportProposalApproveRequest: {
+            name?: string;
+            icon?: string;
+            /** Format: decimal */
+            met_value?: string;
+            note?: string;
+        };
+        SportProposalCreateRequest: {
+            name: string;
+            description?: string;
+        };
+        SportProposalMergeRequest: {
+            /** Format: uuid */
+            sport_id: string;
+            note?: string;
+        };
+        SportProposalRejectRequest: {
+            note: string;
+        };
+        SportRemoved: {
+            status: string;
+        };
+        SportSkill: {
+            /** Format: uuid */
+            readonly id: string;
+            key: string;
+            label: string;
+            description?: string;
+            /** Format: decimal */
+            weight?: string;
+            counts_toward_overall?: boolean;
+            /** Display order */
+            order?: number;
+        };
+        /** @description Just enough to label a sport elsewhere (profile cards, match board, orders). */
+        SportSummary: {
+            /** Format: uuid */
+            readonly id: string;
+            name: string;
+            slug: string;
+            readonly icon: string;
+        };
+        StatDefinition: {
+            /** Format: uuid */
+            readonly id: string;
+            key: string;
+            label: string;
+            /** Type */
+            value_type?: components["schemas"]["ValueTypeEnum"];
+            scope?: components["schemas"]["ScopeEnum"];
+            /**
+             * Minimum
+             * Format: decimal
+             */
+            min_value?: string;
+            /**
+             * Maximum
+             * Format: decimal
+             */
+            max_value?: string | null;
+            unit?: string;
+            /**
+             * Positive stat
+             * @description False for cards, runs conceded and other stats you want fewer of.
+             */
+            is_positive?: boolean;
+            /** Show on profile card */
+            show_on_profile?: boolean;
+            /** Display order */
+            order?: number;
+        };
+        /**
+         * @description * `pending` - Pending review
+         *     * `approved` - Approved
+         *     * `merged` - Merged into an existing sport
+         *     * `rejected` - Rejected
+         * @enum {string}
+         */
+        StatusEnum: "pending" | "approved" | "merged" | "rejected";
         User: {
             /** Format: uuid */
             readonly id: string;
@@ -113,6 +787,13 @@ export interface components {
             /** Format: date-time */
             readonly created_at: string;
         };
+        /**
+         * @description * `int` - Whole number
+         *     * `bool` - Yes/no
+         *     * `decimal` - Decimal
+         * @enum {string}
+         */
+        ValueTypeEnum: "int" | "bool" | "decimal";
         WebhookAccepted: {
             status: string;
             event: string | null;
@@ -144,6 +825,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Health"];
+                };
+            };
+        };
+    };
+    client_config: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientConfig"];
                 };
             };
         };
@@ -190,6 +890,385 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WebhookRejected"];
+                };
+            };
+        };
+    };
+    attributes_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Attribute"][];
+                };
+            };
+        };
+    };
+    sports_list: {
+        parameters: {
+            query?: {
+                /** @description Admins only: include sports awaiting setup after approval. */
+                include_inactive?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sport"][];
+                };
+            };
+        };
+    };
+    sports_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sport"];
+                };
+            };
+        };
+    };
+    sport_proposals_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSportProposalList"];
+                };
+            };
+        };
+    };
+    sport_proposals_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SportProposalCreateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SportProposalCreateRequest"];
+                "multipart/form-data": components["schemas"]["SportProposalCreateRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SportProposal"];
+                };
+            };
+        };
+    };
+    admin_sport_proposals_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+                /** @description Number of results to return per page. */
+                page_size?: number;
+                /** @description Filter by status. */
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedSportProposalList"];
+                };
+            };
+        };
+    };
+    admin_sport_proposals_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this sport proposal. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SportProposal"];
+                };
+            };
+        };
+    };
+    admin_sport_proposals_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this sport proposal. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SportProposalApproveRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SportProposalApproveRequest"];
+                "multipart/form-data": components["schemas"]["SportProposalApproveRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sport"];
+                };
+            };
+        };
+    };
+    admin_sport_proposals_merge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this sport proposal. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SportProposalMergeRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SportProposalMergeRequest"];
+                "multipart/form-data": components["schemas"]["SportProposalMergeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SportProposal"];
+                };
+            };
+        };
+    };
+    admin_sport_proposals_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A UUID string identifying this sport proposal. */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SportProposalRejectRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SportProposalRejectRequest"];
+                "multipart/form-data": components["schemas"]["SportProposalRejectRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SportProposal"];
+                };
+            };
+        };
+    };
+    my_profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerProfile"];
+                };
+            };
+        };
+    };
+    my_profile_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedProfileUpdateRequest"];
+                "multipart/form-data": components["schemas"]["PatchedProfileUpdateRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedProfileUpdateRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerProfile"];
+                };
+            };
+        };
+    };
+    my_onboarding: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OnboardingRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["OnboardingRequest"];
+                "multipart/form-data": components["schemas"]["OnboardingRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerProfile"];
+                };
+            };
+        };
+    };
+    my_sports_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlayerSportWriteRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PlayerSportWriteRequest"];
+                "multipart/form-data": components["schemas"]["PlayerSportWriteRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerSport"];
+                };
+            };
+        };
+    };
+    my_sports_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SportRemoved"];
+                };
+            };
+        };
+    };
+    players_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                player_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicPlayerProfile"];
                 };
             };
         };

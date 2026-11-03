@@ -14,9 +14,20 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    // Fetches the Clerk Testing Token once, so authenticated specs are not served a
+    // bot-protection challenge they cannot clear.
+    { name: "setup clerk", testMatch: /global\.setup\.ts/ },
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+      dependencies: ["setup clerk"],
+    },
     // Bangladesh is a mobile-first market; the shell must hold up at phone width.
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    {
+      name: "mobile",
+      use: { ...devices["Pixel 7"] },
+      dependencies: ["setup clerk"],
+    },
   ],
   webServer: {
     // Always test the production build, never `next dev`. Turbopack's dev client boots

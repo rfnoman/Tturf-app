@@ -30,6 +30,7 @@ turf-app/
     apps/
       core/           base models (TimeStamped, UUID pk), utils, permissions
       accounts/       User (clerk_id), roles, Clerk auth + webhook
+      players/        PlayerProfile, per-sport ratings, onboarding (DECISIONS D19)
       sports/         Sport catalogue, attributes, skills, stat definitions
       turfs/          Turf, Ground, pricing, hours, staff membership
       bookings/       Booking, slot availability, cash payment states

@@ -122,3 +122,15 @@ def patch_jwks(monkeypatch, jwks):
 
     _install.calls = calls  # type: ignore[attr-defined]
     return _install
+
+
+@pytest.fixture(autouse=True)
+def no_clerk_backend_api(monkeypatch):
+    """Keep the Backend API backfill off the network by default.
+
+    ``get_or_create_user_from_claims`` backfills a never-synced account from Clerk, and
+    the test settings carry a (fake) secret key, so without this every authentication
+    test would try to reach api.clerk.com. Tests that care about the backfill patch
+    ``apps.accounts.services.fetch_clerk_user`` themselves.
+    """
+    monkeypatch.setattr("apps.accounts.services.fetch_clerk_user", lambda clerk_id: None)

@@ -17,6 +17,8 @@ from drf_spectacular.views import (
 api_v1 = [
     path("", include("apps.core.urls")),
     path("", include("apps.accounts.urls")),
+    path("", include("apps.sports.urls")),
+    path("", include("apps.players.urls")),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     # url_name must carry the namespace: these URLs live under the "v1" instance namespace.
     path("docs/", SpectacularSwaggerView.as_view(url_name="v1:schema"), name="swagger-ui"),

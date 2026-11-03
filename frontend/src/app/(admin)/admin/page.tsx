@@ -1,12 +1,20 @@
+import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+
+import { Button } from "@/components/ui/button";
 
 export default async function AdminPage() {
   const t = await getTranslations("admin");
 
   return (
-    <section className="flex flex-col gap-3">
+    <section className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold tracking-tight">{t("heading")}</h1>
       <p className="text-muted-foreground">{t("empty")}</p>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/admin/sports">{t("navSports")}</Link>
+        </Button>
+      </div>
     </section>
   );
 }

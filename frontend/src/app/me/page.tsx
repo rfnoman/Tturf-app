@@ -9,6 +9,9 @@ import { getServerApiClient } from "@/lib/api/server";
  */
 export default async function MePage() {
   const t = await getTranslations("me");
+  // `getTranslations("me")` scopes every lookup to the `me` namespace, so the shared
+  // strings need their own translator: a scoped t("common.yes") resolves me.common.yes.
+  const tCommon = await getTranslations("common");
   const { userId } = await auth();
 
   if (!userId) {
@@ -38,14 +41,14 @@ export default async function MePage() {
         </p>
       ) : (
         <dl className="border-border divide-border divide-y rounded-md border text-sm">
-          <Row label={t("fields.name")} value={data.full_name || t("common.notSet")} />
-          <Row label={t("fields.email")} value={data.email || t("common.notSet")} />
-          <Row label={t("fields.phone")} value={data.phone || t("common.notSet")} />
+          <Row label={t("fields.name")} value={data.full_name || tCommon("notSet")} />
+          <Row label={t("fields.email")} value={data.email || tCommon("notSet")} />
+          <Row label={t("fields.phone")} value={data.phone || tCommon("notSet")} />
           <Row label={t("fields.clerkId")} value={data.clerk_id} mono />
           <Row label={t("fields.id")} value={data.id} mono />
           <Row
             label={t("fields.platformAdmin")}
-            value={data.is_platform_admin ? t("common.yes") : t("common.no")}
+            value={data.is_platform_admin ? tCommon("yes") : tCommon("no")}
           />
           <Row label={t("fields.createdAt")} value={data.created_at} mono />
         </dl>
