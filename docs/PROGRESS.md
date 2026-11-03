@@ -6,7 +6,7 @@ Updated by Claude Code at the end of each phase.
 |---|---|---|---|
 | 00 Foundation | **done** (auth flow pending Clerk keys) | 2026-11-03 | Monorepo, Django 6.1 + PostGIS, Clerk JWT auth + webhook, Next.js 16 shell, CI |
 | 01 Accounts, sports, profiles | **done** | 2026-11-03 | Sports catalogue + proposals, player profiles, onboarding wizard, FIFA-style card, authenticated e2e |
-| 02 Turfs & grounds | not started | | |
+| 02 Turfs & grounds | **done** | 2026-11-03 | Turfs, grounds, hours, prices, PostGIS discovery, Leaflet maps, admin review, staff |
 | 03 Bookings & cash payment | not started | | |
 | 04 Matches, squads, joining | not started | | |
 | 05 Scoreboard | not started | | |
@@ -201,3 +201,106 @@ admin approve created an inactive "Kabaddi" with 0 formats/skills/stats and merg
 - `SportProposal` creation is open to any authenticated user; Phase 02 narrows it to owners
   as the phase file says.
 - e2e is still not wired into CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 02 — Turfs, grounds, pricing, discovery (2026-11-03)
+
+**Built**
+
+- **`apps/turfs`** (DOMAIN §1, §4):
+  - `Turf` (PostGIS `PointField` with `geography=True`, so distances come back in metres
+    on the sphere rather than degrees), `TurfPhoto`, `TurfMembership`, `Ground`,
+    `OperatingHours`, `Closure`, `PriceRule`, and a seeded `Amenity` list.
+  - `Turf.status` and `TurfMembership.status` are state machines with one service
+    function per transition. `submit_turf_for_review` refuses a turf that is not actually
+    reviewable — no grounds, no hours, or a ground with unpriced open hours — so an admin
+    never opens an empty queue item and the owner hears about it first.
+  - `TurfMembership` carries a **partial** uniqueness constraint (`status != removed`),
+    so a person who leaves and is invited back does not collide with their own history.
+- **Availability** (`apps/turfs/availability.py`) — the selector Phase 03 books against:
+  - `operating hours − closures − active bookings`, sliced by the ground's `slot_minutes`,
+    computed in Dhaka local time and returned as aware UTC.
+  - **Closing after midnight works** (D27): a date's availability includes both that
+    day's window and the tail of the previous day's, so Mirpur's 07:00–02:00 produces
+    bookable 00:00 and 01:00 slots. Price coverage follows the same rule.
+  - Unavailable slots are returned with a `reason` rather than omitted, so the UI greys
+    them out instead of leaving a gap that reads as "closed".
+  - Partial slots at closing time are not offered — a 90-minute slot cannot start at
+    21:00 when the turf shuts at 22:00.
+  - Bookings reach it through a **provider registry** (D25), so Phase 03 plugs in without
+    touching this file.
+- **Pricing**: most-specific rule wins, and a slot is priced by the band it *starts* in
+  (D26). `activate_ground` refuses until every open minute is priced, and the 400 names
+  the gaps — which is also what makes the seed a real test of the demo price tables.
+- **Discovery**: `GET /turfs?near=lat,lng&radius_km=&sport=&area=&q=`, distance-annotated
+  and nearest-first; alphabetical without a point, so declining geolocation still works.
+  `near` takes latitude first (how humans write it) and is converted to PostGIS order in
+  exactly one place.
+- **Permissions**: `IsTurfOwner`, `IsTurfStaff`, `IsTurfOwnerOrStaffReadOnly` — all
+  resolved through a live `TurfMembership` at *that* turf, which is what stops staff at
+  turf A from touching turf B.
+- **Frontend**: player discovery (filters, list/map toggle, opt-in "near me"), turf detail
+  with a ground/date picker and the slot grid, owner dashboard, three-step registration
+  with a draggable map pin, a management page for grounds/hours/prices/staff/submit, and
+  the admin review queue. Leaflet via `next/dynamic` with `ssr: false` (D24).
+- **Seed**: five approved Dhaka turfs (Dhanmondi, Mirpur, Banani, Uttara, Bashundhara),
+  9 grounds, 28 price rules at real BDT rates, built **through the services** so a broken
+  demo price table fails the seed rather than producing unbookable slots. Weekend peak
+  pricing is Friday/Saturday, as it is in Dhaka — not Saturday/Sunday.
+- **Tests**: 417 backend (135 in `apps/turfs`), 17 Vitest, 31 Playwright across desktop
+  and mobile.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): the five seeded turfs
+list with sports and "from" prices; the map renders OSM tiles with a pin per turf;
+Mirpur's detail page shows 00:00 and 01:00 slots from its 07:00–02:00 hours, and switching
+to the 90-minute pitch reprices to ৳3200 and clears the selection. Then the whole
+acceptance path: registered "Gulshan Sports Arena" with a map pin → draft; set hours;
+added a ground; **activation refused**, naming every unpriced hour; added two price rules;
+activated; submitted; confirmed it 404s for players; approved it in the admin queue; and
+it then appeared publicly with the correct ৳2800 peak price. No console errors.
+
+**Bugs found and fixed along the way**
+
+- **Leaflet 500'd every page that imported it.** It reads `window` at module scope, and
+  `"use client"` does not stop Next evaluating the module on the server for the initial
+  HTML. Now behind `next/dynamic` with `ssr: false` (D24). Caught in the browser — the
+  build passes, because these routes are dynamic and never prerendered.
+- **Owners could not see their own inactive grounds** (D28). `turfs_for_staff` reused the
+  public prefetch, which filters to `is_active=True` — hiding the one row an owner has to
+  price and activate. The API tests had only ever built active grounds; three regression
+  tests now cover player, owner and admin.
+- **Leaflet's default marker was a broken image** ("Marker" alt text): its PNG is resolved
+  relative to Leaflet's own CSS and no bundler rewrites it. Replaced with an inline-SVG
+  `divIcon`.
+- **`SerializerMethodField` generated `unknown`** in the OpenAPI schema, so `turf.sports`
+  and `distance_km` were unusable from TypeScript. Annotated with `@extend_schema_field`.
+  `GroundSerializer` is now declared response-only, which makes its model-default fields
+  *required* in the generated response type instead of `number | undefined`.
+- **The price-rule serializer rejected equal start/end times**, which is the documented
+  "all day" idiom the model itself relies on.
+- **`/turfs` collided** between the Phase 00 owner placeholder and the new player
+  discovery page; the owner area moved to `/owner`.
+- **e2e against the dev server was ambiguous**: Next's Dev Tools button is labelled
+  "Open Next.js Dev Tools", so `getByRole("button", {name: "Next"})` matched it too.
+  Selectors are now exact, and the suite runs against the production build as
+  `playwright.config.ts` always intended.
+
+**Deviations / notes**
+
+- Leaflet + react-leaflet added as dependencies (D24). `react-leaflet` is installed but
+  unused — the map is driven through Leaflet directly; it can be dropped in Phase 11.
+- Nested owner routes are spelled out in `urls.py` rather than pulling in a nested-router
+  package: one shape, five resources, no new dependency.
+- `TurfPhoto` upload works but the owner UI does not expose it yet; media still uses
+  local `FileSystemStorage`. The django-storages abstraction the phase file asks for is
+  **not** done — see below.
+
+**Known gaps / follow-ups**
+
+- **django-storages is not wired up.** `TurfPhoto.image` and `PlayerProfile.photo` still
+  write to local `FileSystemStorage`. `STORAGES` in `settings/base.py` is the single place
+  that changes; do it before any deploy (Phase 11 at the latest).
+- No photo upload UI on the owner page, and no closure editor — both have working API
+  endpoints, so these are frontend-only gaps.
+- Catalogue and amenity labels come from the database and are English in both locales,
+  like the sports catalogue. Phase 11 needs one strategy for all of them.
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.

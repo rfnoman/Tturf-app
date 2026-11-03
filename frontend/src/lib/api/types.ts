@@ -27,6 +27,19 @@ export type PlayerSkillValue = Schemas["PlayerSkill"];
 
 export type User = Schemas["User"];
 
+export type Turf = Schemas["TurfSummary"];
+export type TurfDetail = Schemas["TurfDetail"];
+export type OwnerTurf = Schemas["OwnerTurf"];
+export type Ground = Schemas["Ground"];
+export type Amenity = Schemas["Amenity"];
+export type OperatingHours = Schemas["OperatingHours"];
+export type PriceRule = Schemas["PriceRule"];
+export type TurfPhoto = Schemas["TurfPhoto"];
+export type TurfMembership = Schemas["TurfMembership"];
+export type Availability = Schemas["Availability"];
+export type Slot = Schemas["Slot"];
+export type PriceCoverageGap = Schemas["PriceCoverageGap"];
+
 /**
  * The subset of a profile a {@link PlayerCard} needs.
  *

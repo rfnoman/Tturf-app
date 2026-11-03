@@ -32,7 +32,7 @@ turf-app/
       accounts/       User (clerk_id), roles, Clerk auth + webhook
       players/        PlayerProfile, per-sport ratings, onboarding (DECISIONS D19)
       sports/         Sport catalogue, attributes, skills, stat definitions
-      turfs/          Turf, Ground, pricing, hours, staff membership
+      turfs/          Turf, Ground, pricing, hours, staff membership, availability
       bookings/       Booking, slot availability, cash payment states
       matches/        Match, Squad, JoinRequest, Invite, match board
       scoring/        Teams, scorecard, player stats, MOTM, peer ratings

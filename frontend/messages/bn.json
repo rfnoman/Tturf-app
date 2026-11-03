@@ -12,7 +12,8 @@
     "admin": "Admin",
     "profile": "প্রোফাইল",
     "debug": "Debug",
-    "settings": "সেটিংস"
+    "settings": "সেটিংস",
+    "findTurf": "টার্ফ"
   },
   "auth": {
     "signIn": "সাইন ইন",
@@ -36,13 +37,20 @@
   },
   "owner": {
     "heading": "Turf dashboard",
-    "empty": "No turfs yet. Turf registration arrives in Phase 02."
+    "body": "Your turfs, their review status, and the staff who run them.",
+    "empty": "No turfs yet. Turf registration arrives in Phase 02.",
+    "register": "টার্ফ নিবন্ধন করুন",
+    "groundCount": "{count, plural, one {# ground} other {# grounds}}",
+    "invitations": "আমন্ত্রণ",
+    "invitedAs": "{turf} invited you as {role}",
+    "viewInvite": "View"
   },
   "admin": {
     "heading": "Platform admin",
     "empty": "Review queues arrive in Phase 02.",
     "forbidden": "You need platform administrator access to view this page.",
-    "navSports": "খেলার ক্যাটালগ"
+    "navSports": "খেলার ক্যাটালগ",
+    "navTurfs": "টার্ফ পর্যালোচনা"
   },
   "me": {
     "heading": "Backend session",
@@ -175,5 +183,180 @@
       "rejected": "বাতিল"
     },
     "createdSport": "সৃষ্ট খেলা: {sport}."
+  },
+  "turfs": {
+    "heading": "টার্ফ খুঁজুন",
+    "body": "Filter by sport and area, or let us sort by how far away they are.",
+    "searchPlaceholder": "Search by name, area or address",
+    "nearMe": "আমার কাছে",
+    "nearMeOn": "Near me ✓",
+    "locating": "Finding you…",
+    "geolocationDenied": "No problem — showing every turf instead.",
+    "geolocationUnsupported": "This browser cannot share your location.",
+    "view": "View",
+    "viewList": "তালিকা",
+    "viewMap": "মানচিত্র",
+    "filterSport": "খেলা",
+    "filterArea": "এলাকা",
+    "allSports": "সব খেলা",
+    "allAreas": "সব এলাকা",
+    "clearFilters": "মুছুন",
+    "searching": "খোঁজা হচ্ছে…",
+    "resultCount": "{count, plural, =0 {No turfs} one {# turf} other {# turfs}}",
+    "noResults": "No turfs match those filters yet.",
+    "kmAway": "{km} কিমি দূরে",
+    "priceFrom": "from ৳{price}",
+    "groundCount": "{count, plural, one {# ground} other {# grounds}}",
+    "taka": "৳{price}",
+    "availability": "সময়সূচি",
+    "availabilityHint": "Pick a ground and a date to see what is open and what it costs.",
+    "ground": "মাঠ",
+    "date": "তারিখ",
+    "loadingSlots": "Loading slots…",
+    "noSlots": "The turf is closed on this date.",
+    "noGrounds": "No bookable grounds yet.",
+    "selectedSlot": "{time} · ৳{price}",
+    "bookingSoon": "Booking arrives in Phase 03",
+    "openingHours": "খোলার সময়",
+    "closed": "বন্ধ",
+    "amenities": "সুবিধাসমূহ",
+    "noAmenities": "No amenities listed.",
+    "phone": "Phone: {phone}",
+    "slotReason": {
+      "booked": "বুকড",
+      "closed": "বন্ধ",
+      "unpriced": "No price set"
+    },
+    "weekday": {
+      "0": "সোমবার",
+      "1": "মঙ্গলবার",
+      "2": "বুধবার",
+      "3": "বৃহস্পতিবার",
+      "4": "শুক্রবার",
+      "5": "শনিবার",
+      "6": "রবিবার"
+    }
+  },
+  "ownerRegister": {
+    "stepCounter": "ধাপ {current} / {total}",
+    "back": "পেছনে",
+    "next": "পরবর্তী",
+    "saving": "সংরক্ষণ হচ্ছে…",
+    "createDraft": "Create draft",
+    "failed": "Could not create the turf. Check the details and try again.",
+    "details": {
+      "heading": "About your turf",
+      "body": "Name, address and area. Players search on all three."
+    },
+    "location": {
+      "heading": "Where is it?",
+      "body": "Drop a pin so players can find you and see how far away you are.",
+      "hint": "Click the map or drag the pin. You can fine-tune the coordinates below."
+    },
+    "amenities": {
+      "heading": "What do you offer?",
+      "body": "Pick everything that applies. You can change this later."
+    },
+    "fields": {
+      "name": "টার্ফের নাম",
+      "address": "ঠিকানা",
+      "area": "এলাকা",
+      "areaPlaceholder": "e.g. Dhanmondi",
+      "phone": "যোগাযোগের ফোন",
+      "description": "বিবরণ",
+      "latitude": "Latitude",
+      "longitude": "Longitude"
+    }
+  },
+  "ownerManage": {
+    "failed": "That did not work. Please try again.",
+    "review": "পর্যালোচনার অবস্থা",
+    "reviewHint": "A turf is only visible to players once an admin approves it.",
+    "submit": "পর্যালোচনার জন্য জমা দিন",
+    "viewPublic": "View public page",
+    "backToDashboard": "Back to dashboard",
+    "grounds": "মাঠ",
+    "groundsHint": "A ground becomes bookable once its open hours are fully priced.",
+    "noGrounds": "No grounds yet. Add one below.",
+    "addGround": "মাঠ যোগ করুন",
+    "groundName": "নাম",
+    "maxPlayers": "Max players",
+    "slotMinutes": "Slot (minutes)",
+    "sportFormats": "Sports and formats",
+    "slotLength": "{minutes} min slots",
+    "capacity": "up to {count}",
+    "active": "বুকিংযোগ্য",
+    "inactive": "Not bookable",
+    "activate": "সক্রিয় করুন",
+    "deactivate": "Deactivate",
+    "prices": "Prices ({count})",
+    "price": "মূল্য (৳)",
+    "label": "Label",
+    "labelPlaceholder": "Peak",
+    "addPrice": "মূল্য যোগ করুন",
+    "priceHint": "An end time at or before the start wraps past midnight. Equal times mean all day.",
+    "everyDay": "প্রতিদিন",
+    "from": "থেকে",
+    "until": "পর্যন্ত",
+    "remove": "সরান",
+    "weekdays": "দিন",
+    "hours": "খোলার সময়",
+    "hoursHint": "Closing after midnight is fine — set 18:00 to 02:00 for a late evening.",
+    "opens": "খোলে",
+    "closes": "বন্ধ হয়",
+    "setHours": "Set hours",
+    "closed": "বন্ধ",
+    "nextDay": "(next day)",
+    "staff": "কর্মী",
+    "staffHint": "Managers and cashiers can confirm bookings and take payments. Only you can edit the turf.",
+    "staffEmail": "Email",
+    "staffRole": "Role",
+    "roleCashier": "ক্যাশিয়ার",
+    "roleManager": "ম্যানেজার",
+    "invite": "আমন্ত্রণ",
+    "staffActive": "Active",
+    "staffInvited": "Invitation sent",
+    "weekday": {
+      "0": "সোমবার",
+      "1": "মঙ্গলবার",
+      "2": "বুধবার",
+      "3": "বৃহস্পতিবার",
+      "4": "শুক্রবার",
+      "5": "শনিবার",
+      "6": "রবিবার"
+    },
+    "weekdayShort": {
+      "0": "সোম",
+      "1": "মঙ্গল",
+      "2": "বুধ",
+      "3": "বৃহ",
+      "4": "শুক্র",
+      "5": "শনি",
+      "6": "রবি"
+    }
+  },
+  "adminTurfs": {
+    "heading": "টার্ফ",
+    "body": "Approve new venues, and suspend ones that stop meeting the bar.",
+    "empty": "Nothing in this queue.",
+    "filter": "Filter by status",
+    "approve": "অনুমোদন",
+    "reject": "বাতিল",
+    "suspend": "স্থগিত",
+    "viewPublic": "View public page",
+    "reason": "কারণ",
+    "reasonPlaceholder": "Reason for the owner (required to reject)",
+    "rejectHint": "Rejection needs a reason — the owner sees it and fixes it.",
+    "actionFailed": "That action failed. Reload and try again.",
+    "slotLength": "{minutes} min slots",
+    "priceRules": "{count, plural, one {# price rule} other {# price rules}}",
+    "summary": "{grounds} ground(s), {hours} opening-hours row(s)",
+    "status": {
+      "pending_review": "অপেক্ষমাণ",
+      "approved": "অনুমোদিত",
+      "rejected": "বাতিল",
+      "suspended": "স্থগিত",
+      "draft": "খসড়া"
+    }
   }
 }
