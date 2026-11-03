@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "টার্ফঅ্যাপ",
+    "tagline": "Book a ground, fill your match, build your game."
+  },
+  "nav": {
+    "home": "হোম",
+    "play": "খেলুন",
+    "turfs": "টার্ফ",
+    "myBookings": "My bookings",
+    "owner": "Turf owner",
+    "admin": "Admin",
+    "profile": "প্রোফাইল",
+    "debug": "Debug"
+  },
+  "auth": {
+    "signIn": "সাইন ইন",
+    "signUp": "সাইন আপ",
+    "signOut": "সাইন আউট",
+    "signedInAs": "Signed in as {name}"
+  },
+  "language": {
+    "label": "ভাষা",
+    "switchTo": "Switch to {language}"
+  },
+  "home": {
+    "heading": "Play more football in Dhaka",
+    "body": "Find a turf near you, book a slot, and fill the remaining spots with players at your level.",
+    "ctaPlay": "Find a match",
+    "ctaOwner": "List your turf"
+  },
+  "player": {
+    "heading": "Your matches",
+    "empty": "Nothing booked yet. Bookings arrive in Phase 03."
+  },
+  "owner": {
+    "heading": "Turf dashboard",
+    "empty": "No turfs yet. Turf registration arrives in Phase 02."
+  },
+  "admin": {
+    "heading": "Platform admin",
+    "empty": "Review queues arrive in Phase 02.",
+    "forbidden": "You need platform administrator access to view this page."
+  },
+  "me": {
+    "heading": "Backend session",
+    "body": "What Django reports for your Clerk session, straight from GET /api/v1/me.",
+    "signedOut": "Sign in to see the backend response.",
+    "error": "Could not reach the backend: {message}",
+    "fields": {
+      "id": "Django id",
+      "clerkId": "Clerk id",
+      "email": "Email",
+      "phone": "Phone",
+      "name": "Name",
+      "platformAdmin": "Platform admin",
+      "createdAt": "Created"
+    }
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading…",
+    "notSet": "Not set",
+    "retry": "Try again"
+  }
+}

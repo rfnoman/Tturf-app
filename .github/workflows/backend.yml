@@ -1,0 +1,88 @@
+name: backend
+
+on:
+  push:
+    branches: [main]
+    paths: ["backend/**", ".github/workflows/backend.yml"]
+  pull_request:
+    paths: ["backend/**", ".github/workflows/backend.yml"]
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        # Runners are amd64, so the canonical upstream image works here. Local dev uses
+        # the multi-arch imresamu build for Apple Silicon (DECISIONS D16).
+        image: postgis/postgis:17-3.6
+        env:
+          POSTGRES_DB: turf
+          POSTGRES_USER: turf
+          POSTGRES_PASSWORD: turf
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U turf -d turf"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:8-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DJANGO_SECRET_KEY: ci-secret-key
+      POSTGRES_DB: turf
+      POSTGRES_USER: turf
+      POSTGRES_PASSWORD: turf
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
+      REDIS_URL: redis://127.0.0.1:6379/0
+
+    steps:
+      - uses: actions/checkout@v5
+
+      # GeoDjango loads GEOS/GDAL through ctypes, so importing any model with a
+      # PointField fails without these present on the runner itself.
+      - name: Install geospatial libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gdal-bin libgdal-dev libgeos-dev libproj-dev
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Check for missing migrations
+        run: uv run python manage.py makemigrations --check --dry-run
+
+      - name: Verify OpenAPI schema generates
+        run: uv run python manage.py spectacular --fail-on-warn --file /dev/null
+
+      - name: Tests
+        run: uv run pytest --create-db

@@ -1,0 +1,54 @@
+# Local development infrastructure only. Backend and frontend run on the host.
+#
+# Tags are pinned deliberately: the postgis Debian base moved to trixie in Oct 2026,
+# so `latest` is not reproducible.
+#
+# Host ports are deliberately non-default (55432 / 56379): a native Postgres and Redis
+# already run on 5432 / 6379 on this machine and would silently shadow these containers.
+#
+# POSTGIS_IMAGE defaults to imresamu/postgis, which is the multi-arch (arm64 + amd64)
+# build of the same upstream docker-postgis Dockerfiles, maintained by one of the
+# docker-postgis maintainers. The canonical `postgis/postgis` images are amd64-only and
+# will not run on Apple Silicon without emulation. CI (amd64 runners) overrides this
+# with postgis/postgis:17-3.6. See DECISIONS.md D16.
+
+services:
+  postgres:
+    image: ${POSTGIS_IMAGE:-imresamu/postgis:17-3.6}
+    container_name: turf_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-turf}
+      POSTGRES_USER: ${POSTGRES_USER:-turf}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-turf}
+      # Keep the container's own locale/encoding predictable for test DB creation.
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-turf} -d ${POSTGRES_DB:-turf}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    container_name: turf_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-56379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
