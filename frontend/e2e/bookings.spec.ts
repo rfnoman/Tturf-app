@@ -1,14 +1,8 @@
 import type { Page } from "@playwright/test";
 
+import { DEMO_TURFS, bookAFreeSlot, dhakaDate } from "./support/booking";
 import { apiBaseUrl } from "./support/clerk-users";
 import { expect, requiresClerk, test } from "./support/fixtures";
-
-/** Dhaka-local YYYY-MM-DD, which is what every date control in the app expects. */
-function dhakaDate(offsetDays = 0): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(
-    new Date(Date.now() + offsetDays * 86_400_000),
-  );
-}
 
 async function finishOnboarding(page: Page) {
   await page.goto("/onboarding");
@@ -20,40 +14,6 @@ async function finishOnboarding(page: Page) {
   await expect(page).toHaveURL(/\/profile/);
 }
 
-/** Book the first free slot on a turf, returning the booking's id and the day used. */
-async function bookFirstFreeSlot(page: Page, slug: string): Promise<{ id: string; date: string }> {
-  await page.goto(`/turfs/${slug}`);
-
-  // Repeated runs fill a turf up, so this hunts for a free slot across the next few
-  // days and every ground rather than assuming tomorrow's default pitch is open.
-  const open = page.locator("[data-slot-start][data-slot-available='true']");
-  let found = false;
-  let date = dhakaDate(1);
-
-  for (let day = 1; day <= 5 && !found; day += 1) {
-    date = dhakaDate(day);
-    await page.getByLabel("Date").fill(date);
-    const grounds = await page.locator("#ground option").count();
-
-    for (let index = 0; index < grounds; index += 1) {
-      const value = await page.locator("#ground option").nth(index).getAttribute("value");
-      await page.locator("#ground").selectOption(value);
-      if ((await open.count()) > 0) {
-        found = true;
-        break;
-      }
-    }
-  }
-
-  const slot = open.first();
-  await expect(slot).toBeVisible();
-  await slot.click();
-  await page.getByRole("button", { name: /^Book for/ }).click();
-
-  await expect(page).toHaveURL(/\/bookings\/[0-9a-f-]+$/);
-  return { id: page.url().split("/").pop()!, date };
-}
-
 test.describe("booking a slot", () => {
   requiresClerk();
 
@@ -62,32 +22,36 @@ test.describe("booking a slot", () => {
   });
 
   test("a new player's booking waits for the turf to confirm", async ({ signedInPage: page }) => {
-    await bookFirstFreeSlot(page, "dhanmondi-arena");
+    await bookAFreeSlot(page, { turfs: ["dhanmondi-arena", ...DEMO_TURFS] });
 
     // DECISIONS D3: no track record, so it is held rather than confirmed. "Reserved"
     // appears twice on the page — as the status badge and as a timeline entry.
     await expect(page.getByText("Reserved").first()).toBeVisible();
     await expect(page.getByText(/has not confirmed yet/)).toBeVisible();
-    await expect(page.getByText("Cash at the turf")).toBeVisible();
+    // Exact: the Phase 10 payment card also says "cash at the turf" in its hint.
+    await expect(page.getByText("Cash at the turf", { exact: true })).toBeVisible();
   });
 
   test("the booking appears in my bookings and the slot is no longer free", async ({
     signedInPage: page,
   }) => {
-    const booked = await bookFirstFreeSlot(page, "banani-sports-hub");
+    const booked = await bookAFreeSlot(page, { turfs: ["banani-sports-hub", ...DEMO_TURFS] });
+    // Which turf the helper settled on depends on what is still free, so the name is
+    // read off the booking rather than assumed.
+    const turfName = await page.getByRole("heading", { level: 1 }).textContent();
 
     await page.goto("/bookings");
-    await expect(page.getByRole("heading", { name: "Banani Sports Hub" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: turfName! })).toBeVisible();
 
     // The Phase 02 availability selector picks bookings up through the provider
     // registry, so a booked slot must now read as taken — on the day it was booked.
-    await page.goto("/turfs/banani-sports-hub");
+    await page.goto(`/turfs/${booked.turf}`);
     await page.getByLabel("Date").fill(booked.date);
     await expect(page.getByText("BOOKED").first()).toBeVisible();
   });
 
   test("a player can cancel their own booking", async ({ signedInPage: page }) => {
-    await bookFirstFreeSlot(page, "uttara-green-ground");
+    await bookAFreeSlot(page, { turfs: ["uttara-green-ground", ...DEMO_TURFS] });
 
     await page.getByLabel("Reason").fill("Plans changed");
     await page.getByRole("button", { name: "Cancel booking" }).click();
@@ -97,7 +61,7 @@ test.describe("booking a slot", () => {
   });
 
   test("the timeline records every transition", async ({ signedInPage: page }) => {
-    await bookFirstFreeSlot(page, "bashundhara-play-zone");
+    await bookAFreeSlot(page, { turfs: ["bashundhara-play-zone", ...DEMO_TURFS] });
 
     const timeline = page.locator("ol");
     await expect(timeline.getByText("Reserved")).toBeVisible();
@@ -208,7 +172,7 @@ test.describe("notifications", () => {
 
   test("booking produces a notification the bell can show", async ({ signedInPage: page }) => {
     await finishOnboarding(page);
-    await bookFirstFreeSlot(page, "mirpur-turf-club");
+    await bookAFreeSlot(page, { turfs: ["mirpur-turf-club", ...DEMO_TURFS] });
 
     // The bell reads its count on mount and then every 30s, so the page is reloaded
     // rather than waiting out a poll.

@@ -191,6 +191,9 @@ class TurfDetailSerializer(TurfSummarySerializer):
             "description",
             "phone",
             "cancellation_free_hours",
+            # Public because a player has to see, before booking, that this turf asks
+            # for an advance (DECISIONS D8).
+            "advance_percent",
             "grounds",
             "operating_hours",
         ]
@@ -255,6 +258,7 @@ class TurfWriteSerializer(serializers.ModelSerializer):
             "amenity_ids",
             "auto_confirm_enabled",
             "cancellation_free_hours",
+            "advance_percent",
         ]
 
 

@@ -25,6 +25,12 @@ from .factories import bookable_ground, next_slot_start
 #: transaction.
 pytestmark = pytest.mark.django_db(transaction=True)
 
+#: Generous on purpose. These threads are lining up to race, and a machine running the
+#: whole suite can be slow enough that a tight barrier times out before the race even
+#: starts — which fails a test that is about Postgres, not about scheduling.
+BARRIER_TIMEOUT = 60
+JOIN_TIMEOUT = 90
+
 
 def test_two_threads_booking_the_same_slot_leave_exactly_one_winner():
     """Acceptance: one succeeds, the other is told the slot was just taken."""
@@ -37,7 +43,7 @@ def test_two_threads_booking_the_same_slot_leave_exactly_one_winner():
     def book(user):
         try:
             # Line the threads up so they really do race for the same slot.
-            barrier.wait(timeout=10)
+            barrier.wait(timeout=BARRIER_TIMEOUT)
             results.append(
                 create_booking(user=user, ground=ground, start=start, sport_format=sport_format)
             )
@@ -50,7 +56,7 @@ def test_two_threads_booking_the_same_slot_leave_exactly_one_winner():
     for thread in threads:
         thread.start()
     for thread in threads:
-        thread.join(timeout=20)
+        thread.join(timeout=JOIN_TIMEOUT)
 
     bookings = [r for r in results if isinstance(r, Booking)]
     failures = [r for r in results if isinstance(r, Exception)]
@@ -71,7 +77,7 @@ def test_ten_threads_still_leave_exactly_one_winner():
 
     def book(user):
         try:
-            barrier.wait(timeout=15)
+            barrier.wait(timeout=BARRIER_TIMEOUT)
             results.append(
                 create_booking(user=user, ground=ground, start=start, sport_format=sport_format)
             )
@@ -84,7 +90,7 @@ def test_ten_threads_still_leave_exactly_one_winner():
     for thread in threads:
         thread.start()
     for thread in threads:
-        thread.join(timeout=30)
+        thread.join(timeout=JOIN_TIMEOUT)
 
     assert len([r for r in results if isinstance(r, Booking)]) == 1
     assert all(isinstance(r, SlotTakenError) for r in results if not isinstance(r, Booking))

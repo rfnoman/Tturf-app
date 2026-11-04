@@ -24,6 +24,12 @@ from .factories import stocked_turf
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
+#: Generous on purpose. These threads are lining up to race, and a machine running the
+#: whole suite can be slow enough that a tight barrier times out before the race even
+#: starts — which fails a test that is about Postgres, not about scheduling.
+BARRIER_TIMEOUT = 60
+JOIN_TIMEOUT = 90
+
 
 def run_in_threads(work, count: int):
     """Line `count` threads up on a barrier and run `work(index)` in each."""
@@ -32,7 +38,7 @@ def run_in_threads(work, count: int):
 
     def runner(index):
         try:
-            barrier.wait(timeout=15)
+            barrier.wait(timeout=BARRIER_TIMEOUT)
             results.append(work(index))
         except Exception as exc:
             results.append(exc)
@@ -43,7 +49,7 @@ def run_in_threads(work, count: int):
     for thread in threads:
         thread.start()
     for thread in threads:
-        thread.join(timeout=30)
+        thread.join(timeout=JOIN_TIMEOUT)
     return results
 
 

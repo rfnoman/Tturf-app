@@ -3118,6 +3118,212 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/payments/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start a payment
+         * @description Begin paying for a booking or an order.
+         */
+        post: operations["payment_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/{payment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One payment
+         * @description One payment, for the person who made it.
+         */
+        get: operations["payment_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My payments */
+        get: operations["my_payments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bookings/{booking_id}/refund-quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * What a cancellation refunds
+         * @description What cancelling would be worth back, before anybody commits.
+         */
+        get: operations["refund_quote"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/finance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A turf's earnings
+         * @description What a turf has earned, and what it is owed.
+         */
+        get: operations["turf_finance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/payouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A turf's payouts */
+        get: operations["turf_payouts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/finance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Platform finance
+         * @description The platform's own position.
+         */
+        get: operations["admin_finance"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Refunds */
+        get: operations["admin_refunds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/bookings/{booking_id}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refund a booking
+         * @description Refund a booking by policy, for support cases.
+         */
+        post: operations["admin_refund_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Payouts */
+        get: operations["admin_payouts"];
+        put?: never;
+        /** Draft a payout */
+        post: operations["admin_payout_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payouts/{payout_id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record a payout as sent */
+        post: operations["admin_payout_send"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3276,6 +3482,7 @@ export interface components {
             readonly player_name: string;
             /** Format: uuid */
             readonly player_profile_id: string | null;
+            readonly is_mine: boolean;
             /** Walk-in phone */
             readonly booked_for_phone: string;
             readonly notes: string;
@@ -3603,6 +3810,13 @@ export interface components {
             booking_id?: string | null;
             note?: string;
         };
+        CreatePayoutRequest: {
+            turf: string;
+            /** Format: date */
+            period_start: string;
+            /** Format: date */
+            period_end: string;
+        };
         /** @description Everything the home screen shows, in one request. */
         Dashboard: {
             week: components["schemas"]["WeeklySummary"];
@@ -3760,6 +3974,43 @@ export interface components {
              */
             readonly stat_key: string;
         };
+        /**
+         * @description * `player` - The player
+         *     * `platform` - The platform
+         *     * `turf` - The turf
+         *     * `delivery` - Delivery
+         * @enum {string}
+         */
+        LedgerAccountEnum: "player" | "platform" | "turf" | "delivery";
+        LedgerEntry: {
+            /** Format: uuid */
+            readonly id: string;
+            /**
+             * Date
+             * Format: date
+             */
+            readonly occurred_on: string;
+            readonly account: components["schemas"]["LedgerAccountEnum"];
+            readonly account_label: string;
+            readonly type: components["schemas"]["LedgerEntryTypeEnum"];
+            readonly type_label: string;
+            /**
+             * Format: decimal
+             * @description Signed: positive is money in, negative is money out.
+             */
+            readonly amount: string;
+            readonly note: string;
+        };
+        /**
+         * @description * `booking_fee` - Booking
+         *     * `sale` - Sale
+         *     * `delivery_fee` - Delivery fee
+         *     * `commission` - Commission
+         *     * `refund` - Refund
+         *     * `payout` - Payout
+         * @enum {string}
+         */
+        LedgerEntryTypeEnum: "booking_fee" | "sale" | "delivery_fee" | "commission" | "refund" | "payout";
         ManualActivityRequest: {
             minutes: number;
             /** Format: date */
@@ -3773,6 +4024,10 @@ export interface components {
              * @description Defaults to the booking price. Set it when a discount was given.
              */
             amount?: string;
+        };
+        MarkPayoutSentRequest: {
+            reference?: string;
+            note?: string;
         };
         MarkReadRequest: {
             /** @description Omit to mark everything read. */
@@ -4172,6 +4427,11 @@ export interface components {
              * @description Cancelling later than this counts against the player's reliability.
              */
             readonly cancellation_free_hours: number;
+            /**
+             * Advance (%)
+             * @description DECISIONS D8: how much of the price has to be paid online before a booking is confirmed. Zero means cash at the turf, as before.
+             */
+            readonly advance_percent: number;
             readonly grounds: components["schemas"]["Ground"][];
             readonly operating_hours: components["schemas"]["OperatingHours"][];
             status?: components["schemas"]["TurfStatusEnum"];
@@ -4626,12 +4886,18 @@ export interface components {
              * @description Cancelling later than this counts against the player's reliability.
              */
             cancellation_free_hours?: number;
+            /**
+             * Advance (%)
+             * @description DECISIONS D8: how much of the price has to be paid online before a booking is confirmed. Zero means cash at the turf, as before.
+             */
+            advance_percent?: number;
         };
         Payment: {
             /** Format: uuid */
             readonly id: string;
             readonly method: components["schemas"]["PaymentMethodEnum"];
             readonly method_label: string;
+            readonly kind: components["schemas"]["PaymentKindEnum"];
             /**
              * Format: decimal
              * @description BDT. Money is always Decimal (CLAUDE.md).
@@ -4649,6 +4915,59 @@ export interface components {
             readonly created_at: string;
         };
         /**
+         * @description What a player sees about one payment, including where to pay it.
+         *
+         *     `redirect_url` is included; `raw_response` is not. The gateway's reply is for
+         *     reconciliation and disputes, not for the browser.
+         */
+        PaymentDetail: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly method: components["schemas"]["PaymentMethodEnum"];
+            readonly method_label: string;
+            readonly kind: components["schemas"]["PaymentKindEnum"];
+            /**
+             * Format: decimal
+             * @description BDT. Money is always Decimal (CLAUDE.md).
+             */
+            readonly amount: string;
+            readonly status: components["schemas"]["PaymentStatusEnum"];
+            /** @default  */
+            readonly collected_by_name: string;
+            /** Format: date-time */
+            readonly collected_at: string | null;
+            /** @description Provider transaction id from Phase 10. Empty for cash. */
+            readonly reference: string;
+            readonly note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+            readonly status_label: string;
+            readonly kind_label: string;
+            readonly what_for: string;
+            /** Format: decimal */
+            readonly refunded: string;
+            /**
+             * Gateway URL
+             * Format: uri
+             * @description Where the player was sent.
+             */
+            readonly redirect_url: string;
+            /** Format: uuid */
+            readonly booking: string | null;
+            /**
+             * Format: uuid
+             * @description Cash taken for a store order (Phase 08).
+             */
+            readonly order: string | null;
+        };
+        /**
+         * @description * `full` - The whole amount
+         *     * `advance` - Advance
+         *     * `balance` - Balance
+         * @enum {string}
+         */
+        PaymentKindEnum: "full" | "advance" | "balance";
+        /**
          * @description * `cash` - Cash
          *     * `sslcommerz` - SSLCommerz
          *     * `bkash` - bKash
@@ -4660,9 +4979,42 @@ export interface components {
          *     * `paid` - Paid
          *     * `refunded` - Refunded
          *     * `failed` - Failed
+         *     * `cancelled` - Cancelled
          * @enum {string}
          */
-        PaymentStatusEnum: "pending" | "paid" | "refunded" | "failed";
+        PaymentStatusEnum: "pending" | "paid" | "refunded" | "failed" | "cancelled";
+        Payout: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly turf: string;
+            readonly turf_name: string;
+            /**
+             * From
+             * Format: date
+             */
+            readonly period_start: string;
+            /**
+             * To
+             * Format: date
+             */
+            readonly period_end: string;
+            /** Format: decimal */
+            readonly amount: string;
+            readonly status: components["schemas"]["PayoutStatusEnum"];
+            readonly status_label: string;
+            /** @description Bank or bKash reference. */
+            readonly reference: string;
+            /** Format: date-time */
+            readonly sent_at: string | null;
+            readonly note: string;
+        };
+        /**
+         * @description * `draft` - Draft
+         *     * `sent` - Sent
+         * @enum {string}
+         */
+        PayoutStatusEnum: "draft" | "sent";
         PeerRatingEntryRequest: {
             /** Format: uuid */
             player_id: string;
@@ -4674,6 +5026,21 @@ export interface components {
         };
         PeerRatingsSaved: {
             saved: number;
+        };
+        /** @description The platform's own position for a period. */
+        PlatformFinance: {
+            /** Format: date */
+            period_start: string;
+            /** Format: date */
+            period_end: string;
+            /** Format: decimal */
+            platform: string;
+            /** Format: decimal */
+            delivery: string;
+            /** Format: decimal */
+            owed_to_turfs: string;
+            payments: number;
+            refunds: number;
         };
         /** @description Flattened for the card: the UI wants a key, a label and a number. */
         PlayerAttribute: {
@@ -5154,6 +5521,37 @@ export interface components {
             quantity: number;
             note?: string;
         };
+        Refund: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly payment: string;
+            /** Format: decimal */
+            readonly amount: string;
+            readonly reason: string;
+            readonly status: components["schemas"]["RefundStatusEnum"];
+            readonly status_label: string;
+            /** Provider reference */
+            readonly provider_ref: string;
+            /** Format: date-time */
+            readonly settled_at: string | null;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /** @description What a cancellation would be worth back, before anybody commits to it. */
+        RefundPolicy: {
+            /** Format: decimal */
+            amount: string;
+            reason: string;
+            forfeits_advance: boolean;
+        };
+        /**
+         * @description * `pending` - Pending
+         *     * `done` - Refunded
+         *     * `failed` - Failed
+         * @enum {string}
+         */
+        RefundStatusEnum: "pending" | "done" | "failed";
         ReminderPreference: {
             /** Match-day summary */
             match_day?: boolean;
@@ -5651,6 +6049,16 @@ export interface components {
          * @enum {string}
          */
         StaffInviteRoleEnum: "manager" | "cashier";
+        /** @description Pay for a booking or an order. */
+        StartPaymentRequest: {
+            /** Format: uuid */
+            booking_id?: string | null;
+            /** Format: uuid */
+            order_id?: string | null;
+            method: components["schemas"]["PaymentMethodEnum"];
+            /** @default full */
+            kind: components["schemas"]["PaymentKindEnum"];
+        };
         StatDefinition: {
             /** Format: uuid */
             readonly id: string;
@@ -5693,6 +6101,21 @@ export interface components {
          * @enum {string}
          */
         StatValueTypeEnum: "int" | "bool" | "decimal";
+        /** @description A turf's earnings for a period, and the lines behind the number. */
+        Statement: {
+            /** Format: date */
+            period_start: string;
+            /** Format: date */
+            period_end: string;
+            /** Format: decimal */
+            total: string;
+            /** Format: decimal */
+            already_paid: string;
+            by_type: {
+                [key: string]: string;
+            };
+            entries: components["schemas"]["LedgerEntry"][];
+        };
         StockItem: {
             /** Format: uuid */
             readonly id: string;
@@ -5852,6 +6275,11 @@ export interface components {
              * @description Cancelling later than this counts against the player's reliability.
              */
             readonly cancellation_free_hours: number;
+            /**
+             * Advance (%)
+             * @description DECISIONS D8: how much of the price has to be paid online before a booking is confirmed. Zero means cash at the turf, as before.
+             */
+            readonly advance_percent: number;
             readonly grounds: components["schemas"]["Ground"][];
             readonly operating_hours: components["schemas"]["OperatingHours"][];
         };
@@ -5961,6 +6389,11 @@ export interface components {
              * @description Cancelling later than this counts against the player's reliability.
              */
             cancellation_free_hours?: number;
+            /**
+             * Advance (%)
+             * @description DECISIONS D8: how much of the price has to be paid online before a booking is confirmed. Zero means cash at the turf, as before.
+             */
+            advance_percent?: number;
         };
         UnreadCount: {
             unread: number;
@@ -10615,6 +11048,274 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BundleResult"];
+                };
+            };
+        };
+    };
+    payment_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartPaymentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["StartPaymentRequest"];
+                "multipart/form-data": components["schemas"]["StartPaymentRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentDetail"];
+                };
+            };
+        };
+    };
+    payment_detail: {
+        parameters: {
+            query?: {
+                /** @description The gateway's validation id, when the player has just come back. */
+                val_id?: string;
+            };
+            header?: never;
+            path: {
+                payment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentDetail"];
+                };
+            };
+        };
+    };
+    my_payments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentDetail"][];
+                };
+            };
+        };
+    };
+    refund_quote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RefundPolicy"];
+                };
+            };
+        };
+    };
+    turf_finance: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM-DD. Default: this month. */
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Statement"];
+                };
+            };
+        };
+    };
+    turf_payouts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Payout"][];
+                };
+            };
+        };
+    };
+    admin_finance: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformFinance"];
+                };
+            };
+        };
+    };
+    admin_refunds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"][];
+                };
+            };
+        };
+    };
+    admin_refund_booking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"][];
+                };
+            };
+        };
+    };
+    admin_payouts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Payout"][];
+                };
+            };
+        };
+    };
+    admin_payout_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePayoutRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CreatePayoutRequest"];
+                "multipart/form-data": components["schemas"]["CreatePayoutRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Payout"];
+                };
+            };
+        };
+    };
+    admin_payout_send: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                payout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["MarkPayoutSentRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["MarkPayoutSentRequest"];
+                "multipart/form-data": components["schemas"]["MarkPayoutSentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Payout"];
                 };
             };
         };

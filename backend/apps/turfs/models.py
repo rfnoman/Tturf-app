@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -122,6 +122,15 @@ class Turf(BaseModel):
         _("free cancellation window (hours)"),
         default=12,
         help_text="Cancelling later than this counts against the player's reliability.",
+    )
+    advance_percent = models.PositiveSmallIntegerField(
+        _("advance (%)"),
+        default=0,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        help_text=(
+            "DECISIONS D8: how much of the price has to be paid online before a booking "
+            "is confirmed. Zero means cash at the turf, as before."
+        ),
     )
 
     class Meta:
