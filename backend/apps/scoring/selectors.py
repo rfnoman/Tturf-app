@@ -96,7 +96,7 @@ def player_results(user, *, limit: int = 20) -> list[dict]:
             {
                 "match_id": scorecard.match_id,
                 "scorecard_id": scorecard.id,
-                "sport": scorecard.match.sport.name,
+                "sport": scorecard.match.sport.display_name,
                 "turf_name": scorecard.match.booking.ground.turf.name,
                 "played_at": scorecard.match.starts_at,
                 "team_a_score": scorecard.team_a_score,

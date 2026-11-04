@@ -3413,7 +3413,7 @@ export interface components {
             /** Format: uuid */
             readonly id: string;
             key: string;
-            label: string;
+            readonly label: string;
             description?: string;
             /** Display order */
             order?: number;
@@ -5822,7 +5822,7 @@ export interface components {
         Sport: {
             /** Format: uuid */
             readonly id: string;
-            name: string;
+            readonly name: string;
             slug: string;
             description?: string;
             /** @description Short emoji or icon key the frontend maps to an illustration. */
@@ -5855,7 +5855,7 @@ export interface components {
         SportFormat: {
             /** Format: uuid */
             readonly id: string;
-            name: string;
+            readonly name: string;
             slug: string;
             /** @description Match capacity is players_per_side x 2 unless the ground caps it lower. */
             players_per_side: number;
@@ -5919,7 +5919,7 @@ export interface components {
             /** Format: uuid */
             readonly id: string;
             key: string;
-            label: string;
+            readonly label: string;
             description?: string;
             /** Format: decimal */
             weight?: string;
@@ -5931,7 +5931,7 @@ export interface components {
         SportSummary: {
             /** Format: uuid */
             readonly id: string;
-            name: string;
+            readonly name: string;
             slug: string;
             readonly icon: string;
         };
@@ -6063,7 +6063,7 @@ export interface components {
             /** Format: uuid */
             readonly id: string;
             key: string;
-            label: string;
+            readonly label: string;
             /** Type */
             value_type?: components["schemas"]["StatValueTypeEnum"];
             scope?: components["schemas"]["StatScopeEnum"];

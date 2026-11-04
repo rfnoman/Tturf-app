@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "cn";
 
 import type { ProductCategory, StockItem, StockMovement } from "@/lib/api/types";
@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
+import { formatWhen } from "@/i18n/formats";
 
 /**
  * The shelf, the movement log, and the form for adding something new.
@@ -32,6 +34,7 @@ export function InventoryBoard({
   log: StockMovement[];
 }) {
   const t = useTranslations("inventory");
+  const locale = useLocale();
   const router = useRouter();
   const api = useApiClient();
 
@@ -182,13 +185,7 @@ export function InventoryBoard({
                     <span className="text-muted-foreground text-xs">— {movement.note}</span>
                   )}
                   <span className="text-muted-foreground text-xs">
-                    {new Intl.DateTimeFormat("en-GB", {
-                      timeZone: "Asia/Dhaka",
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }).format(new Date(movement.created_at))}
+                    {formatWhen(movement.created_at, locale, "dayMonthTime")}
                   </span>
                 </li>
               ))}
@@ -244,7 +241,9 @@ function StockRow({
         <td className="px-2 py-2 text-right font-mono font-semibold tabular-nums">
           {item.available}
         </td>
-        <td className="px-2 py-2 text-right font-mono tabular-nums">৳{item.price}</td>
+        <td className="px-2 py-2 text-right">
+          <Money amount={item.price} />
+        </td>
         <td className="px-2 py-2">
           <span className="flex flex-wrap items-center gap-1.5">
             <Input

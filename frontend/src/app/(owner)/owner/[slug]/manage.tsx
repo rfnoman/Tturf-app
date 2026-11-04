@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 
 /** Monday-first, matching the backend's `date.weekday()` convention. */
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6] as const;
@@ -375,7 +376,7 @@ function GroundRow({
                     {rule.label && `(${rule.label})`}
                   </span>
                   <span className="flex items-center gap-2">
-                    <span className="font-mono tabular-nums">৳{rule.price}</span>
+                    <Money amount={rule.price} />
                     <Button
                       size="xs"
                       variant="ghost"

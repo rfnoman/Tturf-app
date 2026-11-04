@@ -13,14 +13,14 @@ class PlayerAttributeSerializer(serializers.Serializer):
     """Flattened for the card: the UI wants a key, a label and a number."""
 
     key = serializers.CharField(source="attribute.key")
-    label = serializers.CharField(source="attribute.label")
+    label = serializers.CharField(source="attribute.display_label")
     value = serializers.IntegerField()
     source = serializers.CharField()
 
 
 class PlayerSkillSerializer(serializers.Serializer):
     key = serializers.CharField(source="sport_skill.key")
-    label = serializers.CharField(source="sport_skill.label")
+    label = serializers.CharField(source="sport_skill.display_label")
     value = serializers.IntegerField()
     source = serializers.CharField()
     counts_toward_overall = serializers.BooleanField(source="sport_skill.counts_toward_overall")

@@ -9,6 +9,7 @@ import { useApiClient } from "@/lib/api/use-api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Money } from "@/components/ui/money";
 
 /**
  * One card per drop, with the two things a rider on a bike needs: where it goes and a
@@ -63,7 +64,7 @@ export function RiderList({ orders }: { orders: Order[] }) {
               <div className="min-w-0">
                 <CardTitle className="text-sm">{where}</CardTitle>
                 <p className="text-muted-foreground mt-1 text-xs">
-                  {order.player_name} · ৳{order.total} · {t("collectCash")}
+                  {order.player_name} · <Money amount={order.total} /> · {t("collectCash")}
                 </p>
               </div>
               <Badge>{order.status_label}</Badge>

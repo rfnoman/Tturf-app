@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { API_BASE_URL } from "@/lib/api/config";
+import { Money } from "@/components/ui/money";
+import { formatWhen } from "@/i18n/formats";
 
 export const metadata = { title: "Finance · TurfApp" };
 
@@ -33,18 +35,14 @@ export default async function FinancePage({
 
   if (!turf.data || !statement.data) notFound();
   const t = await getTranslations("finance");
+  const locale = await getLocale();
   const data = statement.data;
 
   const csv = new URL(`${API_BASE_URL}/api/v1/me/turfs/${slug}/finance.csv`);
   if (from) csv.searchParams.set("from", from);
   if (to) csv.searchParams.set("to", to);
 
-  const when = (value: string) =>
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Dhaka",
-      day: "numeric",
-      month: "short",
-    }).format(new Date(`${value}T12:00:00+06:00`));
+  const when = (value: string) => formatWhen(`${value}T12:00:00+06:00`, locale, "dayMonth");
 
   return (
     <div className="flex flex-col gap-6" data-testid="finance">
@@ -67,13 +65,13 @@ export default async function FinancePage({
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             <p className="font-mono text-3xl font-bold tabular-nums" data-testid="finance-total">
-              ৳{data.total}
+              <Money amount={data.total} />
             </p>
             <ul className="flex flex-col gap-1 text-sm">
               {Object.entries(data.by_type ?? {}).map(([type, amount]) => (
                 <li key={type} className="flex items-baseline justify-between">
                   <span className="text-muted-foreground">{t("entryType", { type })}</span>
-                  <span className="font-mono tabular-nums">৳{amount}</span>
+                  <Money amount={amount} />
                 </li>
               ))}
             </ul>
@@ -99,7 +97,7 @@ export default async function FinancePage({
                       <Badge variant={payout.status === "sent" ? "default" : "outline"}>
                         {payout.status_label}
                       </Badge>
-                      <span className="font-mono tabular-nums">৳{payout.amount}</span>
+                      <Money amount={payout.amount} />
                     </span>
                   </li>
                 ))}
@@ -130,7 +128,7 @@ export default async function FinancePage({
                     {entry.type_label}
                     {entry.note && <span className="text-muted-foreground"> · {entry.note}</span>}
                   </span>
-                  <span className="font-mono tabular-nums">৳{entry.amount}</span>
+                  <Money amount={entry.amount} />
                 </li>
               ))}
             </ul>

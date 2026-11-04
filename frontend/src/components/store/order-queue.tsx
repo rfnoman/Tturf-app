@@ -2,13 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { Order, Rider } from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Money } from "@/components/ui/money";
+import { formatWhen } from "@/i18n/formats";
 
 type ActionPath =
   | "/api/v1/orders/{order_id}/accept"
@@ -27,6 +29,7 @@ type ActionPath =
  */
 export function OrderQueue({ orders, riders = [] }: { orders: Order[]; riders?: Rider[] }) {
   const t = useTranslations("orderQueue");
+  const locale = useLocale();
   const router = useRouter();
   const api = useApiClient();
 
@@ -69,7 +72,7 @@ export function OrderQueue({ orders, riders = [] }: { orders: Order[]; riders?: 
             <CardHeader className="flex-row items-start justify-between gap-3">
               <div className="min-w-0">
                 <CardTitle className="text-sm">
-                  {order.player_name} · ৳{order.total}
+                  {order.player_name} · <Money amount={order.total} />
                 </CardTitle>
                 <p className="text-muted-foreground mt-1 text-xs">
                   {order.items.map((item) => `${item.quantity}× ${item.name}`).join(", ")}
@@ -80,12 +83,7 @@ export function OrderQueue({ orders, riders = [] }: { orders: Order[]; riders?: 
                   {order.address && ` · ${order.address.area}`}
                   {order.scheduled_for &&
                     ` · ${t("neededBy", {
-                      when: new Intl.DateTimeFormat("en-GB", {
-                        timeZone: "Asia/Dhaka",
-                        weekday: "short",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }).format(new Date(order.scheduled_for)),
+                      when: formatWhen(order.scheduled_for, locale, "weekdayTime"),
                     })}`}
                 </p>
               </div>

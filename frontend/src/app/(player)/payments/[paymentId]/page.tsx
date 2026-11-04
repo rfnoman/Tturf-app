@@ -6,6 +6,7 @@ import { getServerApiClient } from "@/lib/api/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Money } from "@/components/ui/money";
 
 /**
  * Where the gateway sends the player back to.
@@ -55,7 +56,7 @@ export default async function PaymentResultPage({
         <CardContent className="flex flex-col gap-2 text-sm">
           <div className="flex items-baseline justify-between">
             <span className="text-muted-foreground">{t("amount")}</span>
-            <span className="font-mono text-lg font-semibold tabular-nums">৳{data.amount}</span>
+            <Money amount={data.amount} className="text-lg font-semibold" />
           </div>
           <div className="flex items-baseline justify-between">
             <span className="text-muted-foreground">{t("kind")}</span>

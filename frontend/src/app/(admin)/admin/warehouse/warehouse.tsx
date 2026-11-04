@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 
 /** Add a product to the platform catalogue, and receive stock against it. */
 export function Warehouse({
@@ -136,7 +137,10 @@ export function Warehouse({
                 >
                   <span className="min-w-0 flex-1 truncate">
                     {item.product.name}
-                    <span className="text-muted-foreground"> · ৳{item.price}</span>
+                    <span className="text-muted-foreground">
+                      {" · "}
+                      <Money amount={item.price} />
+                    </span>
                     {item.is_low && (
                       <Badge variant="destructive" className="ml-2 text-[10px]">
                         {t("low")}

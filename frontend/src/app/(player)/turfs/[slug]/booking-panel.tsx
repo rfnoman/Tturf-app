@@ -2,14 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { Ground, Slot, SquadSummary } from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 import { SlotGrid } from "@/components/turf/slot-grid";
+import { formatWhen } from "@/i18n/formats";
 
 /** Dhaka-local YYYY-MM-DD, which is what the availability endpoint expects. */
 function dhakaDate(offsetDays = 0): string {
@@ -38,6 +40,7 @@ export function BookingPanel({
   squads: SquadSummary[];
 }) {
   const t = useTranslations("turfs");
+  const locale = useLocale();
   const api = useApiClient();
   const router = useRouter();
 
@@ -175,14 +178,11 @@ export function BookingPanel({
         <div className="bg-muted/40 flex flex-col gap-3 rounded-lg border p-4 text-sm">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="font-medium">
-              {t("selectedSlot", {
-                time: new Intl.DateTimeFormat("en-GB", {
-                  timeZone: "Asia/Dhaka",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }).format(new Date(chosen.start)),
-                price: chosen.price ?? "—",
-              })}
+              <span className="font-mono tabular-nums">
+                {formatWhen(chosen.start, locale, "time")}
+              </span>
+              {" · "}
+              <Money amount={chosen.price} />
             </span>
             <span className="text-muted-foreground text-xs">
               {ground?.name} · {format.name}

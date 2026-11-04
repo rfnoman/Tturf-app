@@ -84,6 +84,10 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Resolves the request language from `Accept-Language`, which the frontend sets from
+    # its own locale cookie. Catalogue labels (sports, product categories) are served in
+    # that language; nothing else in the API is translated (DECISIONS D63).
+    "django.middleware.locale.LocaleMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]

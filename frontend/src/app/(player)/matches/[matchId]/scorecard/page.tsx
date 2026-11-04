@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { ScorecardView } from "@/components/scoring/scorecard-view";
@@ -13,6 +13,7 @@ import { ConductReportForm } from "@/components/ratings/conduct-report-form";
 import { PostMatchSheet } from "./post-match";
 import { ScorecardDecision, ScorecardEditor } from "./scorecard-editor";
 import { TeamBuilder } from "./team-builder";
+import { formatWhen } from "@/i18n/formats";
 
 /**
  * One page, four readers: the scorer entering the card, the opposing captain confirming
@@ -39,20 +40,14 @@ export default async function ScorecardPage({ params }: { params: Promise<{ matc
   if (!match.data || !scorecard.data) notFound();
 
   const t = await getTranslations("scorecardPage");
+  const locale = await getLocale();
   const card = scorecard.data;
   const teamRows = teams.data ?? card.teams;
   const isDraft = card.status === "draft";
   const isPublic = card.status === "locked";
   const canRate = card.submitted_at !== null && match.data.is_on_roster;
 
-  const when = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Dhaka",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(card.played_at));
+  const when = formatWhen(card.played_at, locale, "full");
 
   return (
     <div className="flex flex-col gap-6" data-testid="scorecard-page">
@@ -143,13 +138,7 @@ export default async function ScorecardPage({ params }: { params: Promise<{ matc
                     <span className="text-muted-foreground">{event.actor_name}</span>
                   )}
                   <span className="text-muted-foreground">
-                    {new Intl.DateTimeFormat("en-GB", {
-                      timeZone: "Asia/Dhaka",
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }).format(new Date(event.created_at))}
+                    {formatWhen(event.created_at, locale, "dayMonthTime")}
                   </span>
                   {event.note && <span className="text-muted-foreground">— {event.note}</span>}
                 </li>

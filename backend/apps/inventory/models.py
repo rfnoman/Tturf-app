@@ -19,6 +19,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
+from apps.core.utils import in_readers_language
 from apps.sports.models import Sport
 from apps.turfs.models import Turf
 
@@ -51,6 +52,12 @@ class ProductCategory(BaseModel):
 
     slug = models.SlugField(_("slug"), max_length=40, unique=True)
     label = models.CharField(_("label"), max_length=60)
+    label_bn = models.CharField(
+        _("label (Bangla)"),
+        max_length=60,
+        blank=True,
+        help_text="Shown to Bangla readers. Blank falls back to the English label.",
+    )
     icon = models.CharField(_("icon"), max_length=8, blank=True)
     order = models.PositiveSmallIntegerField(_("order"), default=0)
     #: Nutrition is asked for on food and drink and nowhere else.
@@ -63,6 +70,11 @@ class ProductCategory(BaseModel):
 
     def __str__(self) -> str:
         return self.label
+
+    @property
+    def display_label(self) -> str:
+        """The label in the reader's language. Serializers expose this, never `label`."""
+        return in_readers_language(self, "label")
 
 
 class Product(BaseModel):

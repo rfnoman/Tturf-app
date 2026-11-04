@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 
 /** Draft what a turf is owed, then record the transfer once it has actually happened. */
 export function PayoutBoard({
@@ -144,7 +145,7 @@ export function PayoutBoard({
                       </span>
                     </span>
                     <span className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono tabular-nums">৳{payout.amount}</span>
+                      <Money amount={payout.amount} />
                       {payout.status === "sent" ? (
                         <Badge>{payout.status_label}</Badge>
                       ) : (
@@ -183,7 +184,7 @@ export function PayoutBoard({
             <ul className="flex flex-col divide-y text-sm" data-testid="refund-list">
               {refunds.map((refund) => (
                 <li key={String(refund.id)} className="flex flex-wrap items-baseline gap-2 py-2">
-                  <span className="font-mono tabular-nums">৳{refund.amount}</span>
+                  <Money amount={refund.amount} />
                   <span className="text-muted-foreground min-w-0 flex-1 truncate">
                     {refund.reason}
                   </span>

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { createPublicApiClient } from "@/lib/api/client";
 import { ScorecardView } from "@/components/scoring/scorecard-view";
 import { Button } from "@/components/ui/button";
+import { formatWhen } from "@/i18n/formats";
 
 /**
  * The shareable scorecard: no sign-in, no actions, only locked cards (DOMAIN §7).
@@ -14,7 +15,7 @@ import { Button } from "@/components/ui/button";
  * result — the preview has to say the score without anybody opening it.
  */
 async function fetchScorecard(matchId: string) {
-  const api = createPublicApiClient();
+  const api = createPublicApiClient(undefined, await getLocale());
   const { data } = await api.GET("/api/v1/public/matches/{match_id}/scorecard", {
     params: { path: { match_id: matchId } },
   });
@@ -27,6 +28,7 @@ export async function generateMetadata({
   params: Promise<{ matchId: string }>;
 }): Promise<Metadata> {
   const { matchId } = await params;
+  const locale = await getLocale();
   const card = await fetchScorecard(matchId);
   if (!card) return { title: "Scorecard" };
 
@@ -36,12 +38,7 @@ export async function generateMetadata({
   const description = [
     card.sport,
     card.turf_name,
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Dhaka",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(new Date(card.played_at)),
+    formatWhen(card.played_at, locale, "dayMonthYear"),
     card.motm_name ? `MOTM: ${card.motm_name}` : null,
   ]
     .filter(Boolean)

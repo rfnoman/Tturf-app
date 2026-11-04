@@ -49,3 +49,26 @@ def plain_decimal(value) -> str:
     if not isinstance(value, Decimal):
         value = Decimal(str(value))
     return f"{value.normalize():f}"
+
+
+def in_readers_language(obj, field: str = "name") -> str:
+    """A catalogue label in the reader's language, falling back to English.
+
+    Sports and product categories are generic nouns — "Football", "Drinks" — and a
+    Bangla UI that labels every card in English is only half translated. They live in
+    the database rather than in `messages/bn.json`, so the translation has to travel
+    with the row: each gets a `<field>_bn` column, and this picks between them from the
+    language Django resolved for the request (`LocaleMiddleware`, set from the
+    frontend's `Accept-Language`).
+
+    Falling back rather than raising matters: a sport an admin approved five minutes ago
+    has no Bangla name yet, and showing its English one is right. Proper nouns — turf
+    names, player names, product brands — are not translated at all (DECISIONS D63).
+    """
+    from django.utils.translation import get_language
+
+    if (get_language() or "").startswith("bn"):
+        translated = getattr(obj, f"{field}_bn", "") or ""
+        if translated:
+            return translated
+    return getattr(obj, field)

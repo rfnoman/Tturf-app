@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | not started | | |
+| 11 Hardening, Bangla, launch | **in progress** (step 1 of 9 done) | 2026-11-04 | Audit written; Bangla complete — 707 strings, catalogue labels, dates, money, Bengali font |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1022,3 +1022,86 @@ a forged callback is not something to click through.
 - Live scoring (Phase 05 step 5b) is still not built, and still needs your confirmation.
 - django-storages is still not wired up (carried from Phase 02).
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 11 — step 1 of 9: Bangla and localisation (2026-11-04)
+
+Phase 11 is nine steps and is being done one step per commit, as its brief allows. The
+written audit it asks for is `docs/phases/11-audit.md`: seven blocking findings, eight
+should-fix, and the order they are being worked in. This entry covers step 1.
+
+**Built**
+
+- **707 of 950 translation keys were still English placeholders.** All 950 are now Bangla,
+  written by hand, namespace by namespace. The only two strings left identical are
+  `৳{price}`-shaped format strings with no words in them — and both of those are gone
+  too, replaced by a component (below).
+- **Two stale Bangla values the usual check could not see**: `nav.myBookings` read "My
+  bookings" while English had been rewritten to "Bookings", and `owner.empty` still
+  promised "Turf registration arrives in Phase 02". Comparing the two strings finds
+  neither, because they differ — looking for Bengali script finds both, and that is now
+  a test.
+- **Three i18n tests**, because 700 hand-written strings need a net under them:
+  - every message takes the **same ICU arguments** in both languages, read from the
+    parsed message rather than by regex (inside a `select`, the branch bodies are
+    themselves brace-wrapped messages, so `{Hydration}` looks exactly like a placeholder
+    to a regex and is nothing of the kind) — this also pins `select` option names and
+    plural categories, which a translator can silently rename;
+  - **no Bangla value is left in English**;
+  - the existing key-parity and no-empty-string tests still run.
+- **One place decides how money and dates look** (`src/i18n/formats.ts`): named date
+  styles, `formatMoney`, `formatWhen`, `formatDay`, and the numeral system. Before this,
+  38 places interpolated a Decimal straight out of the API next to a ৳ — so every price
+  in the app read **৳1200.00**, trailing paisa that are always zero — and 22 places
+  called `Intl.DateTimeFormat("en-GB", …)` with six near-identical option objects, so
+  every date stayed English however the rest of the page read.
+- **`<Money>` and `<When>`** (`src/components/ui/`), with no `"use client"` on purpose:
+  `useLocale` works on both sides of the boundary, so a server page renders them without
+  shipping any JavaScript. Paisa appear only when there are any (৳1,200, but ৳337.50),
+  and a missing price is **—** rather than ৳0 — "no price set" and "free" are different
+  facts, and a ground with no price rule cannot be booked at all.
+- **Bangla reads in Western digits** (D62): `Intl` would give ০১২৩ for `bn`, and every
+  money app these players already use writes Bangla prose with `0123`. English formats
+  as **en-GB**, which is what each call site had spelled out — bare `en` means American
+  to `Intl`, so centralising naively would have turned every 19:30 kick-off into
+  07:30 PM. A test caught that before it shipped.
+- **Hind Siliguri** via `next/font`, appended to the Latin stack rather than replacing
+  it: font fallback is per glyph, so English keeps the platform face and only Bengali
+  codepoints reach the Bengali font.
+- **Catalogue labels are translated in the database** (D63): `*_bn` columns on `Sport`,
+  `ProductCategory`, `Attribute`, `SportSkill`, `StatDefinition` and `SportFormat`, with
+  50 Bangla terms seeded through the existing catalogue sync. Resolution is per request,
+  from `Accept-Language` — which both API clients now send from the active locale —
+  through `LocaleMiddleware` and one helper. Proper nouns are left alone.
+
+**Verified in the browser** (Chrome DevTools, production build, `NEXT_LOCALE=bn`): the
+whole header in Bangla, the public scorecard reading **ফুটবল · DHANMONDI ARENA** with the
+stat column headed **গোল**, the date as **৫ নভে** — in Bangla with Western digits — and
+Hind Siliguri resolved in the computed font stack. The turf's name is untouched, which is
+the point of D63. No console errors.
+
+**Deviations / notes**
+
+- `player.heading` and `player.empty` were dead keys (nothing scoped a translator to that
+  namespace) whose copy still said "Bookings arrive in Phase 03"; deleted. `admin.empty`
+  promised "Review queues arrive in Phase 02" and now describes what is there.
+- `turfs.taka` and `turfs.selectedSlot` are gone: they existed to interpolate a raw
+  decimal next to a ৳, which is exactly what `<Money>` replaced.
+- Product names are **not** translated, by decision rather than omission (D63): they are
+  brand names — "Mum 500ml", "Spa Water" — and nobody writes those in Bangla either.
+- The Open Graph image route still formats its date in English. It renders in Satori,
+  outside the next-intl tree, and a link preview in a group chat is not a localised
+  surface.
+
+**Known gaps / follow-ups**
+
+- **A native speaker still has to read the 707 strings.** They are idiomatic rather than
+  literal, and some choices are worth arguing with — "ধারা" for a streak, "ভরসা" for
+  reliability, "হিসাব" for finance. The ICU-argument test makes a correction safe to
+  apply; nothing else here needs to change.
+- Notification and email templates (`apps/notifications/templates.py`) are still English
+  only. They are rendered server-side at creation (D31), so translating them needs the
+  recipient's language stored on the account — which is step 1 work that properly belongs
+  with step 5's `PlatformSetting`, and is listed there.
+- Steps 2–9 of Phase 11 remain: PWA, performance, security, observability, admin tools,
+  legal pages, deployment (needs a hosting decision from you) and the seven launch
+  journeys.

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Money } from "@/components/ui/money";
 
 import { PayoutBoard } from "./payout-board";
 
@@ -36,7 +37,7 @@ export default async function AdminFinancePage() {
           </CardHeader>
           <CardContent>
             <p className="font-mono text-2xl font-bold tabular-nums" data-testid="platform-total">
-              ৳{data?.platform ?? 0}
+              <Money amount={data?.platform ?? 0} />
             </p>
           </CardContent>
         </Card>
@@ -45,7 +46,7 @@ export default async function AdminFinancePage() {
             <CardTitle className="text-sm">{t("owedToTurfs")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-mono text-2xl font-bold tabular-nums">৳{data?.owed_to_turfs ?? 0}</p>
+            <Money amount={data?.owed_to_turfs ?? 0} className="text-2xl font-bold" />
           </CardContent>
         </Card>
         <Card>
@@ -53,7 +54,7 @@ export default async function AdminFinancePage() {
             <CardTitle className="text-sm">{t("deliveryFees")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="font-mono text-2xl font-bold tabular-nums">৳{data?.delivery ?? 0}</p>
+            <Money amount={data?.delivery ?? 0} className="text-2xl font-bold" />
           </CardContent>
         </Card>
       </div>

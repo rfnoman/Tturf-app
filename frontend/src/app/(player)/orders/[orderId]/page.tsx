@@ -6,8 +6,10 @@ import { getServerApiClient } from "@/lib/api/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Money } from "@/components/ui/money";
 
 import { CancelOrder } from "./cancel-order";
+import { When } from "@/components/ui/when";
 
 /** One order, and where it has got to. */
 export default async function OrderPage({ params }: { params: Promise<{ orderId: string }> }) {
@@ -19,14 +21,6 @@ export default async function OrderPage({ params }: { params: Promise<{ orderId:
 
   if (!data) notFound();
   const t = await getTranslations("orders");
-
-  const when = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Dhaka",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
   return (
     <div className="flex flex-col gap-6" data-testid="order-detail">
@@ -41,7 +35,7 @@ export default async function OrderPage({ params }: { params: Promise<{ orderId:
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Badge data-testid="order-status">{data.status_label}</Badge>
-            <span className="font-mono text-sm tabular-nums">৳{data.total}</span>
+            <Money amount={data.total} className="text-sm" />
           </div>
         </div>
         <Button size="sm" variant="ghost" asChild>
@@ -70,7 +64,7 @@ export default async function OrderPage({ params }: { params: Promise<{ orderId:
                     </span>
                   )}
                 </span>
-                <span className="font-mono tabular-nums">৳{item.line_total}</span>
+                <Money amount={item.line_total} />
               </li>
             ))}
           </ul>
@@ -78,17 +72,23 @@ export default async function OrderPage({ params }: { params: Promise<{ orderId:
           <dl className="mt-3 flex flex-col gap-1 border-t pt-3 text-sm">
             <div className="flex justify-between">
               <dt className="text-muted-foreground">{t("subtotal")}</dt>
-              <dd className="font-mono tabular-nums">৳{data.subtotal}</dd>
+              <dd>
+                <Money amount={data.subtotal} />
+              </dd>
             </div>
             {Number(data.delivery_fee) > 0 && (
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">{t("deliveryFee")}</dt>
-                <dd className="font-mono tabular-nums">৳{data.delivery_fee}</dd>
+                <dd>
+                  <Money amount={data.delivery_fee} />
+                </dd>
               </div>
             )}
             <div className="flex justify-between font-semibold">
               <dt>{t("total")}</dt>
-              <dd className="font-mono tabular-nums">৳{data.total}</dd>
+              <dd>
+                <Money amount={data.total} />
+              </dd>
             </div>
           </dl>
         </CardContent>
@@ -123,7 +123,7 @@ export default async function OrderPage({ params }: { params: Promise<{ orderId:
                   <span className="text-muted-foreground">{event.actor_name}</span>
                 )}
                 <span className="text-muted-foreground">
-                  {when.format(new Date(event.created_at))}
+                  <When at={event.created_at} style="dayMonthTime" />
                 </span>
                 {event.note && <span className="text-muted-foreground">— {event.note}</span>}
               </li>

@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { Badge } from "@/components/ui/badge";
+import { Money } from "@/components/ui/money";
+import { formatWhen } from "@/i18n/formats";
 
 export const metadata = { title: "Payments · TurfApp" };
 
@@ -11,6 +13,7 @@ export default async function PaymentsPage() {
   const api = await getServerApiClient();
   const { data } = await api.GET("/api/v1/me/payments");
   const t = await getTranslations("payments");
+  const locale = await getLocale();
   const payments = data ?? [];
 
   return (
@@ -34,12 +37,7 @@ export default async function PaymentsPage() {
                   <span className="font-medium">{payment.what_for}</span>
                   <span className="text-muted-foreground block text-xs">
                     {payment.method_label} · {payment.kind_label} ·{" "}
-                    {new Intl.DateTimeFormat("en-GB", {
-                      timeZone: "Asia/Dhaka",
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    }).format(new Date(payment.created_at))}
+                    {formatWhen(payment.created_at, locale, "dayMonthYear")}
                   </span>
                 </span>
                 <span className="flex items-center gap-2">
@@ -49,7 +47,7 @@ export default async function PaymentsPage() {
                   <Badge variant={payment.status === "paid" ? "default" : "outline"}>
                     {payment.status_label}
                   </Badge>
-                  <span className="font-mono tabular-nums">৳{payment.amount}</span>
+                  <Money amount={payment.amount} />
                 </span>
               </Link>
             </li>

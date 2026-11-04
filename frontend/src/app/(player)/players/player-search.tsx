@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { MatchSummary, PlayerSearchResult, Sport, SquadSummary } from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatWhen } from "@/i18n/formats";
 
 type Filters = {
   sport: string;
@@ -42,6 +43,7 @@ export function PlayerSearch({
   squads: SquadSummary[];
 }) {
   const t = useTranslations("playerSearch");
+  const locale = useLocale();
   const api = useApiClient();
 
   const [filters, setFilters] = useState<Filters>(EMPTY);
@@ -178,12 +180,7 @@ export function PlayerSearch({
               {player.availability.length > 0 && (
                 <p className="text-muted-foreground text-xs">
                   {t("free", {
-                    when: new Intl.DateTimeFormat("en-GB", {
-                      timeZone: "Asia/Dhaka",
-                      weekday: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }).format(new Date(player.availability[0].starts_at)),
+                    when: formatWhen(player.availability[0].starts_at, locale, "weekdayTime"),
                     area: player.availability[0].area || player.area || "",
                   })}
                 </p>
