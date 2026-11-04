@@ -8,9 +8,16 @@ name: deploy
 # credentials here and nothing to push. What this workflow does is the part they cannot:
 # refuse to deploy a broken main, and tell Sentry which commit went out.
 
+# **Disarmed on purpose.** `workflow_dispatch` only, so merging to main does not deploy
+# anything — there is nothing deployed yet, and a workflow that fires at infrastructure
+# which does not exist is noise at best. When the DigitalOcean app and the secrets below
+# exist and you want merges to ship, add back:
+#
+#   push:
+#     branches: [main]
+#
+# and delete this comment.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:

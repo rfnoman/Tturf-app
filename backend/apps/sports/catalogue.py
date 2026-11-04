@@ -11,6 +11,12 @@ Keeping one definition means a catalogue change is a single edit, and re-running
 caller is idempotent — rows are matched on their natural keys (``slug`` / ``key``), never
 recreated.
 
+**The migration caller is the awkward one**, and `only_existing` below exists for it: a
+data migration runs *today's* code against *that migration's* schema, so a column added
+later simply is not there. Writing `label_bn` unconditionally broke every fresh database
+while every existing one kept working — which is precisely the failure that only shows
+up under `pytest --create-db` and on the first real deploy.
+
 MET values follow the 2024 Compendium of Physical Activities (soccer casual 7.0 /
 competitive 10.0, indoor futsal 8.0, cricket 4.8, badminton social 5.5).
 """
@@ -427,6 +433,19 @@ SPORTS: list[dict[str, Any]] = [
 ]
 
 
+def only_existing(model, values: dict) -> dict:
+    """Drop keys the given model does not have a field for.
+
+    A historical model from a data migration has the columns that existed *at that
+    migration*, not the ones that exist now. Filtering here means the catalogue can gain
+    a column without breaking the migration that seeds it, and without the migration
+    having to be rewritten every time (Phase 11 step 1 added the `_bn` columns; this is
+    what makes that safe).
+    """
+    fields = {field.name for field in model._meta.get_fields()}
+    return {key: value for key, value in values.items() if key in fields}
+
+
 def _models(registry):
     """Resolve the models from either the live registry or a migration's historical one."""
     if registry is None:
@@ -456,12 +475,15 @@ def sync_catalogue(registry=None) -> dict[str, int]:
     for spec in ATTRIBUTES:
         attribute, _ = Attribute.objects.update_or_create(
             key=spec["key"],
-            defaults={
-                "label": spec["label"],
-                "label_bn": spec.get("label_bn", ""),
-                "description": spec["description"],
-                "order": spec["order"],
-            },
+            defaults=only_existing(
+                Attribute,
+                {
+                    "label": spec["label"],
+                    "label_bn": spec.get("label_bn", ""),
+                    "description": spec["description"],
+                    "order": spec["order"],
+                },
+            ),
         )
         attributes[spec["key"]] = attribute
         counts["attributes"] += 1
@@ -469,16 +491,19 @@ def sync_catalogue(registry=None) -> dict[str, int]:
     for spec in SPORTS:
         sport, _ = Sport.objects.update_or_create(
             slug=spec["slug"],
-            defaults={
-                "name": spec["name"],
-                "name_bn": spec.get("name_bn", ""),
-                "icon": spec["icon"],
-                "description": spec["description"],
-                "met_value": Decimal(spec["met_value"]),
-                "positions": list(spec["positions"]),
-                "order": spec["order"],
-                "is_active": True,
-            },
+            defaults=only_existing(
+                Sport,
+                {
+                    "name": spec["name"],
+                    "name_bn": spec.get("name_bn", ""),
+                    "icon": spec["icon"],
+                    "description": spec["description"],
+                    "met_value": Decimal(spec["met_value"]),
+                    "positions": list(spec["positions"]),
+                    "order": spec["order"],
+                    "is_active": True,
+                },
+            ),
         )
         counts["sports"] += 1
 
@@ -486,13 +511,16 @@ def sync_catalogue(registry=None) -> dict[str, int]:
             SportFormat.objects.update_or_create(
                 sport=sport,
                 slug=fmt["slug"],
-                defaults={
-                    "name": fmt["name"],
-                    "name_bn": fmt.get("name_bn", ""),
-                    "players_per_side": fmt["players_per_side"],
-                    "order": fmt["order"],
-                    "is_active": True,
-                },
+                defaults=only_existing(
+                    SportFormat,
+                    {
+                        "name": fmt["name"],
+                        "name_bn": fmt.get("name_bn", ""),
+                        "players_per_side": fmt["players_per_side"],
+                        "order": fmt["order"],
+                        "is_active": True,
+                    },
+                ),
             )
             counts["formats"] += 1
 
@@ -508,13 +536,16 @@ def sync_catalogue(registry=None) -> dict[str, int]:
             Skill.objects.update_or_create(
                 sport=sport,
                 key=skill["key"],
-                defaults={
-                    "label": skill["label"],
-                    "label_bn": skill.get("label_bn", ""),
-                    "weight": Decimal(skill["weight"]),
-                    "counts_toward_overall": skill.get("counts_toward_overall", True),
-                    "order": skill["order"],
-                },
+                defaults=only_existing(
+                    Skill,
+                    {
+                        "label": skill["label"],
+                        "label_bn": skill.get("label_bn", ""),
+                        "weight": Decimal(skill["weight"]),
+                        "counts_toward_overall": skill.get("counts_toward_overall", True),
+                        "order": skill["order"],
+                    },
+                ),
             )
             counts["skills"] += 1
 
@@ -522,20 +553,23 @@ def sync_catalogue(registry=None) -> dict[str, int]:
             StatDef.objects.update_or_create(
                 sport=sport,
                 key=stat["key"],
-                defaults={
-                    "label": stat["label"],
-                    "label_bn": stat.get("label_bn", ""),
-                    "value_type": stat.get("value_type", "int"),
-                    "scope": stat.get("scope", "player"),
-                    "min_value": Decimal(str(stat.get("min_value", 0))),
-                    "max_value": Decimal(str(stat["max_value"]))
-                    if stat.get("max_value") is not None
-                    else None,
-                    "unit": stat.get("unit", ""),
-                    "is_positive": stat.get("is_positive", True),
-                    "show_on_profile": stat.get("show_on_profile", True),
-                    "order": stat["order"],
-                },
+                defaults=only_existing(
+                    StatDef,
+                    {
+                        "label": stat["label"],
+                        "label_bn": stat.get("label_bn", ""),
+                        "value_type": stat.get("value_type", "int"),
+                        "scope": stat.get("scope", "player"),
+                        "min_value": Decimal(str(stat.get("min_value", 0))),
+                        "max_value": Decimal(str(stat["max_value"]))
+                        if stat.get("max_value") is not None
+                        else None,
+                        "unit": stat.get("unit", ""),
+                        "is_positive": stat.get("is_positive", True),
+                        "show_on_profile": stat.get("show_on_profile", True),
+                        "order": stat["order"],
+                    },
+                ),
             )
             counts["stats"] += 1
 

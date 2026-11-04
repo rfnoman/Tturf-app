@@ -238,18 +238,30 @@ TURF_PRODUCTS = [
 
 def sync_categories(registry) -> dict:
     """Upsert the categories. ``registry`` is the model, so migrations can pass the
-    historical one."""
+    historical one.
+
+    Which is exactly why the defaults are filtered: a data migration runs *today's* code
+    against *that migration's* schema, so a column added later simply is not there.
+    Writing `label_bn` unconditionally broke every database built from migrations while
+    every existing one kept working — the failure that only appears under
+    `pytest --create-db` and on a first deploy.
+    """
+    from apps.sports.catalogue import only_existing
+
     categories = {}
     for row in CATEGORIES:
         category, _ = registry.objects.update_or_create(
             slug=row["slug"],
-            defaults={
-                "label": row["label"],
-                "label_bn": row.get("label_bn", ""),
-                "icon": row["icon"],
-                "order": row["order"],
-                "is_consumable": row["is_consumable"],
-            },
+            defaults=only_existing(
+                registry,
+                {
+                    "label": row["label"],
+                    "label_bn": row.get("label_bn", ""),
+                    "icon": row["icon"],
+                    "order": row["order"],
+                    "is_consumable": row["is_consumable"],
+                },
+            ),
         )
         categories[row["slug"]] = category
     return categories

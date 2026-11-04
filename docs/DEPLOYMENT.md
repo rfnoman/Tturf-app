@@ -129,7 +129,12 @@ Postgres 17 client for exactly this reason.
 
 ## 7. Deploying after that
 
-Merge to `main`. `.github/workflows/deploy.yml` waits for the checks on that commit,
+**The deploy workflow is disarmed.** It is `workflow_dispatch` only, so merging to main
+deploys nothing — there is no app yet, and a workflow firing at infrastructure that does
+not exist is noise. Once the steps above are done, add the `push: branches: [main]`
+trigger back (the file says where).
+
+Then: merge to `main`. `.github/workflows/deploy.yml` waits for the checks on that commit,
 tells App Platform to deploy, and fails if the API does not come back healthy. App
 Platform runs migrations as a `PRE_DEPLOY` job, so a migration failure stops the rollout
 instead of leaving new code against an old schema. Vercel deploys the frontend from its
