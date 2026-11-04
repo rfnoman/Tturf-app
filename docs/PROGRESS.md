@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (steps 1-7 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; observability; admin tools; policy pages |
+| 11 Hardening, Bangla, launch | **in progress** (steps 1-8 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; observability; admin tools; policies; deployable |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1567,3 +1567,84 @@ deciding to pay" is the property that matters, not the prose.
   skipped.
 - The company's legal name, address and a support contact are not in them yet — they need
   to be, and they are facts I do not have.
+
+### Phase 11 — step 8 of 9: deployment (2026-11-04)
+
+**You chose DigitalOcean Bangalore and Vercel** (D71), which is what D11 left open since
+Phase 00. Bangalore is the nearest region to Dhaka among the large providers — roughly
+40–60ms — and managed Postgres and Redis rather than containers, because the backup,
+failover and upgrade stories are better handled by somebody whose job they are.
+
+**Built**
+
+- **`backend/Dockerfile`** — one image, three processes. The API, the worker and beat run
+  the same code and the same dependencies and differ only in their command; three images
+  would be three things to keep in step, and the day they drift is the day beat runs last
+  week's business rules. GeoDjango loads GEOS and GDAL through `ctypes`, so those are
+  runtime libraries in the final image rather than build-time ones (D16 again, in a new
+  place). Runs as a non-root user, collects static at build time so a restart cannot race
+  `collectstatic`, and serves through **uvicorn workers** because the Phase 09
+  notification stream is a long-lived response and a sync worker holding one is a worker
+  serving nobody (D54).
+- **`frontend/Dockerfile`** — not used on Vercel, and kept working anyway. `output:
+  "standalone"` is scoped off under `process.env.VERCEL`, so the escape hatch is a real
+  one rather than dead weight. A platform choice should not be welded into the code.
+- **`.do/app.yaml`** — the App Platform spec: three services, managed Postgres 17 and
+  Redis, and migrations as a **`PRE_DEPLOY` job** so a deploy cannot start serving
+  requests against a schema it has not migrated. `beat` is pinned to one instance, with
+  a comment saying it is the one number in the file that must not be raised: two beats
+  mean every timer fires twice, and the jobs are idempotent per match and per week, not
+  per run.
+- **`docker-compose.prod.yml`** — the same topology runnable on one box, for anyone who
+  wants it and as documentation of how the pieces fit.
+- **Media on Spaces** (D71), closing a gap open since Phase 02. Through **S3-compatible**
+  settings, not Spaces-specific ones, so moving to R2 or S3 is an environment change
+  rather than a code change. A container filesystem is not a place to keep anything that
+  has to survive a deploy, and until now that is exactly where turf photos went.
+- **`.github/workflows/deploy.yml`** — waits for the checks on that commit, deploys,
+  and **fails if the API does not come back healthy**. One deploy at a time: two
+  overlapping ones race on the migration job, and the loser starts serving against a
+  schema the winner has already moved.
+- **`docs/DEPLOYMENT.md`** — the runbook, including the things that are easy to forget
+  and expensive to discover: `CREATE EXTENSION btree_gist` (without it the migration that
+  prevents double-booking fails), `CLERK_AUTHORIZED_PARTIES` matching the frontend origin
+  exactly (the single most likely reason a working staging deploy stops authenticating),
+  and **registering the server's egress IP with SSLCommerz** — they refuse refund calls
+  from an unregistered address, so refunds fail in production while payments work, which
+  only shows up the first time somebody cancels.
+
+**What building the images found**
+
+**A real bug, not a packaging one.** `process.env.NEXT_PUBLIC_SITE_URL ?? "…"` does not
+do what it looks like it does: `??` catches `null` and `undefined`, and an environment
+variable set to the **empty string** is neither. Docker turns an unset `ARG` into an
+empty `ENV`, so `new URL("")` killed `next build` with `ERR_INVALID_URL`. Every container
+platform behaves that way, so this would have failed identically on the first real
+deploy. There is now one `env()` helper used at all seven sites, with a test.
+
+**Verified by building and running both images:**
+
+- Backend (948 MB): Django 6.1.2, GEOS constructing a Dhaka point, production settings
+  confirmed live — `DEBUG` off, API docs closed, admin OTP on, JSON logs — and gunicorn,
+  uvicorn and Celery all present.
+- Frontend (422 MB): serves the home page, the policy pages and the manifest, with the
+  content policy header intact. Its first run returned 500s, correctly: no
+  `CLERK_SECRET_KEY` and no reachable API. With both supplied it serves 200s.
+
+**Deviations / notes**
+
+- **No BuildKit cache mounts.** They are faster and they make the file unbuildable on a
+  Docker install without buildx — and an image nobody can build locally is one nobody
+  checks before pushing. Layer ordering does most of the same work.
+- The backend image is 948 MB, most of it GDAL and GEOS. That is the cost of PostGIS in
+  the application layer and not worth contorting the build to avoid.
+
+**Known gaps / follow-ups**
+
+- **Nothing has been deployed yet.** The spec, the workflow and the runbook are written
+  and the images build and run; the accounts, domains and credentials are yours to
+  create, and step 9 runs the launch journeys against the staging environment that
+  follows.
+- The backup command needs scheduling once the app exists, and its dumps need to go
+  somewhere that is not the application server.
+- An external uptime prober should be pointed at `/api/v1/health`.

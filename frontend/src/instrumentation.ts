@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { env } from "@/lib/env";
 
 import { scrub } from "@/lib/sentry-scrub";
 
@@ -15,9 +16,9 @@ export async function register() {
 
   Sentry.init({
     dsn,
-    environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
+    environment: env(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT, "development"),
     release: process.env.NEXT_PUBLIC_SENTRY_RELEASE,
-    tracesSampleRate: Number(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE ?? 0.1),
+    tracesSampleRate: Number(env(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE, "0.1")),
     // v11 no longer attaches personal data by default, which is the right default but
     // not a guarantee. `scrub` is the guarantee, and it redacts the same names the
     // Django side does.

@@ -1,5 +1,6 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
+import { env } from "@/lib/env";
 
 /**
  * Next.js 16 renamed `middleware.ts` to `proxy.ts` (Node runtime only, no `edge`).
@@ -28,7 +29,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * more. Browsers that do not understand it fall back to the host list after it.
  */
 function policy(nonce: string): string {
-  const api = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+  const api = env(process.env.NEXT_PUBLIC_API_BASE_URL, "http://127.0.0.1:8000");
   const clerk = "https://*.clerk.accounts.dev https://*.clerk.com";
 
   return [

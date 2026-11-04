@@ -9,6 +9,7 @@ dependencies = [
     "django-environ>=0.14.0",
     "django-filter>=26.2",
     "django-otp>=1.6",
+    "django-storages[s3]>=1.14",
     "djangorestframework>=3.18.3",
     "drf-spectacular>=0.30.0",
     "gunicorn>=26.2.0",
@@ -19,6 +20,7 @@ dependencies = [
     "requests>=2.32",
     "sentry-sdk[celery,django]>=2.0",
     "svix>=2.9.1",
+    "uvicorn[standard]>=0.32",
     "whitenoise>=6.12.0",
 ]
 

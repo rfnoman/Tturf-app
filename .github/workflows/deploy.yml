@@ -1,0 +1,86 @@
+name: deploy
+
+# Deployment is a consequence of a green main, never a thing somebody does by hand at
+# 11pm (Phase 11 step 8).
+#
+# Both platforms build from the repository themselves — App Platform from
+# `backend/Dockerfile`, Vercel from its git integration — so there are no registry
+# credentials here and nothing to push. What this workflow does is the part they cannot:
+# refuse to deploy a broken main, and tell Sentry which commit went out.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # One deploy at a time. Two overlapping ones race on the migration job, and the loser
+  # starts serving against a schema the winner has already moved.
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  # The backend and frontend check workflows run on their own paths filters, so a commit
+  # touching only one of them never runs the other. This waits for whatever did run.
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Wait for checks on this commit
+        uses: lewagon/wait-on-check-action@v1.4.0
+        with:
+          ref: ${{ github.sha }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          running-workflow-name: gate
+          allowed-conclusions: success,skipped
+          wait-interval: 20
+
+  backend:
+    needs: gate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      # App Platform runs the PRE_DEPLOY migration job itself, then rolls the three
+      # services. `--wait` is what makes a failed migration fail this workflow rather
+      # than leave a half-deployed app and a green tick.
+      - name: Deploy
+        run: doctl apps create-deployment ${{ secrets.DO_APP_ID }} --wait
+
+      - name: Check it came back up
+        run: |
+          for attempt in $(seq 1 10); do
+            status=$(curl -s -o /dev/null -w '%{http_code}' "${{ vars.API_BASE_URL }}/api/v1/health" || true)
+            if [ "$status" = "200" ]; then echo "healthy"; exit 0; fi
+            echo "health check returned ${status:-nothing}, retrying"
+            sleep 15
+          done
+          echo "The API did not come back healthy after the deploy."
+          exit 1
+
+  # Vercel deploys from its own git integration; this only records the release, so a
+  # Sentry report names the commit that caused it rather than "production".
+  release:
+    needs: [backend]
+    runs-on: ubuntu-latest
+    if: ${{ vars.SENTRY_ORG != '' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ github.sha }}

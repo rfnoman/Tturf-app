@@ -20,6 +20,12 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  // For the self-hosted image only: Next traces the modules actually imported and
+  // copies just those, so the container does not ship node_modules. Vercel does its own
+  // bundling and does not want this, so it is off there — which keeps the Dockerfile a
+  // working escape hatch rather than dead weight (Phase 11 step 8).
+  output: process.env.VERCEL ? undefined : "standalone",
+
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
