@@ -39,7 +39,15 @@ export async function TurfCard({
           // configured for; a plain <img> avoids a build-time remotePatterns list that
           // would have to track every deployment's media host.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo.image} alt="" className="h-full w-full object-cover" />
+          <img
+            src={photo.image}
+            alt=""
+            // Below the fold on every row but the first, and these are the heaviest
+            // bytes on the page over a Dhaka mobile connection.
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="text-muted-foreground flex h-full w-full items-center justify-center text-3xl">
             {turf.sports?.[0]?.icon ?? "🏟️"}

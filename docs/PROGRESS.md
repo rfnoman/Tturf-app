@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (steps 1-2 of 9 done) | 2026-11-04 | Audit written; Bangla complete; installable PWA with an offline page |
+| 11 Hardening, Bangla, launch | **in progress** (steps 1-3 of 9 done) | 2026-11-04 | Audit; Bangla; installable PWA; two N+1s fixed with query budgets and a cache policy |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1161,3 +1161,83 @@ v1 cache and replaced it with v2, so bumping the name is how the page is changed
 
 - Low-end Android over throttled 3G has not been measured yet — that is step 3
   (performance), which also owns the image and query work.
+
+### Phase 11 — step 3 of 9: performance (2026-11-04)
+
+**What the query budgets found**
+
+The point of writing them was that an N+1 never fails a test, raises an error or shows
+up in review — it shows up as a page that is fine with three rows and unusable with
+thirty. Two of the four endpoints measured had one:
+
+- **The match board cost one extra query per card.** `average_rating_for` asked "is the
+  annotation None?" to decide whether to fall back to a query — but a board row whose
+  roster is entirely unrated *is* annotated NULL, and that is the answer (D38 keeps such
+  a match on the board), not a missing annotation. So the busiest authenticated page in
+  the app went back to the database once per match, and did so hardest for exactly the
+  matches full of new players. The test is now `hasattr`. 3 matches cost 5 queries; 15
+  matches now cost the same 5, where they used to cost 17.
+- **The match page cost one extra query per player on the roster.** Each roster row
+  shows that player's rating *in this sport*, read off `profile.sport_ratings`, which
+  the prefetch did not cover. Adding it to the `Prefetch` queryset flattened 20 queries
+  back to 12 for an eight-player roster.
+
+`apps/core/tests/test_query_budgets.py` keeps both fixed. Each test asserts a ceiling and
+then — the assertion with teeth — that the **same request with many more rows costs the
+same number of queries**. The ceilings are deliberately not exact: a test that fails when
+somebody adds a legitimate `select_related` teaches people to raise the number without
+reading it.
+
+**A caching policy, written down and tested**
+
+`apps/core/cache.py`, with two rules that are the whole of it:
+
+1. **Nothing per-player is cached.** Every page behind a session is built from that
+   player's own rows, and a key loose enough to be useful would be loose enough to show
+   one player another's bookings. The service worker makes the same call (step 2).
+2. **What is cached is public and already stale.** The leaderboard is recomputed
+   overnight and read all day; the turf page changes when an admin approves a venue.
+
+So two things are cached: the **leaderboards** (an hour, invalidated by the nightly
+rebuild task itself) and the **public turf page**, per slug *and per language* — it
+carries sport names, which are now translated (D63), and one entry for both languages
+would serve whichever reader arrived first. The turf **list** is deliberately not cached:
+its `near=` variant is keyed by the caller's coordinates, so the key space is unbounded
+and the hit rate would be roughly zero.
+
+Invalidation is by **version key** — bump one integer and every key derived from it
+becomes unreachable at once — driven by a signal on every model that feeds the turf page
+(`apps/turfs/signals.py`). Hooking the models rather than the dozen endpoints that edit
+one is the only version that still works after somebody adds a thirteenth. A test asserts
+an owner who renames their turf sees the new name on the next request, and another pins
+the invariant that makes caching the page safe at all: two different players get byte-for-
+byte the same payload.
+
+**Measured, not assumed** (Chrome DevTools, Slow 3G + 4× CPU throttling, Pixel-class
+viewport, cold cache — the brief's "low-end Android over slow 3G"): **LCP 3.7s, CLS
+0.04**. The only render-blocking resource is one stylesheet, and it is already 13.5 kB
+gzipped — there is nothing left to squeeze in the app. The remaining 1.2s of that
+download is bandwidth and HTTP/1.1 on a local server; a CDN with HTTP/2 and Brotli is
+what fixes it, and that is step 8. Off-screen images (turf photos, roster and search
+avatars) are now `loading="lazy"` and `decoding="async"`, which is the one thing on the
+page that was still free to improve.
+
+**Deviations / notes**
+
+- **Cache Components stays off**, revisited as D14's note asked. The reason has not
+  changed and is not a matter of effort: almost every page renders one player's own data,
+  so there is nothing a shared render cache can hold. What is shared and expensive is
+  cached server-side instead, where it can be invalidated when the data changes.
+- **Indexes were audited, not added.** The board's `(visibility, status)`, the turf
+  list's `(status, area)`, rating history's `(profile, sport, -played_at)`, ground stats
+  and the bookings GiST exclusion constraint all already cover the hot paths. Adding
+  indexes nothing queries is a cost, not a safeguard.
+- **Resized uploads are not built**, because there is nowhere to put them: django-storages
+  is still not wired up (carried since Phase 02), so there is no upload pipeline to resize
+  in. It belongs with step 8.
+
+**Known gaps / follow-ups**
+
+- Only four endpoints have budgets. The scorecard, store checkout and owner finance pages
+  build nested payloads too and should get one each.
+- No load test yet — step 9 owns that, against staging.

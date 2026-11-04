@@ -45,7 +45,12 @@ def _with_related(queryset: QuerySet[Match]) -> QuerySet[Match]:
     ).prefetch_related(
         Prefetch(
             "players",
-            queryset=MatchPlayer.objects.select_related("player", "player__player_profile"),
+            # The ratings are prefetched too: the roster row shows each player's rating
+            # *in this sport*, and reading it off the profile sent the match page back
+            # to the database once per player on the roster.
+            queryset=MatchPlayer.objects.select_related(
+                "player", "player__player_profile"
+            ).prefetch_related("player__player_profile__sport_ratings"),
         ),
     )
 
@@ -175,10 +180,16 @@ def average_rating_for(match: Match) -> float | None:
 
     Uses the annotation when the match came from a board query, and falls back to a
     query for a single match page — where one extra query is not worth avoiding.
+
+    The test is `hasattr`, not "is it None": a board row whose roster is entirely
+    unrated is annotated with NULL, which is the *answer* (D38 — such a match stays on
+    the board), not a missing annotation. Reading it as missing sent the board back to
+    the database once per card, so a board of new players cost one query per match —
+    exactly the page that matters most, and exactly the players it matters most for.
     """
-    annotated = getattr(match, "average_overall", None)
-    if annotated is not None:
-        return round(float(annotated), 1)
+    if hasattr(match, "average_overall"):
+        annotated = match.average_overall
+        return round(float(annotated), 1) if annotated is not None else None
 
     result = PlayerSportRating.objects.filter(
         sport=match.sport_id, profile__user__match_entries__match=match

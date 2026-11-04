@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.cache import LEADERBOARD_TTL, cached
 from apps.core.permissions import IsPlatformAdmin
 from apps.matches.models import Match
 from apps.matches.services import can_view_match
@@ -330,11 +331,19 @@ class LeaderboardView(APIView):
         if period not in LeaderboardEntry.Period.values:
             return Response({"period": "Unknown period."}, status=status.HTTP_400_BAD_REQUEST)
 
-        rows = leaderboard(
-            sport=sport,
-            turf=turf,
-            metric=metric,
-            stat_key=params.get("stat_key", ""),
-            period=period,
-        )
-        return Response(LeaderboardEntrySerializer(rows, many=True).data)
+        stat_key = params.get("stat_key", "")
+
+        # The board is rewritten nightly and read all day, by every player who opens a
+        # turf page. It is the same answer for all of them, so it is built once.
+        def build():
+            rows = leaderboard(
+                sport=sport,
+                turf=turf,
+                metric=metric,
+                stat_key=stat_key,
+                period=period,
+            )
+            return LeaderboardEntrySerializer(rows, many=True).data
+
+        key = f"{sport.slug}:{turf.slug if turf else ''}:{metric}:{stat_key}:{period}"
+        return Response(cached("leaderboard", key, LEADERBOARD_TTL, build))
