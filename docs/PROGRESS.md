@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (steps 1-8 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; observability; admin tools; policies; deployable |
+| 11 Hardening, Bangla, launch | **done** (not deployed; see gaps) | 2026-11-04 | Audit; Bangla; PWA; performance; security; observability; admin tools; policies; deployable; launch journeys |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1648,3 +1648,111 @@ deploy. There is now one `env()` helper used at all seven sites, with a test.
 - The backup command needs scheduling once the app exists, and its dumps need to go
   somewhere that is not the application server.
 - An external uptime prober should be pointed at `/api/v1/health`.
+
+### Phase 11 — step 9 of 9: the launch journeys (2026-11-04)
+
+The seven journeys from the phase brief, as `frontend/e2e/journeys.spec.ts`.
+
+**These are not more feature tests.** Every step in them is already covered by a spec
+that does one thing well; what they add is the **seams** — a booking becoming a match
+becoming a scorecard becoming a rating, each handing to the next. That is where
+integration bugs live, and no single-feature test can see them.
+
+**What made them possible**
+
+`seed_demo` creates `rafi+clerk_test@turfapp.dev` as a platform admin, the owner of
+three turfs *and* a rider — in Clerk as well as in Django. Several journeys cross a role
+boundary (an owner lists a turf and an admin reviews it; a player orders and a cashier
+sells), and a suite that can only ever be one anonymous new player stops short of all of
+them. One account rather than four, because roles here are permissions on an account,
+not separate kinds of user (DOMAIN §1). Nothing is faked: it signs in through the same
+ticket flow as every other test.
+
+The other half is `openAsNewPlayer`, which opens a **second** browser context as a
+second real player. A scorecard cannot lock without the opposing captain, and a rating
+cannot move without a locked card — so journey 2 with one player would have stopped
+three steps short of the thing it exists to prove.
+
+**The seven**
+
+1. **An owner lists a turf** and it starts as a draft invisible to players; the admin
+   queue is reachable by somebody who holds that role.
+2. **The spine**: onboard → book → somebody else finds the match and asks to join → the
+   organiser approves → teams, with a captain on each side → the score → **the other
+   side's captain confirms it, which is what locks it** (D41) → the locked card has a
+   public page → the profile carries the sport. Two players, two contexts, end to end.
+3. **A closed squad** and the D1 invite chain — the one flow where a player joins a match
+   nobody advertised, needing three people's consent in order.
+4. **An order for a match**: the store knows there is a match to deliver to, and offers
+   delivery to the turf because the cutoff has not passed.
+5. **Two shelves that must not move each other**: a player's home delivery comes out of
+   the platform warehouse and leaves the turf's bananas alone; a cashier's counter sale
+   moves the turf's shelf by exactly one and leaves the warehouse alone (D48).
+6. **The money rules are visible before anybody commits to them**: paying online is
+   offered *and so is cash*, the cancellation window is on the booking rather than buried
+   in a policy page, and the refund quote comes from the server's own policy table —
+   which is the number the refund will actually use, not a second implementation in the
+   UI.
+7. **The whole thing in Bangla at 390px**, including that the page does not scroll
+   sideways.
+
+**What writing them changed**
+
+- **The booking helper no longer depends on English.** It reached for `getByLabel("Date")`
+  and a button labelled "Book for ৳…", so journey 7 failed at the first step — which is
+  exactly the bug a Bangla journey is for. It now uses `#date` and a `data-testid`,
+  matching `#ground`, which was already doing the right thing.
+- **Onboarding in the journeys is language-aware.** A helper that only worked in English
+  would have quietly reduced journey 7 to a smoke test of the language switcher.
+- `test.slow()` was replaced with an explicit timeout: its 3× multiplier turned a hung
+  sign-in into a seven-minute wait and made the file miserable to work on.
+
+**Deviations / notes**
+
+- **These run against the local stack, not staging**, because there is no staging — you
+  asked not to deploy, and step 8 created configuration rather than infrastructure. They
+  are written to be environment-agnostic (`PLAYWRIGHT_BASE_URL`), so pointing them at a
+  staging URL is a variable, not a rewrite.
+- **Journey 6 does not complete a card payment.** The gateway leg needs SSLCommerz
+  credentials, and the stub I used in Phase 10 was deliberately temporary. What it
+  asserts instead is the part the app owns: both payment options offered, the window
+  stated, and the refund quote coming from `refund_due` rather than a UI reimplementation.
+  The gateway path itself is covered by `apps/payments/tests/test_callbacks.py`, including
+  a forged callback and a tampered amount.
+- Journey 1 stops at the review queue rather than approving: approving a turf needs the
+  same account to be both owner and admin, and asserting that it can is a weaker test
+  than asserting the draft is invisible until somebody with that role acts.
+
+### Phase 11 — where the project stands (2026-11-04)
+
+All nine steps are done. What is **not** done is a deployment: you asked for the build
+to be completed rather than shipped, so step 8 produced the images, the platform spec,
+the CI workflow and the runbook — and touched no account and no infrastructure.
+
+**Before this can go live**, in the order it matters:
+
+1. **A lawyer has to read the four policy pages.** They are accurate about what the
+   software does, which is the part I can be sure of; whether they are sufficient under
+   Bangladeshi consumer and data protection law is not something to assume.
+2. **A Bangla speaker has to read the 707 translated strings.** They are idiomatic rather
+   than literal, and some choices are worth arguing with — "ধারা" for a streak, "ভরসা" for
+   reliability, "হিসাব" for finance. The ICU-argument test makes corrections safe to apply.
+3. **Accounts and credentials**: DigitalOcean, Vercel, a Clerk *production* instance, an
+   SSLCommerz merchant account, a domain. `docs/DEPLOYMENT.md` is the runbook.
+4. **Then staging**, and the launch journeys pointed at it via `PLAYWRIGHT_BASE_URL`.
+
+**Carried forward, still open**
+
+- Live scoring over the Phase 09 channel (Phase 05 step 5b) — still not built, still
+  needs your confirmation that it is wanted.
+- The e2e suite is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret. It runs
+  locally against the production build on port 3000.
+- Notification and email templates are English only. Translating them needs the
+  recipient's language stored on the account, which is a small piece of work nobody has
+  asked for yet.
+- Only four endpoints have query budgets; the scorecard, checkout and owner finance pages
+  deserve one each.
+- No load test has been run.
+
+**The numbers**: 1517 backend tests, 27 Vitest, 143 Playwright (including the eight
+launch journeys), 71 decisions recorded, 11 phases.

@@ -47,7 +47,9 @@ async function* openSlotDays(
 
   for (const day of daysToTry(days)) {
     const date = dhakaDate(day);
-    await page.getByLabel("Date").fill(date);
+    // `#date`, not the label: journey 7 runs this whole flow in Bangla, and a helper
+    // keyed on English text would quietly fail there (`#ground` below, same reason).
+    await page.locator("#date").fill(date);
 
     const grounds = await page.locator("#ground option").count();
     for (let index = 0; index < grounds; index += 1) {
@@ -92,7 +94,9 @@ export async function bookAFreeSlot(
     for await (const date of openSlotDays(page, { sport, days })) {
       const open = page.locator(OPEN_SLOT);
       await open.nth(Math.floor(Math.random() * (await open.count()))).click();
-      await page.getByRole("button", { name: /^Book for/ }).click();
+      // The confirm button's label carries the price and is translated, so it is reached
+      // by test id — journey 7 runs this whole flow in Bangla.
+      await page.getByTestId("confirm-booking").click();
 
       const booked = await page
         .waitForURL(/\/bookings\/[0-9a-f-]+$/, { timeout: 10_000 })
