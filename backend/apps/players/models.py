@@ -133,8 +133,14 @@ class PlayerProfile(BaseModel):
 
     @property
     def name(self) -> str:
-        """What to call this player anywhere in the UI."""
-        return self.display_name or self.user.full_name or self.user.email or "Player"
+        """What to call this player anywhere in the UI.
+
+        Never their email. Phase 11 step 4 replaced that fallback in eleven serializers
+        and missed this one — which sits *underneath* all of them, so a player with a
+        profile but no name set was still having their email shown to everybody who
+        could see the match. One layer down and the same bug.
+        """
+        return self.display_name or self.user.full_name or "Player"
 
     @property
     def photo_url(self) -> str:

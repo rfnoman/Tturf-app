@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (steps 1-5 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; Sentry, JSON logs, verified backups, PlatformSetting |
+| 11 Hardening, Bangla, launch | **in progress** (steps 1-6 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; observability; admin dashboard and support lookup |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1436,3 +1436,79 @@ hazard the docstring now names.
 - Uptime checks need an external prober pointed at `/api/v1/health`; also step 8.
 - No settings rows are seeded. That is correct — every rule still has its default in
   code, and a row should exist only once somebody has deliberately changed something.
+
+### Phase 11 — step 6 of 9: admin and support tools (2026-11-04)
+
+**Built**
+
+- **A dashboard that says whether the pilot is working** (`/admin/dashboard`): bookings
+  and how many were confirmed, the no-show rate, active and new players, live and pending
+  turfs, platform earnings and commission, matches, orders, a bookings-a-day chart and the
+  busiest turfs — over 7, 30 or 90 days. Every number was already derivable from rows the
+  app writes; what was missing was anywhere to read them together. An owner had a finance
+  page and an admin had four separate queues, but nobody could answer "how many bookings
+  yesterday, and how many of them did somebody turn up to".
+- **The no-show rate is counted against bookings that reached their slot**, not against
+  every booking ever made. A cancelled booking is not a no-show, and including them would
+  have flattered the number exactly as the business grew — which is the one direction a
+  metric must not drift.
+- **"Active" means a player who did something**, not one who exists. A sign-up that never
+  books is not a user of this app, and counting them makes the number useless for the
+  decision it is for.
+- **Days with no bookings are rendered**, not skipped. A chart that silently drops them
+  draws a healthy-looking line straight through an outage. The chart is divs, not a
+  charting library: one series over at most ninety points, and shipping a canvas renderer
+  to draw ninety rectangles is a poor trade on the connections this app runs on.
+- **GMV is read off the ledger**, not re-derived from bookings and orders, so the
+  dashboard cannot disagree with the finance page about how much money moved.
+- **A support lookup** (`/admin/support`): find an account by name, email or phone. The
+  Phase 06 player search cannot do this on purpose — it is limited to discoverable
+  players and never exposes contact details — so this is the deliberate exception, and it
+  is narrow: platform admins only, three characters minimum (two would return most of the
+  directory), what support needs to tell two Rafis apart and nothing more, and **no
+  impersonation anywhere** — an admin can read an account, never act as one.
+- Computed on demand rather than rolled up nightly: these are read a few times a day by a
+  handful of people, and a rollup table is a second source of truth that goes quietly
+  wrong. The leaderboards earn that treatment because everybody reads them all day; this
+  does not.
+
+**What building it found**
+
+- **The email-as-display-name leak was still live, one layer down.** Step 4 replaced the
+  fallback in eleven serializers; `PlayerProfile.name` — which sits *underneath* all of
+  them and is what `player_label()` prefers — still ended in `self.user.email`. So a
+  player who had started onboarding but set no name was still having their email shown to
+  everybody who could see the match. Fixed, and the test now covers both paths: the step 4
+  test only checked a player with no profile at all, which is why it passed.
+- **The "Debug" link was in the header for everyone**, pointing at `/me`, which dumps the
+  raw backend session. Development only now.
+
+**Verified in the browser** (Chrome DevTools, production build, signed in as a real
+platform admin): the dashboard rendered 439 bookings over 30 days with 4 confirmed, a 0%
+no-show rate, 432 active players, ৳350 platform earnings of which ৳35 commission, the
+per-day chart with its peak marked, and the six seeded turfs ranked by bookings —
+Dhanmondi 160, Banani 92, Mirpur 87. The support lookup for "rafi" returned the two
+accounts that share that name, distinguished by their email addresses, which is exactly
+the problem it exists to solve. No console errors.
+
+The chart gained a baseline afterwards: without one, a day with no bookings rendered as
+nothing rather than as a zero, which is the chart's whole job.
+
+**Deviations / notes**
+
+- The existing queues (turfs, sports, conduct, orders, finance) were **not** merged into
+  one screen. They are each a working queue with their own actions, and collapsing five
+  of them into tabs would make every one of them worse; the admin index now links to all
+  of them plus the two new pages.
+- CSV export already exists where it is useful — the turf statement (Phase 10). The
+  dashboard's numbers are a screen to read, not a file to reconcile.
+- The Playwright suite asserts the **gate**, not the pages: it cannot grant itself
+  platform-admin, which is the point of the role. The pages themselves were verified by
+  signing in as a promoted throwaway account, which is how the screenshots above exist.
+
+**Known gaps / follow-ups**
+
+- No per-turf drill-down from the dashboard yet; the busiest-turf list links to the public
+  page, not to that turf's own numbers.
+- The dashboard has no query budget (step 3's tests cover four endpoints); it is
+  admin-only and read a few times a day, so it is low on the list.

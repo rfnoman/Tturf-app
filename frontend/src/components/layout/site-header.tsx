@@ -47,9 +47,13 @@ export async function SiteHeader() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/owner">{t("nav.owner")}</Link>
           </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/me">{t("nav.debug")}</Link>
-          </Button>
+          {/* `/me` dumps the raw backend session — useful while building, not something
+              to put in front of players. Development only (Phase 11 step 6). */}
+          {process.env.NODE_ENV !== "production" && (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/me">{t("nav.debug")}</Link>
+            </Button>
+          )}
         </nav>
 
         <LanguageSwitcher />
