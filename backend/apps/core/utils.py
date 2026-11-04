@@ -72,3 +72,23 @@ def in_readers_language(obj, field: str = "name") -> str:
         if translated:
             return translated
     return getattr(obj, field)
+
+
+def player_label(user) -> str:
+    """What to call a player on screen, without giving away their email.
+
+    Every roster row, board card, timeline entry and audit line needs a name for
+    somebody. The obvious fallback chain ended in ``user.email``, which meant a player
+    who had not finished onboarding had their email address shown to everybody who could
+    see the match — a leak that nothing in the UI hinted at and no test covered
+    (Phase 11 step 4).
+
+    An email is not a display name. The chain is now: the profile name they chose, the
+    name on their account, and otherwise a neutral word. Two unnamed players look alike,
+    which is the correct trade: they are strangers to each other, and the app is about
+    to ask them to turn up to the same pitch, not to identify each other.
+    """
+    profile = getattr(user, "player_profile", None)
+    if profile is not None and getattr(profile, "name", ""):
+        return profile.name
+    return (getattr(user, "full_name", "") or "").strip() or "Player"

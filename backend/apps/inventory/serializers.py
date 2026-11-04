@@ -3,6 +3,8 @@ from __future__ import annotations
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from apps.core.utils import player_label
+
 from .models import (
     CounterSale,
     CounterSaleLine,
@@ -203,8 +205,7 @@ class StockMovementSerializer(serializers.ModelSerializer):
     def get_actor_name(self, obj) -> str:
         if not obj.actor:
             return ""
-        profile = getattr(obj.actor, "player_profile", None)
-        return profile.name if profile else (obj.actor.full_name or obj.actor.email)
+        return player_label(obj.actor)
 
 
 class CounterSaleLineSerializer(serializers.ModelSerializer):
@@ -293,8 +294,7 @@ class RentalSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.CharField())
     def get_player_name(self, obj) -> str:
-        profile = getattr(obj.player, "player_profile", None)
-        return profile.name if profile else (obj.player.full_name or obj.player.email)
+        return player_label(obj.player)
 
 
 class RentOutSerializer(serializers.Serializer):

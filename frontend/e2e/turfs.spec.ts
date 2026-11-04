@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 
 import { apiBaseUrl } from "./support/clerk-users";
-import { OPEN_SLOT, findOpenSlot } from "./support/booking";
+import { OPEN_SLOT, dhakaDate, findOpenSlot } from "./support/booking";
 import { expect, requiresClerk, test } from "./support/fixtures";
 
 /**
@@ -81,6 +81,8 @@ test.describe("turf detail", () => {
 
   test("slot prices come from the turf's own price rules", async ({ signedInPage: page }) => {
     // Mirpur prices peak evenings at ৳3200 on its 90-minute pitch (demo data).
+    // Written with the thousands separator `<Money>` adds — asserting the formatting as
+    // well as the price, which is the thing a player actually reads.
     await page.goto("/turfs/mirpur-turf-club");
     await page.getByLabel("Ground").selectOption({ label: "Pitch 1 — Football" });
 
@@ -89,14 +91,14 @@ test.describe("turf detail", () => {
     );
     await page.getByLabel("Date").fill(tomorrow);
 
-    await expect(page.locator("[data-slot-start]", { hasText: "৳3200" }).first()).toBeVisible();
+    await expect(page.locator("[data-slot-start]", { hasText: "৳3,200" }).first()).toBeVisible();
   });
 
   test("availability matches what the API reports", async ({ signedInPage: page }) => {
     await page.goto("/turfs/dhanmondi-arena");
-    const tomorrow = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(
-      new Date(Date.now() + 86_400_000),
-    );
+    // Any day with a grid will do; repeated runs leave some days with nothing free, and
+    // this test is about the grid agreeing with the API, not about which day it is.
+    const tomorrow = (await findOpenSlot(page)) ?? dhakaDate(1);
     await page.getByLabel("Date").fill(tomorrow);
     await expect(page.locator("[data-slot-start]").first()).toBeVisible();
 

@@ -52,6 +52,10 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    # A second factor for the Django admin, and nothing else — player and owner accounts
+    # authenticate through Clerk, which has its own (Phase 11 step 4, DECISIONS D64).
+    "django_otp",
+    "django_otp.plugins.otp_totp",
     "rest_framework",
     "drf_spectacular",
     "corsheaders",
@@ -84,6 +88,9 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Must follow AuthenticationMiddleware: it decorates `request.user` with the
+    # verified-device state the admin login then checks (Phase 11 step 4).
+    "django_otp.middleware.OTPMiddleware",
     # Resolves the request language from `Accept-Language`, which the frontend sets from
     # its own locale cookie. Catalogue labels (sports, product categories) are served in
     # that language; nothing else in the API is translated (DECISIONS D63).
@@ -231,6 +238,21 @@ AUTH_PASSWORD_VALIDATORS = [
 # ---------------------------------------------------------------------------
 # i18n / time
 # ---------------------------------------------------------------------------
+#: Whether the OpenAPI schema and its two documentation UIs are readable without an
+#: account. True in development, so `npm run gen:api` needs no credentials; the
+#: production settings turn it off (Phase 11 step 4).
+API_DOCS_PUBLIC = env.bool("API_DOCS_PUBLIC", default=True)
+
+#: Whether the Django admin demands a TOTP code as well as a password. Off locally,
+#: where it is friction with nothing to protect; on in production (Phase 11 step 4).
+ADMIN_REQUIRES_OTP = env.bool("ADMIN_REQUIRES_OTP", default=False)
+
+#: Django's own ceiling on a request body, so an oversized upload is refused before
+#: anything parses it. `apps/core/validators.py` then bounds the image itself
+#: (Phase 11 step 4); this is the cruder guard that runs first.
+DATA_UPLOAD_MAX_MEMORY_SIZE = env.int("DATA_UPLOAD_MAX_MEMORY_SIZE", default=6 * 1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = env.int("FILE_UPLOAD_MAX_MEMORY_SIZE", default=2 * 1024 * 1024)
+
 LANGUAGE_CODE = "en"
 LANGUAGES = [("en", "English"), ("bn", "Bangla")]
 LOCALE_PATHS = [BASE_DIR / "locale"]
@@ -268,6 +290,34 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    # Rate limiting (Phase 11 step 4). Nothing was metered before this, so one script
+    # could fill a player's inbox with join requests, flood the admin conduct queue, or
+    # walk the whole player directory.
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        # The anonymous limit is deliberately high, and the reason matters: DRF keys it
+        # on IP address, and **every server-rendered page shares one** — the Next.js
+        # server calls the API on behalf of whoever is reading, so from Django's side a
+        # thousand visitors look like one address. A tight anonymous limit would throttle
+        # the site itself before it ever inconvenienced a scraper. It is a crude flood
+        # guard, nothing more; the limits that do real work are the per-user scopes
+        # below, which key on the account (Phase 11 step 4).
+        #
+        # Found the hard way: 60/min took the whole end-to-end suite down, because every
+        # page render reads `/api/v1/config` and they all arrive from one host.
+        "anon": env("THROTTLE_ANON", default="1200/min"),
+        "user": env("THROTTLE_USER", default="600/min"),
+        # The scopes below are the ones that *reach another person* — an inbox, a queue,
+        # somebody's phone. They are deliberately much tighter, because there is no
+        # legitimate reason to do any of them quickly.
+        "reaching-people": env("THROTTLE_REACHING_PEOPLE", default="20/hour"),
+        "reports": env("THROTTLE_REPORTS", default="10/hour"),
+        "player-search": env("THROTTLE_PLAYER_SEARCH", default="120/hour"),
+        "webhook": env("THROTTLE_WEBHOOK", default="600/min"),
+    },
 }
 
 SPECTACULAR_SETTINGS = {
@@ -278,6 +328,10 @@ SPECTACULAR_SETTINGS = {
     ),
     "VERSION": "0.1.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    # drf-spectacular's own views read this and ignore `permission_classes` passed to
+    # `as_view()`, so this is the only place that decides who may read the schema.
+    # The class itself checks `API_DOCS_PUBLIC` per request (Phase 11 step 4).
+    "SERVE_PERMISSIONS": ["apps.core.permissions.CanReadApiDocs"],
     "SCHEMA_PATH_PREFIX": "/api/v1",
     "COMPONENT_SPLIT_REQUEST": True,
     "SORT_OPERATIONS": False,

@@ -10,6 +10,10 @@ from .base import *
 DEBUG = False
 ALLOWED_HOSTS = ["*", "testserver"]
 
+# The production posture, so the permission matrix covers the schema routes for real
+# rather than exempting them (Phase 11 step 4).
+API_DOCS_PUBLIC = False
+
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 # Local-memory cache: the JWKS cache must not leak between tests or need Redis.

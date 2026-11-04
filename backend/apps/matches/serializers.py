@@ -3,6 +3,7 @@ from __future__ import annotations
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from apps.core.utils import player_label
 from apps.players.selectors import player_sport_cards, profile_queryset
 from apps.players.serializers import PlayerSportCardSerializer
 from apps.sports.serializers import SportFormatSerializer, SportSummarySerializer
@@ -42,7 +43,7 @@ def roster_entry(entry: MatchPlayer, *, sport_id) -> dict:
         "id": entry.id,
         "player_id": entry.player_id,
         "profile_id": profile.id if profile else None,
-        "name": profile.name if profile else (entry.player.full_name or entry.player.email),
+        "name": player_label(entry.player),
         "photo_url": profile.photo_url if profile else entry.player.image_url,
         "area": profile.area if profile else "",
         "source": entry.source,
@@ -81,8 +82,7 @@ class SquadMemberSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.CharField())
     def get_name(self, obj) -> str:
-        profile = getattr(obj.player, "player_profile", None)
-        return profile.name if profile else (obj.player.full_name or obj.player.email)
+        return player_label(obj.player)
 
     @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_profile_id(self, obj):
@@ -166,8 +166,7 @@ class JoinRequestSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.CharField())
     def get_player_name(self, obj) -> str:
-        profile = getattr(obj.player, "player_profile", None)
-        return profile.name if profile else (obj.player.full_name or obj.player.email)
+        return player_label(obj.player)
 
     @extend_schema_field(serializers.UUIDField(allow_null=True))
     def get_player_profile_id(self, obj):
@@ -195,10 +194,7 @@ class MatchInviteSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.CharField())
     def get_invited_player_name(self, obj) -> str:
-        profile = getattr(obj.invited_player, "player_profile", None)
-        return (
-            profile.name if profile else (obj.invited_player.full_name or obj.invited_player.email)
-        )
+        return player_label(obj.invited_player)
 
 
 class MatchSummarySerializer(serializers.ModelSerializer):
@@ -298,8 +294,7 @@ class MatchDetailSerializer(MatchSummarySerializer):
     @extend_schema_field(serializers.CharField())
     def get_organiser_name(self, obj) -> str:
         organiser = obj.organiser
-        profile = getattr(organiser, "player_profile", None)
-        return profile.name if profile else (organiser.full_name or organiser.email)
+        return player_label(organiser)
 
     @extend_schema_field(serializers.BooleanField())
     def get_is_organiser(self, obj) -> bool:

@@ -86,3 +86,11 @@ jobs:
 
       - name: Tests
         run: uv run pytest --create-db
+
+      # Same reasoning as the frontend's `npm audit`: a known-vulnerable dependency is a
+      # security bug nobody wrote and nobody reviews. `pip-audit` is run through `uvx`
+      # so it never enters the project's own lock file.
+      - name: Dependency audit
+        run: |
+          uv export --no-dev --format requirements-txt > /tmp/requirements.txt
+          uvx pip-audit --strict --progress-spinner off -r /tmp/requirements.txt
