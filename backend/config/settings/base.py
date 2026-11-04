@@ -71,6 +71,7 @@ LOCAL_APPS = [
     "apps.scoring",
     "apps.ratings",
     "apps.inventory",
+    "apps.store",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -176,6 +177,15 @@ CELERY_BEAT_SCHEDULE: dict[str, dict] = {
         "task": "scoring.close_motm",
         "schedule": 3600.0,
     },
+    "remind-before-store-cutoff": {
+        "task": "store.remind_before_cutoff",
+        # Hourly: the window is three hours wide, so this cannot miss one.
+        "schedule": 3600.0,
+    },
+    "flag-late-turf-deliveries": {
+        "task": "store.flag_late_turf_deliveries",
+        "schedule": 1800.0,
+    },
     "rebuild-leaderboards": {
         "task": "ratings.rebuild_leaderboards",
         # Nightly at 03:00 Dhaka — the boards move once a day at most and this is the
@@ -271,6 +281,9 @@ SPECTACULAR_SETTINGS = {
         "StockMovementTypeEnum": "apps.inventory.models.STOCK_MOVEMENT_TYPE_CHOICES",
         "CounterSaleStatusEnum": "apps.inventory.models.COUNTER_SALE_STATUS_CHOICES",
         "RentalStatusEnum": "apps.inventory.models.RENTAL_STATUS_CHOICES",
+        "OrderStatusEnum": "apps.store.models.ORDER_STATUS_CHOICES",
+        "OrderFulfilmentEnum": "apps.store.models.ORDER_FULFILMENT_CHOICES",
+        "OrderPaymentMethodEnum": "apps.store.models.ORDER_PAYMENT_METHOD_CHOICES",
         "PlayerPreferredSideEnum": "apps.players.models.PLAYER_PREFERRED_SIDE_CHOICES",
         "NotificationKindEnum": "apps.notifications.models.NotificationKind.choices",
         "MatchStatusEnum": "apps.matches.models.MatchStatus.choices",
@@ -362,6 +375,8 @@ ONBOARDING_DEFAULT_RATING = 50
 
 # Store / delivery (DECISIONS D5)
 TURF_DELIVERY_CUTOFF_HOURS = 16
+# How close to kick-off an undelivered turf order becomes a warning for the admins.
+STORE_DELIVERY_WARNING_HOURS = 4
 
 # Fitness (DOMAIN §10)
 DEFAULT_PLAYER_WEIGHT_KG = 70

@@ -40,7 +40,14 @@ class Payment(BaseModel):
         blank=True,
         related_name="payments",
     )
-    # Phase 08 adds `order`; the check constraint below already expects it to be exclusive.
+    order = models.ForeignKey(
+        "store.Order",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="payments",
+        help_text="Cash taken for a store order (Phase 08).",
+    )
     method = models.CharField(
         _("method"), max_length=16, choices=PaymentMethod.choices, default=PaymentMethod.CASH
     )
@@ -76,9 +83,14 @@ class Payment(BaseModel):
         verbose_name_plural = _("payments")
         ordering = ["-created_at"]
         constraints = [
+            # A payment is for exactly one thing. Without this, a row could be for both
+            # a booking and an order, and neither total would be trustworthy.
             models.CheckConstraint(
-                condition=models.Q(booking__isnull=False),
-                name="payment_has_a_target",
+                condition=(
+                    models.Q(booking__isnull=False, order__isnull=True)
+                    | models.Q(booking__isnull=True, order__isnull=False)
+                ),
+                name="payment_has_exactly_one_target",
             ),
         ]
         indexes = [

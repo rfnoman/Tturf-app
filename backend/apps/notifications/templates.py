@@ -163,4 +163,39 @@ TEMPLATES: dict[str, Template] = {
         "body": "{quantity} taken by {player} at {turf} and still out.",
         "email": False,
     },
+    NotificationKind.ORDER_PLACED: {
+        "title": "New order: {total}",
+        "body": "{items} item(s) from {source}.",
+        "email": False,
+    },
+    NotificationKind.ORDER_ACCEPTED: {
+        "title": "{source} accepted your order",
+        "body": "{total}. We will tell you when it is on its way.",
+        "email": False,
+    },
+    NotificationKind.ORDER_READY: {
+        "title": "Your order is ready",
+        "body": "Collect it at {source}.",
+        "email": True,
+    },
+    NotificationKind.ORDER_ASSIGNED: {
+        "title": "A delivery for you",
+        "body": "{total} to {where}.",
+        "email": False,
+    },
+    NotificationKind.ORDER_DELIVERED: {
+        "title": "Delivered: {total}",
+        "body": "From {source}. Thanks for shopping with us.",
+        "email": True,
+    },
+    NotificationKind.ORDER_CANCELLED: {
+        "title": "Order cancelled",
+        "body": "{source}: {reason}",
+        "email": True,
+    },
+    NotificationKind.ORDER_CUTOFF_SOON: {
+        "title": "Order by {cutoff} for your match",
+        "body": "{sport} at {turf} on {when}. After that it cannot reach the turf in time.",
+        "email": False,
+    },
 }

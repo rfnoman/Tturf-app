@@ -12,7 +12,7 @@ Updated by Claude Code at the end of each phase.
 | 05 Scoreboard | **done** | 2026-11-03 | Teams + auto-balance, scorecard state machine, per-sport validators, disputes, MOTM, peer ratings, public shareable card |
 | 06 Ratings, track record, discovery | **done** | 2026-11-03 | Pure versioned rating engine, rating history with explanations, track record, conduct reports, fair play, leaderboards, player search |
 | 07 Inventory & counter POS | **done** | 2026-11-04 | Product catalogue, stock ledger, counter POS, rentals, low-stock alerts, warehouse |
-| 08 Store, orders, delivery | not started | | |
+| 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | not started | | |
 | 10 Online payments & ledger | not started | | |
 | 11 Hardening, Bangla, launch | not started | | |
@@ -754,4 +754,79 @@ of rediscovering it.
 - Rentals can be attached to a match or a booking, but the board only offers today's
   bookings; attaching to a match wants the Phase 04 match picker.
 - django-storages is still not wired up, so product images are URLs rather than uploads.
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 08 — Store, orders and delivery (2026-11-04)
+
+**Built**
+
+- **`apps/store`** around two rules. **One order has one stock source**: a cart holding the
+  platform's whey and a turf's bananas becomes two orders at checkout, because different
+  people pick, carry and are paid for them. And **what a player may choose depends on where
+  the goods are** — the DOMAIN §9 matrix, in one function.
+- **`fulfilment_options`** answers with every option and, for the closed ones, the reason:
+  turf stock is pickup only (D4); platform → a turf needs a match the player is actually on
+  and more than `TURF_DELIVERY_CUTOFF_HOURS` before kick-off (D5, overridable per zone);
+  platform → an address is priced by `DeliveryZone` and refused by name when nobody
+  delivers there. Perishables are pickup only whatever else is true.
+- **Checkout is all or nothing.** It reserves through the Phase 07 services, snapshots the
+  name, price and nutrition onto each line, and rolls the whole thing back if the last item
+  of the second order is gone — leaving the cart intact so the player can fix it.
+- **The order lifecycle**: placed → accepted → packed → out for delivery | ready for pickup
+  → delivered | picked up, plus cancelled. Settling commits the stock and records the cash
+  as a `Payment` (which now targets a booking **or** an order, exclusively). Cancelling
+  releases the stock. A player may cancel until it is packed; after that only the source can.
+- **Riders** are a profile on an ordinary account, not a separate kind of user, and
+  `rider_orders` only ever returns what they were given.
+- **Celery**: a cutoff reminder to players whose match is about to pass the deadline ("Order
+  by 5 AM"), sent once per match, and a warning to admins about turf deliveries that are not
+  on their way with kick-off approaching.
+- **Frontend**: the store leads with the player's next match and a live cutoff line, with a
+  source switcher, category and fitness-tag filters and nutrition on the card; the cart is
+  grouped by source with a fulfilment choice per group — unavailable options stay visible
+  with the API's reason — and an address can be added without leaving it; order tracking
+  with the timeline; the turf and platform queues (one component, since the job is the
+  same); and a one-handed rider view with call and map links.
+- **Tests**: 1143 backend (77 in `apps/store`), 17 Vitest, 89 Playwright.
+
+**The matrix is tested as a matrix**
+
+`test_fulfilment.py` walks each source × each option, checks that every refusal carries a
+reason, and pins the cutoff at the exact boundary: a minute inside it works, a minute past
+it does not, a zone may override it, and somebody else's match is refused by name. That is
+the phase's acceptance line ("at 4:59 AM it works, at 5:01 AM it is disabled") as an
+assertion.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): with a match 28 hours out
+the store led with "For your match at Mirpur Turf Club" and "28h left to have it sent to the
+turf". Added a turf item and a platform item; the cart showed two groups, each with its own
+options and reasons ("It is already at the turf — pick it up there", "The platform store
+delivers; there is nothing to pick up"). Checkout produced two orders, both holding stock.
+Moved the match inside the cutoff and the option became "Too late for this one — orders have
+to be in 16 hours before kick-off", exactly as the acceptance list asks. Added a Dhanmondi
+address from the cart and home delivery priced at ৳60, total ৳120. Then: accepted the order
+in the admin queue, assigned a rider, marked it on the way and delivered from the rider
+view — stock went 100 → 99 and a ৳120 cash payment was recorded. Picked up the turf order
+from that turf's queue. No console errors.
+
+**Deviations / notes**
+
+- The platform warehouse offers no pickup: there is no counter to collect from, and saying
+  so is better than a silently missing option.
+- Settling is allowed straight from `placed`. A player who orders at the counter and takes
+  it away should not need the staff to tap "accept" first; the event log still records it.
+- `cancel_order` checks "is this order finished?" before the player/packed rule, so a
+  delivered order says "already finished" rather than "call the turf".
+- Delivery zones are matched by area name, with an optional PostGIS polygon that wins when
+  both are present. A Dhaka address is a neighbourhood long before it is a coordinate.
+
+**Known gaps / follow-ups**
+
+- Riders are created in the admin; there is no sign-up flow for them.
+- The match page does not yet show "items for this match" — the data is there
+  (`Order.match`), it is a component away, and it belongs next to the Phase 05 scorecard
+  work on that page.
+- Delivery to a *turf* is not yet distinguished in the rider view from delivery to an
+  address; the card shows the match instead of a street, which works but is not a route.
+- django-storages is still not wired up, so product images are URLs.
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
