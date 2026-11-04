@@ -89,6 +89,15 @@ export type Order = Schemas["Order"];
 export type OrderItem = Schemas["OrderItem"];
 export type StoreAddress = Schemas["Address"];
 export type Rider = Schemas["Rider"];
+
+export type ActivityLog = Schemas["ActivityLog"];
+export type WeeklySummary = Schemas["WeeklySummary"];
+export type Streak = Schemas["Streak"];
+export type GoalProgress = Schemas["GoalProgress"];
+export type FitnessDashboard = Schemas["Dashboard"];
+export type Bundle = Schemas["Bundle"];
+export type StoreHome = Schemas["StoreHome"];
+export type ReminderPreference = Schemas["ReminderPreference"];
 export type LeaderboardEntry = Schemas["LeaderboardEntry"];
 
 /**

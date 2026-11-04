@@ -31,6 +31,32 @@ class AddressSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
+class StoreMatchSerializer(serializers.Serializer):
+    """The match the store arranges itself around."""
+
+    id = serializers.UUIDField()
+    sport = serializers.CharField()
+    turf_name = serializers.CharField()
+    turf_slug = serializers.SlugField()
+    starts_at = serializers.DateTimeField()
+    source_id = serializers.UUIDField(allow_null=True)
+
+
+class StoreSourceSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    turf_slug = serializers.CharField(allow_blank=True)
+    is_platform = serializers.BooleanField()
+
+
+class StoreHomeSerializer(serializers.Serializer):
+    """What the store's front page needs, typed so the client is too."""
+
+    match = StoreMatchSerializer(allow_null=True)
+    platform_source_id = serializers.UUIDField()
+    sources = StoreSourceSerializer(many=True)
+
+
 class StoreItemSerializer(serializers.Serializer):
     """One buyable thing at one source: the product, its price here, and how many."""
 

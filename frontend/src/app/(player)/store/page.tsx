@@ -21,6 +21,12 @@ export default async function StorePage() {
     api.GET("/api/v1/matches/mine"),
   ]);
 
+  // Tailored to the next match when there is one: a pre-match kit is only a good
+  // suggestion if there is a match to take it to.
+  const bundles = await api.GET("/api/v1/bundles", {
+    params: home.data?.match ? { query: { match: String(home.data.match.id) } } : { query: {} },
+  });
+
   const t = await getTranslations("store");
 
   return (
@@ -34,6 +40,7 @@ export default async function StorePage() {
         home={home.data}
         categories={categories.data ?? []}
         initialCart={cart.data}
+        bundles={bundles.data ?? []}
         addresses={addresses.data ?? []}
         matches={matches.data ?? []}
       />

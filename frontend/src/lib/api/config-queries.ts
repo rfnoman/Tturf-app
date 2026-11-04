@@ -22,6 +22,10 @@ export const CLIENT_CONFIG_FALLBACK: ClientConfig = {
   turf_delivery_cutoff_hours: 16,
   currency: "BDT",
   time_zone: "Asia/Dhaka",
+  // 5 = Saturday, the day a Bangladeshi week starts (DECISIONS D56).
+  week_starts_on: 5,
+  // No key means no push, which is the right answer when the API is unreachable too.
+  vapid_public_key: "",
 };
 
 export async function fetchClientConfig(): Promise<ClientConfig> {

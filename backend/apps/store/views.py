@@ -42,6 +42,7 @@ from .serializers import (
     RiderSerializer,
     SetCartQuantitySerializer,
     SettleOrderSerializer,
+    StoreHomeSerializer,
     StoreItemSerializer,
 )
 from .services import (
@@ -88,7 +89,7 @@ class StoreHomeView(APIView):
     @extend_schema(
         operation_id="store_home",
         summary="The store, arranged around this player",
-        responses={200: None},
+        responses={200: StoreHomeSerializer},
     )
     def get(self, request):
         match = next_match_for(request.user)

@@ -82,7 +82,31 @@ def notify(
         # After commit: never email about a transition that then rolled back.
         transaction.on_commit(lambda: _send_email(notification))
 
+    # Same reasoning for the two Phase 09 channels: a push to a phone and a line down an
+    # open stream are both impossible to take back.
+    transaction.on_commit(lambda: _deliver_live(notification))
+
     return notification
+
+
+def _deliver_live(notification: Notification) -> None:
+    """Push it to the player's phone and down any stream they have open.
+
+    Both are best-effort by design: a notification row exists either way, and the bell
+    will show it the next time the app asks.
+    """
+    from .push import send_push
+    from .stream import publish
+
+    try:
+        send_push(notification=notification)
+    except Exception:
+        logger.exception("Push delivery failed", extra={"id": str(notification.id)})
+
+    try:
+        publish(notification=notification)
+    except Exception:
+        logger.exception("Stream delivery failed", extra={"id": str(notification.id)})
 
 
 def _send_email(notification: Notification) -> None:

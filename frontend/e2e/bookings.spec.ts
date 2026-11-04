@@ -20,19 +20,29 @@ async function finishOnboarding(page: Page) {
   await expect(page).toHaveURL(/\/profile/);
 }
 
-/** Book the first free slot on a turf, returning the booking's id. */
-async function bookFirstFreeSlot(page: Page, slug: string): Promise<string> {
+/** Book the first free slot on a turf, returning the booking's id and the day used. */
+async function bookFirstFreeSlot(page: Page, slug: string): Promise<{ id: string; date: string }> {
   await page.goto(`/turfs/${slug}`);
-  await page.getByLabel("Date").fill(dhakaDate(1));
 
-  // A turf has several grounds, and a run that books every slot on one of them must not
-  // break the next run: take the first ground that still has something free.
+  // Repeated runs fill a turf up, so this hunts for a free slot across the next few
+  // days and every ground rather than assuming tomorrow's default pitch is open.
   const open = page.locator("[data-slot-start][data-slot-available='true']");
-  const grounds = await page.locator("#ground option").count();
-  for (let index = 0; index < grounds; index += 1) {
-    const value = await page.locator("#ground option").nth(index).getAttribute("value");
-    await page.locator("#ground").selectOption(value);
-    if ((await open.count()) > 0) break;
+  let found = false;
+  let date = dhakaDate(1);
+
+  for (let day = 1; day <= 5 && !found; day += 1) {
+    date = dhakaDate(day);
+    await page.getByLabel("Date").fill(date);
+    const grounds = await page.locator("#ground option").count();
+
+    for (let index = 0; index < grounds; index += 1) {
+      const value = await page.locator("#ground option").nth(index).getAttribute("value");
+      await page.locator("#ground").selectOption(value);
+      if ((await open.count()) > 0) {
+        found = true;
+        break;
+      }
+    }
   }
 
   const slot = open.first();
@@ -41,7 +51,7 @@ async function bookFirstFreeSlot(page: Page, slug: string): Promise<string> {
   await page.getByRole("button", { name: /^Book for/ }).click();
 
   await expect(page).toHaveURL(/\/bookings\/[0-9a-f-]+$/);
-  return page.url().split("/").pop()!;
+  return { id: page.url().split("/").pop()!, date };
 }
 
 test.describe("booking a slot", () => {
@@ -64,15 +74,15 @@ test.describe("booking a slot", () => {
   test("the booking appears in my bookings and the slot is no longer free", async ({
     signedInPage: page,
   }) => {
-    await bookFirstFreeSlot(page, "banani-sports-hub");
+    const booked = await bookFirstFreeSlot(page, "banani-sports-hub");
 
     await page.goto("/bookings");
     await expect(page.getByRole("heading", { name: "Banani Sports Hub" })).toBeVisible();
 
     // The Phase 02 availability selector picks bookings up through the provider
-    // registry, so a booked slot must now read as taken.
+    // registry, so a booked slot must now read as taken — on the day it was booked.
     await page.goto("/turfs/banani-sports-hub");
-    await page.getByLabel("Date").fill(dhakaDate(1));
+    await page.getByLabel("Date").fill(booked.date);
     await expect(page.getByText("BOOKED").first()).toBeVisible();
   });
 

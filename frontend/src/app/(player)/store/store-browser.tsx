@@ -5,7 +5,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "cn";
 
-import type { Cart, MatchSummary, ProductCategory, StoreAddress, StoreItem } from "@/lib/api/types";
+import type {
+  Bundle,
+  Cart,
+  MatchSummary,
+  ProductCategory,
+  StoreAddress,
+  StoreHome,
+  StoreItem,
+} from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,19 +22,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { CartPanel } from "./cart-panel";
-
-type Home = {
-  match: {
-    id: string;
-    sport: string;
-    turf_name: string;
-    turf_slug: string;
-    starts_at: string;
-    source_id: string | null;
-  } | null;
-  platform_source_id: string;
-  sources: { id: string; name: string; turf_slug: string; is_platform: boolean }[];
-};
 
 /** Hours until a moment, or a negative number once it has passed. */
 function hoursUntil(when: string): number {
@@ -37,12 +32,14 @@ export function StoreBrowser({
   home,
   categories,
   initialCart,
+  bundles,
   addresses,
   matches,
 }: {
-  home?: Home;
+  home?: StoreHome;
   categories: ProductCategory[];
   initialCart?: Cart;
+  bundles: Bundle[];
   addresses: StoreAddress[];
   matches: MatchSummary[];
 }) {
@@ -172,6 +169,32 @@ export function StoreBrowser({
                     : t("cutoffPassed")}
                 </span>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {bundles.length > 0 && (
+          <Card data-testid="bundles">
+            <CardHeader>
+              <CardTitle className="text-sm">{t("bundles")}</CardTitle>
+              <p className="text-muted-foreground text-xs">{t("bundlesHint")}</p>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              {bundles.map((bundle) => (
+                <BundleCard
+                  key={String(bundle.id)}
+                  bundle={bundle}
+                  onAdded={(result) => {
+                    setCart(undefined);
+                    void refreshCart();
+                    setError(
+                      result.missing.length > 0
+                        ? t("bundlePartly", { missing: result.missing.join(", ") })
+                        : null,
+                    );
+                  }}
+                />
+              ))}
             </CardContent>
           </Card>
         )}
@@ -312,6 +335,46 @@ export function StoreBrowser({
         onChanged={refreshCart}
         onPlaced={(orderId) => router.push(`/orders/${orderId}`)}
       />
+    </div>
+  );
+}
+
+/** A curated kit, added whole (DOMAIN §10). */
+function BundleCard({
+  bundle,
+  onAdded,
+}: {
+  bundle: Bundle;
+  onAdded: (result: { missing: string[] }) => void;
+}) {
+  const t = useTranslations("store");
+  const api = useApiClient();
+  const [busy, setBusy] = useState(false);
+
+  return (
+    <div className="flex min-w-56 flex-col gap-2 rounded-xl border p-3">
+      <span className="text-sm font-medium">{bundle.name}</span>
+      <span className="text-muted-foreground text-xs">
+        {bundle.items.map((item) => `${item.quantity}× ${item.product_name}`).join(", ")}
+      </span>
+      <Button
+        size="sm"
+        variant="outline"
+        className="self-start"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          // No source to choose: a bundle comes from whoever owns it, which is what
+          // keeps the resulting order to a single source.
+          const { data } = await api.POST("/api/v1/bundles/{slug}/add", {
+            params: { path: { slug: bundle.slug } },
+          });
+          setBusy(false);
+          if (data) onAdded({ missing: data.missing });
+        }}
+      >
+        {busy ? t("adding") : t("addBundle")}
+      </Button>
     </div>
   );
 }

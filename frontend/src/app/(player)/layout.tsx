@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 
 import { getServerApiClient } from "@/lib/api/server";
+import { LiveNotifications } from "@/components/fitness/live-notifications";
 
 /**
  * Player area gate.
@@ -26,5 +27,12 @@ export default async function PlayerLayout({ children }: { children: React.React
     redirect("/onboarding");
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {/* One stream for the whole signed-in area, so a notification arriving reaches
+          whatever page the player happens to be on (DECISIONS D54). */}
+      <LiveNotifications />
+      {children}
+    </>
+  );
 }

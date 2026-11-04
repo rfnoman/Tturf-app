@@ -72,6 +72,7 @@ LOCAL_APPS = [
     "apps.ratings",
     "apps.inventory",
     "apps.store",
+    "apps.fitness",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -186,6 +187,25 @@ CELERY_BEAT_SCHEDULE: dict[str, dict] = {
         "task": "store.flag_late_turf_deliveries",
         "schedule": 1800.0,
     },
+    "match-day-summary": {
+        "task": "fitness.match_day_summary",
+        # Hourly, but only fires for matches today and only once per player.
+        "schedule": 3600.0,
+    },
+    "hydration-reminder": {
+        "task": "fitness.hydration_reminder",
+        # Every ten minutes: "two hours before" has to mean roughly that.
+        "schedule": 600.0,
+    },
+    "recovery-tip": {
+        "task": "fitness.recovery_tip",
+        "schedule": 1800.0,
+    },
+    "weekly-recap": {
+        "task": "fitness.weekly_recap",
+        # Saturday morning, when the Bangladeshi week turns over (DECISIONS D56).
+        "schedule": crontab(hour=9, minute=0, day_of_week="sat"),
+    },
     "rebuild-leaderboards": {
         "task": "ratings.rebuild_leaderboards",
         # Nightly at 03:00 Dhaka — the boards move once a day at most and this is the
@@ -284,6 +304,9 @@ SPECTACULAR_SETTINGS = {
         "OrderStatusEnum": "apps.store.models.ORDER_STATUS_CHOICES",
         "OrderFulfilmentEnum": "apps.store.models.ORDER_FULFILMENT_CHOICES",
         "OrderPaymentMethodEnum": "apps.store.models.ORDER_PAYMENT_METHOD_CHOICES",
+        "ActivitySourceEnum": "apps.fitness.models.ACTIVITY_SOURCE_CHOICES",
+        "FitnessGoalTypeEnum": "apps.fitness.models.FITNESS_GOAL_TYPE_CHOICES",
+        "BundleOccasionEnum": "apps.fitness.models.BUNDLE_OCCASION_CHOICES",
         "PlayerPreferredSideEnum": "apps.players.models.PLAYER_PREFERRED_SIDE_CHOICES",
         "NotificationKindEnum": "apps.notifications.models.NotificationKind.choices",
         "MatchStatusEnum": "apps.matches.models.MatchStatus.choices",
@@ -377,6 +400,24 @@ ONBOARDING_DEFAULT_RATING = 50
 TURF_DELIVERY_CUTOFF_HOURS = 16
 # How close to kick-off an undelivered turf order becomes a warning for the admins.
 STORE_DELIVERY_WARNING_HOURS = 4
+
+# Fitness (DOMAIN §10).
+# Bangladesh's weekend is Friday and Saturday, so a player's week runs Saturday to
+# Friday — an ISO week would cut a Friday-night match off from the Saturday-morning one
+# that belongs with it (DECISIONS D56). 5 = Saturday, matching `date.weekday()`.
+FITNESS_WEEK_STARTS_ON = 5
+#: Used when the player has not told us their weight; the log is flagged as an estimate.
+FITNESS_FALLBACK_WEIGHT_KG = 70
+#: How long before kick-off the hydration nudge goes out.
+FITNESS_HYDRATION_LEAD_HOURS = 2
+#: Default quiet hours, Dhaka time, when a player has not set their own.
+FITNESS_QUIET_FROM = "22:00"
+FITNESS_QUIET_UNTIL = "07:00"
+
+# Web push (DECISIONS D55). Unset in development and CI, where push is skipped.
+VAPID_PUBLIC_KEY = env("VAPID_PUBLIC_KEY", default="")
+VAPID_PRIVATE_KEY = env("VAPID_PRIVATE_KEY", default="")
+VAPID_CONTACT_EMAIL = env("VAPID_CONTACT_EMAIL", default="admin@turfapp.local")
 
 # Fitness (DOMAIN §10)
 DEFAULT_PLAYER_WEIGHT_KG = 70
