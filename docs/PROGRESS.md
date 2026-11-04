@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (steps 1-4 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; N+1s and caching; permission matrix, throttling, CSP, PII and upload limits |
+| 11 Hardening, Bangla, launch | **in progress** (steps 1-5 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; Sentry, JSON logs, verified backups, PlatformSetting |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1336,9 +1336,103 @@ page hydrates and the console is clean. Before the nonce was passed to `ClerkPro
 the console showed exactly the failure described above, which is how that line got
 written.
 
+**Tests**: 1517 backend (the permission matrix is parametrised over every route, so it
+grows with the URL conf by design), 26 Vitest, 113 Playwright — all green under the new
+content policy, which is the run that matters: a policy that breaks sign-in would pass
+every unit test ever written.
+
 **Known gaps / follow-ups**
 
 - CORS still allows the development origins; the production list is part of step 8.
 - The admin TOTP device has to be registered by hand after the first deploy — there is
   no bootstrap flow, and for one or two administrators there should not be.
 - Notification and email templates remain English-only (carried from step 1).
+
+### Phase 11 — step 5 of 9: observability and operations (2026-11-04)
+
+**`PlatformSetting`, finally** (D66)
+
+CLAUDE.md has said since Phase 00 that configurable rules live in one place and that
+`apps/core/utils.setting()` would be the only thing that ever learned about a database.
+That is now true: a row overrides the code's default, deleting it restores the default,
+and nothing else changed anywhere.
+
+The direction matters. The app is always runnable with an empty settings table, and
+undoing a bad edit is deleting a row rather than remembering what the number used to be.
+Values are text, read back as the type of the code's default — a column per type would
+make the admin form worse for the people who use it — and **an unparseable value falls
+back rather than raising**, so a typo degrades to yesterday's behaviour instead of
+taking the site down. There is a test for exactly that. Reads are cached for a minute:
+long enough not to be a query on every booking, short enough that "without a deploy"
+stays true, and the admin clears the key on save so somebody who just pressed save sees
+their change.
+
+The admin shows **what the code's default is** next to each row, because an admin about
+to change a number should be able to see what they are overriding.
+
+**Error reporting** (D67)
+
+Sentry in all three processes — web, worker and beat — started from one place and
+**initialised only when a DSN is configured**, the same shape web push uses (D55). No
+account needed for development or CI, and no `if (sentry)` anywhere in the app.
+
+What is deliberately not sent:
+
+- **Request bodies.** A booking payload carries a phone number; a payment callback
+  carries a transaction reference. An error report is not a place to keep either.
+- **Anything credential-shaped**, through a scrubber on *both* sides that redacts the
+  names this app actually uses. `store_passwd` is SSLCommerz's spelling, not a convention
+  a generic denylist would guess — D59 keeps it out of stored responses, and this keeps
+  it from reaching a third party as well.
+- **Session replay.** It would record players' own screens, including their phone numbers
+  and delivery addresses, to somebody else's server.
+
+Celery is integrated too, because the timers that confirm bookings and close votes are
+exactly where a failure is silent: the site looks fine and nothing has auto-confirmed
+for six hours.
+
+**Structured logging**: JSON where something is going to index it, the readable one-line
+format where a person is reading the terminal. Every log call in the codebase already
+passed its facts through `extra=`, so **no call site changed** — only the formatter,
+which now keeps those fields at the top level of each line instead of discarding them.
+
+**The health endpoint now reports its dependencies**, not just itself: the database,
+PostGIS, the cache, and how many Celery workers answered a ping. Redis is not optional
+here — it is the cache, the broker and the Phase 09 pub/sub channel — so a 200 while it
+is down would tell a load balancer to keep sending traffic; it returns 503 instead.
+Worker count is `null` when the broker could not be asked, which is a different fact
+from "none are running" and reads that way on a status page.
+
+**Backups that have been restored** (D68)
+
+`manage.py backup_database` dumps **and then restores the dump into a scratch database
+and counts the tables**, failing if what came back is not usable. The failure mode of a
+nightly dump is finding out on the day it matters that it has been zero bytes for three
+months, and the only thing that catches that is restoring it. Old dumps are pruned to the
+last fourteen.
+
+**Verified by running it**: dumped the development database (2.1 MB), restored it into a
+scratch database, counted 90 tables, dropped the scratch. It also failed correctly on the
+first attempt — `pg_dump` 16 against a server running 17 — which is a real deployment
+hazard the docstring now names.
+
+**Deviations / notes**
+
+- **No Flower, no Prometheus, no log pipeline** (D67). A pilot in two Dhaka
+  neighbourhoods needs to know when a booking failed for somebody, not a metrics stack.
+  Sentry's Celery integration reports a task that dies — the thing Flower is mostly
+  watched for — and the health endpoint answers "are there any workers at all".
+- `@sentry/nextjs` v11 removed `sendDefaultPii`; personal data is no longer attached by
+  default, which is the right default but is not a guarantee. The scrubber is the
+  guarantee.
+- The backup command is a management command, not a Celery task: a worker that is down
+  cannot back up the database, which is precisely when you want the backup. Where it
+  runs from is step 8's decision.
+
+**Known gaps / follow-ups**
+
+- Nothing *calls* `backup_database` yet — scheduling it, and putting the dumps somewhere
+  that is not the application server, belongs to step 8.
+- Uptime checks need an external prober pointed at `/api/v1/health`; also step 8.
+- No settings rows are seeded. That is correct — every rule still has its default in
+  code, and a row should exist only once somebody has deliberately changed something.

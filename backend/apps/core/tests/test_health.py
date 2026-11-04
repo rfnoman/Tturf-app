@@ -16,6 +16,37 @@ def test_health_is_public_and_reports_postgis():
     assert response.data["postgis"].startswith("3.")
 
 
+def test_health_reports_the_cache_and_the_workers():
+    """Redis is not optional: it is the cache, the Celery broker and the SSE channel.
+
+    "The site is up but no booking has auto-confirmed for six hours" is the outage this
+    line exists for — the web process alone cannot see it (Phase 11 step 5).
+    """
+    response = APIClient().get(reverse("v1:health"))
+
+    assert response.data["cache"] == "ok"
+    # `None` means the broker could not be asked, which is a different fact from "no
+    # workers are running" and should read that way on a status page. Under the test
+    # settings Celery is eager and there is no broker, so either is correct here.
+    assert response.data["workers"] is None or response.data["workers"] >= 0
+
+
+def test_health_goes_degraded_when_the_cache_is_gone(monkeypatch):
+    """A 200 while Redis is down would tell a load balancer to keep sending traffic."""
+    from django.core.cache import cache
+
+    def explode(*args, **kwargs):
+        raise ConnectionError("redis is gone")
+
+    monkeypatch.setattr(cache, "set", explode)
+
+    response = APIClient().get(reverse("v1:health"))
+
+    assert response.status_code == 503
+    assert response.data["status"] == "degraded"
+    assert response.data["cache"] == "error"
+
+
 def test_health_needs_no_authentication():
     response = APIClient().get(reverse("v1:health"), HTTP_AUTHORIZATION="Bearer nonsense")
     assert response.status_code == 200

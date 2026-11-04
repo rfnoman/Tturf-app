@@ -27,14 +27,67 @@ def dhaka_today() -> datetime:
     return local.replace(hour=0, minute=0, second=0, microsecond=0)
 
 
-def setting(name: str, default=None):
-    """Read a configurable rule.
+#: How long a database override is trusted before it is read again. Short, because the
+#: point of moving a rule into the database is that it takes effect without a deploy —
+#: and long enough that it is not a query on every booking.
+SETTING_CACHE_SECONDS = 60
 
-    Indirection kept deliberately thin: when the ``PlatformSetting`` model arrives, this
-    is the single place that learns to consult the database before falling back to
-    settings, so callers never change.
+
+def setting(name: str, default=None):
+    """Read a configurable rule: the database override if there is one, else the code.
+
+    That direction is deliberate. Every rule has a default in ``config/settings``, and a
+    ``PlatformSetting`` row *overrides* it — so the app is always runnable with nothing
+    in the database, and undoing a bad edit is deleting a row rather than remembering
+    what the number used to be.
+
+    The value is stored as text and parsed back to the type of the default, because the
+    admin form is nicer to the people who use it than a column per type would be. An
+    unparseable value falls back to the default rather than raising: a typo should
+    degrade to yesterday's behaviour, not take the site down. Phase 00 promised this
+    function would be the only place that learned any of it, and it is.
     """
-    return getattr(settings, name, default)
+    from django.core.cache import cache
+
+    fallback = getattr(settings, name, default)
+
+    cached = cache.get(f"platform-setting:{name}", "\x00")
+    if cached != "\x00":
+        return _coerced(cached, fallback)
+
+    try:
+        from .models import PlatformSetting
+
+        row = PlatformSetting.objects.filter(key=name).values_list("value", flat=True).first()
+    except Exception:
+        # No table yet (a migration is running), no database, or it is unreachable. A
+        # business rule must never be the reason a request fails.
+        return fallback
+
+    cache.set(f"platform-setting:{name}", row, SETTING_CACHE_SECONDS)
+    return _coerced(row, fallback)
+
+
+def _coerced(raw, fallback):
+    """Read `raw` back as whatever type the code's default is."""
+    if raw is None:
+        return fallback
+
+    from decimal import Decimal, InvalidOperation
+
+    try:
+        if isinstance(fallback, bool):
+            return str(raw).strip().lower() in {"1", "true", "yes", "on"}
+        if isinstance(fallback, int):
+            return int(str(raw).strip())
+        if isinstance(fallback, Decimal):
+            return Decimal(str(raw).strip())
+        if isinstance(fallback, float):
+            return float(str(raw).strip())
+    except TypeError, ValueError, InvalidOperation:
+        return fallback
+
+    return raw
 
 
 def plain_decimal(value) -> str:

@@ -29,6 +29,8 @@ class HealthView(APIView):
                     "status": serializers.CharField(),
                     "database": serializers.CharField(),
                     "postgis": serializers.CharField(allow_null=True),
+                    "cache": serializers.CharField(),
+                    "workers": serializers.IntegerField(allow_null=True),
                     "version": serializers.CharField(),
                 },
             )
@@ -45,15 +47,41 @@ class HealthView(APIView):
         except Exception:  # pragma: no cover - only hit when the DB is down
             database = "error"
 
+        # Redis is not optional here: it is the cache, the Celery broker and the Phase
+        # 09 pub/sub channel. "The site is up but no booking has auto-confirmed for six
+        # hours" is the outage this line is for (Phase 11 step 5).
+        cache_state = "ok"
+        try:
+            from django.core.cache import cache
+
+            cache.set("health", "1", 10)
+            if cache.get("health") != "1":
+                cache_state = "error"
+        except Exception:  # pragma: no cover - only hit when Redis is down
+            cache_state = "error"
+
+        # How many Celery workers answered a ping. `None` means the question could not
+        # be asked, which is different from "none are running" and should read that way
+        # on a status page.
+        workers = None
+        try:
+            from config.celery import app as celery_app
+
+            replies = celery_app.control.ping(timeout=0.5)
+            workers = len(replies or [])
+        except Exception:  # pragma: no cover - broker unreachable
+            workers = None
+
+        healthy = database == "ok" and cache_state == "ok"
         payload = {
-            "status": "ok" if database == "ok" else "degraded",
+            "status": "ok" if healthy else "degraded",
             "database": database,
             "postgis": postgis,
+            "cache": cache_state,
+            "workers": workers,
             "version": settings.SPECTACULAR_SETTINGS["VERSION"],
         }
-        http_status = (
-            status.HTTP_200_OK if database == "ok" else status.HTTP_503_SERVICE_UNAVAILABLE
-        )
+        http_status = status.HTTP_200_OK if healthy else status.HTTP_503_SERVICE_UNAVAILABLE
         return Response(payload, status=http_status)
 
 

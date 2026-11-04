@@ -1,7 +1,7 @@
 """Production settings. Final hosting choices land in Phase 11 (DECISIONS D11)."""
 
 from .base import *
-from .base import MIDDLEWARE, STORAGES, env
+from .base import LOGGING, MIDDLEWARE, STORAGES, env
 
 DEBUG = False
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
@@ -20,6 +20,9 @@ X_FRAME_OPTIONS = "DENY"
 API_DOCS_PUBLIC = env.bool("API_DOCS_PUBLIC", default=False)
 # Behind the admin password is every booking, payment and player record (D64).
 ADMIN_REQUIRES_OTP = env.bool("ADMIN_REQUIRES_OTP", default=True)
+
+# One JSON object per line: whatever collects these is a machine, not a person.
+LOGGING["handlers"]["console"]["formatter"] = "json"
 
 # WhiteNoise serves collected static files in production; in dev the staticfiles app does.
 MIDDLEWARE = MIDDLEWARE.copy()

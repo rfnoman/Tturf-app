@@ -522,14 +522,33 @@ MAILERS = {
 }
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="TurfApp <no-reply@turfapp.local>")
 
+#: JSON where something will index it, readable where a person is reading the terminal.
+#: Every log call already passes its facts through `extra=`; only the formatter changes
+#: (Phase 11 step 5).
+LOG_FORMAT = env("DJANGO_LOG_FORMAT", default="console")
+
+#: Error reporting. No DSN means nothing is sent and nothing is initialised — the same
+#: shape as web push (D55), so development and CI need no account (Phase 11 step 5).
+SENTRY_DSN = env("SENTRY_DSN", default="")
+SENTRY_ENVIRONMENT = env("SENTRY_ENVIRONMENT", default="development")
+#: Set by the deploy to the commit it shipped, so a report names a version.
+SENTRY_RELEASE = env("SENTRY_RELEASE", default="")
+#: Performance tracing is sampled, not switched: 100% of traces on a booking endpoint is
+#: a second traffic load nobody asked for.
+SENTRY_TRACES_SAMPLE_RATE = env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.1)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {"format": "{levelname} {asctime} {name} {message}", "style": "{"},
+        "json": {"()": "apps.core.logging.JsonFormatter"},
     },
     "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "verbose"},
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json" if LOG_FORMAT == "json" else "verbose",
+        },
     },
     "root": {"handlers": ["console"], "level": env("DJANGO_LOG_LEVEL", default="INFO")},
     "loggers": {
