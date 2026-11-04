@@ -1136,5 +1136,12 @@
     "inactive": "নিষ্ক্রিয়",
     "admin": "অ্যাডমিন",
     "viewProfile": "প্রোফাইল দেখুন"
+  },
+  "footer": {
+    "copyright": "© {year} টার্ফঅ্যাপ"
+  },
+  "legal": {
+    "lastUpdated": "সর্বশেষ হালনাগাদ {date}",
+    "alsoRead": "এগুলোও দেখে নিন"
   }
 }

@@ -1136,5 +1136,12 @@
     "inactive": "Deactivated",
     "admin": "Admin",
     "viewProfile": "View profile"
+  },
+  "footer": {
+    "copyright": "© {year} TurfApp"
+  },
+  "legal": {
+    "lastUpdated": "Last updated {date}",
+    "alsoRead": "Also worth reading"
   }
 }
