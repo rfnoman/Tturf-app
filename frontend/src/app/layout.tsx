@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 
+import { InstallPrompt } from "@/components/layout/install-prompt";
+import { RegisterServiceWorker } from "@/components/layout/register-service-worker";
 import { SiteHeader } from "@/components/layout/site-header";
 
 import { Providers } from "./providers";
@@ -33,6 +35,17 @@ export const metadata: Metadata = {
   description: "Book sports turfs in Bangladesh, fill your match, build your profile.",
 };
 
+/**
+ * Installed, the app has no browser chrome, so the status bar takes its colour from
+ * here. `maximum-scale` is deliberately left alone: pinch-zoom is an accessibility
+ * feature and blocking it on a phone-first app would be a mistake.
+ */
+export const viewport: Viewport = {
+  themeColor: "#16a34a",
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Locale comes from the cookie, resolved in src/i18n/request.ts (no URL prefix, D13).
   const locale = await getLocale();
@@ -44,8 +57,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ClerkProvider>
           <NextIntlClientProvider>
             <Providers>
+              <RegisterServiceWorker />
               <SiteHeader />
-              <main className="mx-auto w-full max-w-5xl px-4 py-8">{children}</main>
+              <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8">
+                <InstallPrompt />
+                {children}
+              </main>
             </Providers>
           </NextIntlClientProvider>
         </ClerkProvider>
