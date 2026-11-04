@@ -14,7 +14,7 @@ Updated by Claude Code at the end of each phase.
 | 07 Inventory & counter POS | **done** | 2026-11-04 | Product catalogue, stock ledger, counter POS, rentals, low-stock alerts, warehouse |
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
-| 10 Online payments & ledger | not started | | |
+| 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
 | 11 Hardening, Bangla, launch | not started | | |
 
 ## Log
@@ -910,5 +910,115 @@ errors.
   `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` turns it on with no code change.
 - The weekly recap and match-day jobs are covered by tests and beat, not by a browser run
   — there is nothing to watch for a week.
+- django-storages is still not wired up (carried from Phase 02).
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 10 — Online payments, advances, ledger and payouts (2026-11-04)
+
+**Built**
+
+- **A provider abstraction** (`apps/payments/providers/`): `PaymentProvider` with
+  `start`, `validate` and `refund`, returning dataclasses (`StartedPayment`,
+  `ValidationResult`, `RefundResult`) rather than raw gateway dicts — so a second
+  gateway is a new class and a settings entry, and `services.py` never learns a
+  provider's vocabulary. `CashProvider` is the existing counter flow behind the same
+  interface; `SSLCommerzProvider` speaks v4 (`gwprocess/v4/api.php` to open a session,
+  `validator/api/validationserverAPI.php` to validate, `merchantTransIDvalidationAPI.php`
+  to refund).
+- **Nothing is settled from the browser's return** (D57). `validate()` makes a
+  server-to-server call and refuses on any of three checks: the status must be `VALID`
+  or `VALIDATED`, the `tran_id` must be the one stored on the payment, and the amount
+  must match to the paisa. The return page and the IPN both call the same
+  `settle_payment`, which returns early when the payment is already `PAID` — so a
+  duplicate IPN, a refreshed return page, and both at once all settle exactly once.
+  The IPN answers **200 for a payment it has never heard of**: a gateway retries a
+  non-2xx for hours, and there is nothing to retry towards.
+- **Advances** (D60): `Turf.advance_percent` decides how much is due up front, a paid
+  advance confirms the booking even for a player D3 would have held, and the balance is
+  payable in cash at the counter or online. `mark_paid(..., record_payment=False)` stops
+  the counter recording a second cash payment for money that came through the gateway.
+- **Refunds follow a policy table**, not a judgement call (`refund_due`): the turf
+  cancelled — everything back; the player cancelled inside the free window — everything
+  back; the player cancelled late — the advance is forfeited and the rest comes back.
+  A booking with no separate advance treats the advance share of its price as the
+  deposit, which is what makes a full prepayment behave like everybody else's.
+  `GET /api/v1/bookings/{id}/refund-policy` answers the same question before anybody
+  commits to cancelling.
+- **A ledger that cannot be written unbalanced** (D58): `post_entries()` raises before it
+  writes unless the lines of one event sum to zero. Entries are signed and grouped by an
+  `event_id`, so a ৳1000 booking at 10% is one event of three lines — player −1000, turf
+  +900, platform +100. `unbalanced_events()` is there for an auditor, and a test asserts
+  it is empty across the whole database.
+- **`CommissionPlan`** per turf with a platform default created on first use, because a
+  turf with no plan is on the default — a normal state, not a missing row to raise about.
+- **Payouts** (D61): a statement per turf per period computed from the ledger, drafted by
+  an admin, transferred by hand, then marked sent with its reference. The payout is itself
+  a ledger event, which is what takes a paid-out turf's balance to zero instead of letting
+  the same earnings be counted again next period.
+- **Gateway replies are stripped before they are stored** (D59): `_safe()` drops
+  `store_id`, `store_passwd`, `card_no`, `verify_sign` and `verify_key`. Card numbers and
+  our own credentials never reach a database row, a log line or an error report. The
+  player-facing serializer drops `raw_response` entirely.
+- **Frontend**: a pay button on bookings and checkout (cash / pay the advance / pay in
+  full), a redirect-and-return page that settles and then shows the result, payment
+  history for players, an owner finance page (earnings by type, commissions, payouts and
+  a CSV statement) and an admin finance dashboard with a payout board.
+- **Tests**: 1310 backend (58 in `apps/payments`, covering success, failure, cancel,
+  duplicate IPN, a tampered amount, a mismatched `tran_id`, the refund policy table and
+  the ledger invariant), 17 Vitest, 105 Playwright.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session, against a local stub of
+the gateway): paid a ৳350 advance on a ৳1000 booking, came back through the return URL and
+watched the booking flip to **Confirmed** with the balance shown as payable at the turf.
+The ledger read player −350, turf +315, platform +35 — three lines, summing to zero.
+Confirmed `raw_response` held neither card data nor credentials. Drafted a payout for the
+turf from its statement, marked it sent, and the turf's balance went to zero with
+`unbalanced_events()` still empty. The duplicate-IPN, tampered-amount and mismatched-
+`tran_id` cases are covered by `apps/payments/tests/test_callbacks.py` rather than by hand:
+a forged callback is not something to click through.
+
+**What the browser caught**
+
+- The IPN crashed on a non-UUID reference — a gateway sending junk, or a test doing so,
+  should get a 200 and be forgotten, not a 500 and a retry loop.
+- Marking the balance paid at the counter recorded a *second* cash payment for a booking
+  whose advance had already arrived through the gateway, so the ledger counted the money
+  twice. `mark_paid(..., record_payment=False)` is the settlement path's answer.
+- `cancel_order` told a delivered order it was "being prepared", because the status check
+  ran after the message was chosen.
+- The platform finance endpoint was untyped, so the generated client typed it `never` —
+  the same hole Phase 09 found in `/store/home`. It has a `PlatformFinanceSerializer`
+  now, and so does the turf statement.
+
+**Deviations / notes**
+
+- The ledger is double-entry *in the sense that counts* — every event's lines sum to zero
+  — not a full chart of accounts. Accounts are `platform`, `delivery` and `turf:<id>`,
+  which is what the payout statement and the platform dashboard need.
+- `Booking` now exposes `player_profile_id` and `is_mine`; the payment screens need to
+  know whose booking they are looking at, and a reader-relative flag is cheaper than a
+  second request.
+- `manage.py generate_vapid_keys` now mints a web-push key pair in the exact encoding the
+  browser wants, and `.env.example` documents every new variable — the Phase 09 entry
+  left "generate a pair" as an exercise, which is how a launch step gets skipped.
+- The e2e slot helpers moved into `e2e/support/booking.ts`. Repeated runs book real slots
+  that nothing releases, so every booking spec now hunts across turfs, days and grounds,
+  waits for the grid before deciding a ground is full, and retries when another worker
+  takes the slot first. Clerk's rate limit is also retried with backoff — a 429 after
+  fifty sign-ins says "later", not "your app is broken".
+
+**Known gaps / follow-ups**
+
+- **Credentials needed from you**, before this can be pointed at the real gateway:
+  a **SSLCommerz sandbox store ID and store password** (free, from their sandbox portal)
+  to replace the stub; and for live, a **merchant account** plus a **registered public IP
+  address** — SSLCommerz refuses refund API calls from unregistered IPs, so the server's
+  egress IP has to be declared to them. Set `SSLCOMMERZ_STORE_ID`,
+  `SSLCOMMERZ_STORE_PASSWORD` and `SSLCOMMERZ_SANDBOX`; with none set, the provider is
+  unavailable and only cash is offered.
+- bKash direct is not built. It goes behind `PaymentProvider` with no change above it.
+- Payout transfers are manual by decision (D61), not by omission.
+- SSE still needs an ASGI server in production (carried from Phase 09).
+- Live scoring (Phase 05 step 5b) is still not built, and still needs your confirmation.
 - django-storages is still not wired up (carried from Phase 02).
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.

@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { PayButton } from "@/components/payments/pay-button";
+
 import { BookingActions } from "./booking-actions";
 
 export default async function BookingPage({ params }: { params: Promise<{ bookingId: string }> }) {
@@ -23,6 +25,14 @@ export default async function BookingPage({ params }: { params: Promise<{ bookin
   if (!booking.data) notFound();
   const data = booking.data;
   const t = await getTranslations("bookingDetail");
+
+  // The advance is a turf setting, so it comes from the public turf record rather than
+  // from the booking itself.
+  const turf = await api.GET("/api/v1/turfs/{slug}", {
+    params: { path: { slug: data.turf_slug } },
+  });
+  const advancePercent = turf.data?.advance_percent ?? 0;
+  const advanceAmount = ((Number(data.price) * advancePercent) / 100).toFixed(2);
 
   // The API decides what staff may do; this only decides which buttons to render.
   const isStaff = (myTurfs.data?.results ?? []).some((turf) => turf.slug === data.turf_slug);
@@ -51,6 +61,37 @@ export default async function BookingPage({ params }: { params: Promise<{ bookin
       {data.status === "reserved" && data.expires_at && (
         <Card>
           <CardContent className="py-4 text-sm">{t("awaitingConfirmation")}</CardContent>
+        </Card>
+      )}
+
+      {/* Paying up front is what confirms a slot at a turf that asks for an advance,
+          whatever the player's record says (DECISIONS D8). */}
+      {data.is_mine && ["reserved", "confirmed"].includes(data.status) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">{t("payNow")}</CardTitle>
+            <p className="text-muted-foreground text-xs">
+              {advancePercent > 0 && data.status === "reserved"
+                ? t("advanceHint", { percent: advancePercent })
+                : t("payHint")}
+            </p>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {advancePercent > 0 && data.status === "reserved" && (
+              <PayButton
+                bookingId={String(data.id)}
+                kind="advance"
+                amount={advanceAmount}
+                label={t("payAdvance", { amount: advanceAmount })}
+              />
+            )}
+            <PayButton
+              bookingId={String(data.id)}
+              kind="full"
+              amount={data.price}
+              variant={advancePercent > 0 && data.status === "reserved" ? "outline" : "default"}
+            />
+          </CardContent>
         </Card>
       )}
 

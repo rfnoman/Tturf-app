@@ -442,13 +442,19 @@ def cancel_booking(
 
 
 @transaction.atomic
-def mark_paid(*, booking: Booking, actor=None, amount=None) -> Booking:
-    """``confirmed -> paid``: staff took the cash at the counter."""
+def mark_paid(*, booking: Booking, actor=None, amount=None, record_payment: bool = True) -> Booking:
+    """``confirmed -> paid``.
+
+    `record_payment` is False when the money arrived through a gateway: Phase 10 has
+    already written that `Payment` row and posted the ledger, and recording a second,
+    cash one here would double the turf's takings.
+    """
     _require(booking, (BookingStatus.CONFIRMED,), "marked paid")
 
-    from apps.payments.services import record_cash_payment
+    if record_payment:
+        from apps.payments.services import record_cash_payment
 
-    record_cash_payment(booking=booking, collected_by=actor, amount=amount)
+        record_cash_payment(booking=booking, collected_by=actor, amount=amount)
 
     previous = booking.status
     booking.status = BookingStatus.PAID

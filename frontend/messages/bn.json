@@ -16,7 +16,8 @@
     "findTurf": "টার্ফ",
     "squads": "স্কোয়াড",
     "store": "Store",
-    "activity": "Activity"
+    "activity": "Activity",
+    "payments": "Payments"
   },
   "auth": {
     "signIn": "সাইন ইন",
@@ -56,7 +57,8 @@
     "navTurfs": "টার্ফ পর্যালোচনা",
     "navConduct": "Conduct reports",
     "navWarehouse": "Warehouse",
-    "navOrders": "Store orders"
+    "navOrders": "Store orders",
+    "navFinance": "Finance"
   },
   "me": {
     "heading": "Backend session",
@@ -365,7 +367,8 @@
     "viewBookings": "বুকিং",
     "viewInventory": "Inventory",
     "openCounter": "Counter",
-    "viewOrders": "Orders"
+    "viewOrders": "Orders",
+    "viewFinance": "Finance"
   },
   "adminTurfs": {
     "heading": "টার্ফ",
@@ -434,7 +437,11 @@
     "notes": "নোট",
     "autoConfirmed": "Auto-confirmed",
     "myBookings": "আমার বুকিং",
-    "viewTurf": "টার্ফ দেখুন"
+    "viewTurf": "টার্ফ দেখুন",
+    "payNow": "Pay for it",
+    "payHint": "Pay online now, or cash at the turf.",
+    "advanceHint": "This turf asks for a {percent}% advance to confirm the slot.",
+    "payAdvance": "Pay the ৳{amount} advance"
   },
   "turfCalendar": {
     "body": "Today's bookings, the confirmation queue, and walk-ins.",
@@ -1045,5 +1052,53 @@
     "pushUnavailable": "Push is not set up on this server yet.",
     "pushFailed": "That did not work. Try again.",
     "failed": "That did not save. Try again."
+  },
+  "payments": {
+    "heading": "Payments",
+    "body": "Everything you have paid, and anything that came back.",
+    "empty": "You have not paid for anything yet.",
+    "payOnline": "Pay online",
+    "payAmount": "Pay ৳{amount}",
+    "starting": "Opening…",
+    "startFailed": "That could not be started. Try again.",
+    "doneHeading": "Paid",
+    "doneBody": "Thanks — that is settled.",
+    "notDoneHeading": "Not paid",
+    "notDoneBody": "Nothing was taken. You can try again whenever you like.",
+    "amount": "Amount",
+    "kind": "For",
+    "status": "Status",
+    "backToIt": "Back to it",
+    "allPayments": "All payments",
+    "refunded": "৳{amount} back"
+  },
+  "finance": {
+    "heading": "Finance",
+    "backToTurf": "Back to the turf",
+    "earned": "Earned this period",
+    "afterCommission": "After the platform's commission.",
+    "entryType": "{type, select, booking_fee {Bookings} sale {Sales} delivery_fee {Delivery} commission {Commission} refund {Refunds} payout {Paid out} other {{type}}}",
+    "payouts": "Payouts",
+    "noPayouts": "Nothing paid out yet.",
+    "download": "Download the statement",
+    "lines": "Every line",
+    "noLines": "Nothing in this period.",
+    "adminHeading": "Finance",
+    "adminBody": "What the platform has taken, and what it owes.",
+    "platformEarned": "Platform earnings",
+    "owedToTurfs": "Owed to turfs",
+    "deliveryFees": "Delivery fees",
+    "draftPayout": "Draft a payout",
+    "draftHint": "Works out what a turf is owed for a period. Sending it is a separate step.",
+    "turf": "Turf",
+    "from": "From",
+    "to": "To",
+    "draft": "Work it out",
+    "markSent": "Mark sent",
+    "reference": "Reference",
+    "referencePlaceholder": "bKash / bank ref",
+    "refunds": "Refunds",
+    "noRefunds": "No refunds.",
+    "failed": "That did not go through. Try again."
   }
 }

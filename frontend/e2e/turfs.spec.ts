@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 
 import { apiBaseUrl } from "./support/clerk-users";
+import { OPEN_SLOT, findOpenSlot } from "./support/booking";
 import { expect, requiresClerk, test } from "./support/fixtures";
 
 /**
@@ -66,26 +67,13 @@ test.describe("turf detail", () => {
     await page.goto("/turfs/dhanmondi-arena");
     await expect(page.getByRole("heading", { level: 1, name: "Dhanmondi Arena" })).toBeVisible();
 
-    // Tomorrow, so the whole day's slots are in the future whatever time the suite runs.
-    const tomorrow = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(
-      new Date(Date.now() + 86_400_000),
-    );
-    await page.getByLabel("Date").fill(tomorrow);
-
-    // A turf has several grounds and repeated runs can book one of them out for a day,
-    // so this picks the first ground that actually has a slot rather than assuming the
-    // default one does.
-    const open = page.locator("[data-slot-start][data-slot-available='true']");
-    const grounds = await page.locator("#ground option").count();
-    for (let index = 0; index < grounds; index += 1) {
-      const value = await page.locator("#ground option").nth(index).getAttribute("value");
-      await page.locator("#ground").selectOption(value);
-      if ((await open.count()) > 0) break;
-    }
+    // Repeated runs book this turf out, so the test looks for a day and ground that
+    // still has something free rather than asserting on tomorrow's default pitch.
+    expect(await findOpenSlot(page)).not.toBeNull();
 
     // Selected on the data hook, not on the text: once a slot is picked, the review
     // panel adds a "Book for ৳…" button that a price-based locator also matches.
-    const slot = open.first();
+    const slot = page.locator(OPEN_SLOT).first();
     await expect(slot).toBeVisible();
     await slot.click();
     await expect(slot).toHaveAttribute("aria-pressed", "true");

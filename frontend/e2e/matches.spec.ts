@@ -1,13 +1,8 @@
 import type { Page } from "@playwright/test";
 
+import { DEMO_TURFS, bookAFreeSlot } from "./support/booking";
 import { apiBaseUrl } from "./support/clerk-users";
 import { expect, requiresClerk, test } from "./support/fixtures";
-
-function dhakaDate(offsetDays = 0): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(
-    new Date(Date.now() + offsetDays * 86_400_000),
-  );
-}
 
 async function finishOnboarding(page: Page) {
   await page.goto("/onboarding");
@@ -21,13 +16,7 @@ async function finishOnboarding(page: Page) {
 
 /** Book a slot so the player organises a match. Returns the match id. */
 async function organiseAMatch(page: Page, slug: string): Promise<string> {
-  await page.goto(`/turfs/${slug}`);
-  await page.getByLabel("Date").fill(dhakaDate(2));
-
-  const slot = page.locator("[data-slot-start][data-slot-available='true']").first();
-  await slot.click();
-  await page.getByRole("button", { name: /^Book for/ }).click();
-  await expect(page).toHaveURL(/\/bookings\/[0-9a-f-]+$/);
+  await bookAFreeSlot(page, { turfs: [slug, ...DEMO_TURFS] });
 
   // The booking page links to nothing match-shaped yet, so the id comes from the API.
   return page.evaluate(async (base) => {

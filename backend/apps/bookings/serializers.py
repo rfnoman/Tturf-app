@@ -44,6 +44,9 @@ class BookingSerializer(serializers.ModelSerializer):
     # The turf's staff screens act on a person — renting gear out, attaching a counter
     # sale — and a name is not an identifier. Profile ids are what the API speaks (D39).
     player_profile_id = serializers.SerializerMethodField()
+    # Reader-relative: a turf's own staff can also be the player who booked, and the
+    # page needs to know which hat they are wearing before it offers to take money.
+    is_mine = serializers.SerializerMethodField()
     events = BookingEventSerializer(many=True, read_only=True)
     payments = PaymentSerializer(many=True, read_only=True)
     # Staff need to know which of their players is which; the booker's own view uses it
@@ -79,6 +82,7 @@ class BookingSerializer(serializers.ModelSerializer):
             "was_late_cancel",
             "player_name",
             "player_profile_id",
+            "is_mine",
             "booked_for_phone",
             "notes",
             "cancellation_free_hours",
@@ -92,6 +96,11 @@ class BookingSerializer(serializers.ModelSerializer):
     def get_player_profile_id(self, obj):
         profile = getattr(obj.booked_by, "player_profile", None)
         return profile.id if profile else None
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_is_mine(self, obj) -> bool:
+        user = getattr(self.context.get("request"), "user", None)
+        return bool(user and user.is_authenticated and obj.booked_by_id == user.id)
 
 
 class BookingCreateSerializer(serializers.Serializer):

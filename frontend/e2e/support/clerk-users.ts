@@ -25,17 +25,51 @@ export function clerkSecretKey(): string | undefined {
   return process.env.CLERK_SECRET_KEY;
 }
 
+/**
+ * Retry anything Clerk rejected for rate limiting.
+ *
+ * A full run signs in around fifty throwaway accounts within a couple of minutes, which
+ * is enough to exhaust a development instance's limit — more so when runs follow each
+ * other. A 429 says "later", not "no", so treating it as a failure reports a broken app
+ * when nothing is broken.
+ */
+export async function retryWhileRateLimited<T>(
+  what: string,
+  attempt: () => Promise<T>,
+): Promise<T> {
+  // Long waits on purpose: Clerk's limit is a sustained one, so a run that follows
+  // another closely needs the window to roll over rather than a quick second try.
+  const backoff = [3_000, 6_000, 12_000, 24_000, 45_000];
+  let last: unknown;
+
+  for (let tries = 0; ; tries += 1) {
+    try {
+      return await attempt();
+    } catch (error) {
+      last = error;
+      if (!/429|Too Many Requests/i.test(String(error)) || tries >= backoff.length) break;
+      await new Promise((resolve) => setTimeout(resolve, backoff[tries]));
+    }
+  }
+
+  throw new Error(`${what} kept hitting Clerk's rate limit: ${String(last)}`);
+}
+
 async function clerkRequest(path: string, init: RequestInit = {}): Promise<Response> {
   const secret = clerkSecretKey();
   if (!secret) throw new Error("CLERK_SECRET_KEY is required to manage test users.");
 
-  return fetch(`${CLERK_API}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${secret}`,
-      "Content-Type": "application/json",
-      ...init.headers,
-    },
+  return retryWhileRateLimited(`${init.method ?? "GET"} ${path}`, async () => {
+    const response = await fetch(`${CLERK_API}${path}`, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${secret}`,
+        "Content-Type": "application/json",
+        ...init.headers,
+      },
+    });
+    if (response.status === 429) throw new Error("429 Too Many Requests");
+    return response;
   });
 }
 

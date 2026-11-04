@@ -1,7 +1,13 @@
 import { test as base, type Page } from "@playwright/test";
 import { clerk } from "@clerk/testing/playwright";
 
-import { clerkSecretKey, createTestUser, deleteTestUser, type TestUser } from "./clerk-users";
+import {
+  clerkSecretKey,
+  createTestUser,
+  deleteTestUser,
+  retryWhileRateLimited,
+  type TestUser,
+} from "./clerk-users";
 
 /**
  * A page already signed in as a brand-new player.
@@ -28,7 +34,9 @@ export const test = base.extend<{ newPlayer: TestUser; signedInPage: Page }>({
     // Clerk's client only loads on a real page, and must be loaded before signing in.
     await page.goto("/");
     await clerk.loaded({ page });
-    await clerk.signIn({ page, emailAddress: newPlayer.identifier });
+    await retryWhileRateLimited(`signing in ${newPlayer.identifier}`, () =>
+      clerk.signIn({ page, emailAddress: newPlayer.identifier }),
+    );
     await use(page);
   },
 });

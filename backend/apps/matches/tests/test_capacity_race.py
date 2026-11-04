@@ -23,6 +23,12 @@ from .factories import make_match
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
+#: Generous on purpose. These threads are lining up to race, and a machine running the
+#: whole suite can be slow enough that a tight barrier times out before the race even
+#: starts — which fails a test that is about Postgres, not about scheduling.
+BARRIER_TIMEOUT = 60
+JOIN_TIMEOUT = 90
+
 
 def run_concurrently(targets):
     """Run callables on real threads, lined up so they genuinely collide."""
@@ -31,7 +37,7 @@ def run_concurrently(targets):
 
     def runner(fn):
         try:
-            barrier.wait(timeout=15)
+            barrier.wait(timeout=BARRIER_TIMEOUT)
             results.append(fn())
         except Exception as exc:
             results.append(exc)
@@ -42,7 +48,7 @@ def run_concurrently(targets):
     for thread in threads:
         thread.start()
     for thread in threads:
-        thread.join(timeout=30)
+        thread.join(timeout=JOIN_TIMEOUT)
     return results
 
 

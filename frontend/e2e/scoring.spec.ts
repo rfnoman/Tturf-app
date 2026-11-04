@@ -1,13 +1,8 @@
 import type { Page } from "@playwright/test";
 
+import { DEMO_TURFS, bookAFreeSlot } from "./support/booking";
 import { apiBaseUrl } from "./support/clerk-users";
 import { expect, requiresClerk, test } from "./support/fixtures";
-
-function dhakaDate(offsetDays = 0): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dhaka" }).format(
-    new Date(Date.now() + offsetDays * 86_400_000),
-  );
-}
 
 async function finishOnboarding(page: Page) {
   await page.goto("/onboarding");
@@ -22,34 +17,16 @@ async function finishOnboarding(page: Page) {
 /**
  * Book a slot so this player organises a match of their own. Returns the match id.
  *
- * The day differs per test and project, and the slot is picked at random.
+ * The named turf is only a preference: `bookAFreeSlot` moves on to another turf, day or
+ * ground when that one has nothing free, which it eventually does because every run of
+ * this suite leaves real bookings behind.
  */
 async function organiseAMatch(
   page: Page,
   slug: string,
-  { dayOffset = 2, sport }: { dayOffset?: number; sport?: string } = {},
+  { sport }: { sport?: string } = {},
 ): Promise<string> {
-  // The two projects run the same specs against one database at the same time, so they
-  // book different days as well as different slots: two of them reaching for the same
-  // slot is a 409, which is correct behaviour and a useless test failure.
-  const shift = test.info().project.name === "mobile" ? 3 : 0;
-
-  await page.goto(`/turfs/${slug}`);
-  await page.getByLabel("Date").fill(dhakaDate(dayOffset + shift));
-
-  if (sport) {
-    // A turf hosts several grounds and the picker defaults to the first, which is not
-    // necessarily the sport whose validator a test is about.
-    const option = page.locator("#ground option").filter({ hasText: sport }).first();
-    await page.getByLabel("Ground").selectOption(await option.getAttribute("value"));
-  }
-
-  const open = page.locator("[data-slot-start][data-slot-available='true']");
-  await expect(open.first()).toBeVisible();
-  const slot = open.nth(Math.floor(Math.random() * (await open.count())));
-  await slot.click();
-  await page.getByRole("button", { name: /^Book for/ }).click();
-  await expect(page).toHaveURL(/\/bookings\/[0-9a-f-]+$/);
+  await bookAFreeSlot(page, { turfs: [slug, ...DEMO_TURFS], sport });
 
   return page.evaluate(async (base) => {
     const token = await (
@@ -80,7 +57,6 @@ test.describe("scorecard", () => {
   }) => {
     await finishOnboarding(page);
     const matchId = await organiseAMatch(page, "dhanmondi-arena", {
-      dayOffset: 2,
       sport: "Football",
     });
 
@@ -106,7 +82,6 @@ test.describe("scorecard", () => {
   test("goals that beat the team's score are rejected", async ({ signedInPage: page }) => {
     await finishOnboarding(page);
     const matchId = await organiseAMatch(page, "dhanmondi-arena", {
-      dayOffset: 3,
       sport: "Football",
     });
 
@@ -128,7 +103,7 @@ test.describe("scorecard", () => {
 
   test("a card that is not locked has no public page", async ({ signedInPage: page }) => {
     await finishOnboarding(page);
-    const matchId = await organiseAMatch(page, "banani-sports-hub", { dayOffset: 4 });
+    const matchId = await organiseAMatch(page, "banani-sports-hub");
 
     const response = await page.goto(`/scorecards/${matchId}`);
     expect(response?.status()).toBe(404);

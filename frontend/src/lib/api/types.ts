@@ -98,6 +98,13 @@ export type FitnessDashboard = Schemas["Dashboard"];
 export type Bundle = Schemas["Bundle"];
 export type StoreHome = Schemas["StoreHome"];
 export type ReminderPreference = Schemas["ReminderPreference"];
+
+export type PaymentDetail = Schemas["PaymentDetail"];
+export type Refund = Schemas["Refund"];
+export type RefundPolicy = Schemas["RefundPolicy"];
+export type LedgerEntry = Schemas["LedgerEntry"];
+export type Payout = Schemas["Payout"];
+export type Statement = Schemas["Statement"];
 export type LeaderboardEntry = Schemas["LeaderboardEntry"];
 
 /**

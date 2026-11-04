@@ -307,6 +307,11 @@ SPECTACULAR_SETTINGS = {
         "ActivitySourceEnum": "apps.fitness.models.ACTIVITY_SOURCE_CHOICES",
         "FitnessGoalTypeEnum": "apps.fitness.models.FITNESS_GOAL_TYPE_CHOICES",
         "BundleOccasionEnum": "apps.fitness.models.BUNDLE_OCCASION_CHOICES",
+        "PaymentKindEnum": "apps.payments.models.PAYMENT_KIND_CHOICES",
+        "RefundStatusEnum": "apps.payments.models.REFUND_STATUS_CHOICES",
+        "LedgerAccountEnum": "apps.payments.models.LEDGER_ACCOUNT_CHOICES",
+        "LedgerEntryTypeEnum": "apps.payments.models.LEDGER_ENTRY_TYPE_CHOICES",
+        "PayoutStatusEnum": "apps.payments.models.PAYOUT_STATUS_CHOICES",
         "PlayerPreferredSideEnum": "apps.players.models.PLAYER_PREFERRED_SIDE_CHOICES",
         "NotificationKindEnum": "apps.notifications.models.NotificationKind.choices",
         "MatchStatusEnum": "apps.matches.models.MatchStatus.choices",
@@ -413,6 +418,27 @@ FITNESS_HYDRATION_LEAD_HOURS = 2
 #: Default quiet hours, Dhaka time, when a player has not set their own.
 FITNESS_QUIET_FROM = "22:00"
 FITNESS_QUIET_UNTIL = "07:00"
+
+# Payments (DOMAIN §5, §12; DECISIONS D8).
+#: Default advance when a turf has not set one of its own. Zero keeps Phase 03's
+#: cash-only behaviour until a turf opts in.
+BOOKING_DEFAULT_ADVANCE_PERCENT = env.int("BOOKING_DEFAULT_ADVANCE_PERCENT", default=25)
+#: What the platform takes when no commission plan says otherwise.
+DEFAULT_BOOKING_COMMISSION_PERCENT = env("DEFAULT_BOOKING_COMMISSION_PERCENT", default="10.00")
+DEFAULT_SALES_COMMISSION_PERCENT = env("DEFAULT_SALES_COMMISSION_PERCENT", default="5.00")
+
+# SSLCommerz (DECISIONS D8). Sandbox by default; a store id is all that switches it on.
+SSLCOMMERZ_STORE_ID = env("SSLCOMMERZ_STORE_ID", default="")
+SSLCOMMERZ_STORE_PASSWORD = env("SSLCOMMERZ_STORE_PASSWORD", default="")
+SSLCOMMERZ_SANDBOX = env.bool("SSLCOMMERZ_SANDBOX", default=True)
+#: Development escape hatch: point the provider at a local stand-in so the payment path
+#: can be exercised without sandbox credentials. Empty in every real environment.
+SSLCOMMERZ_BASE_URL = env("SSLCOMMERZ_BASE_URL", default="")
+#: Where the gateway sends the player back to. The IPN goes to the API instead.
+PAYMENT_RETURN_BASE_URL = env("PAYMENT_RETURN_BASE_URL", default="http://localhost:3000")
+#: The API's own public address, which is where a gateway posts its IPN. It has to be
+#: reachable from the internet in production — localhost works only against a tunnel.
+API_PUBLIC_BASE_URL = env("API_PUBLIC_BASE_URL", default="http://localhost:8000")
 
 # Web push (DECISIONS D55). Unset in development and CI, where push is skipped.
 VAPID_PUBLIC_KEY = env("VAPID_PUBLIC_KEY", default="")
