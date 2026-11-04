@@ -294,7 +294,15 @@ export function BookingPanel({
             {t("payCash")} {t("cancellationPolicy", { hours: cancellationFreeHours })}
           </p>
 
-          <Button size="sm" className="self-start" disabled={booking} onClick={confirmBooking}>
+          {/* The label carries the price and is translated, so the tests reach for this
+              rather than its words (Phase 11 step 9). */}
+          <Button
+            size="sm"
+            data-testid="confirm-booking"
+            className="self-start"
+            disabled={booking}
+            onClick={confirmBooking}
+          >
             {booking ? t("booking") : t("confirmBooking", { price: chosen.price ?? "—" })}
           </Button>
         </div>
