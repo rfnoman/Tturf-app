@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (steps 1-6 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; observability; admin dashboard and support lookup |
+| 11 Hardening, Bangla, launch | **in progress** (steps 1-7 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; performance; security; observability; admin tools; policy pages |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1512,3 +1512,58 @@ nothing rather than as a zero, which is the chart's whole job.
   page, not to that turf's own numbers.
 - The dashboard has no query budget (step 3's tests cover four endpoints); it is
   admin-only and read a few times a day, so it is low on the list.
+
+### Phase 11 — step 7 of 9: policies and content (2026-11-04)
+
+**Built**
+
+Four policy pages at `/legal/…`, public and linked from a new footer on every page:
+
+- **Cancellation and refund policy.** Every rule in it is the one the code actually
+  applies — `refund_due()` is the implementation of this document, and if the two ever
+  disagree the code is the bug. This is also the URL SSLCommerz asks for during merchant
+  onboarding, which is why it has to resolve without an account.
+- **Privacy policy**, written from what the code stores and sends rather than from a
+  template. It can say "your email address is never used as your name" and "request
+  bodies are never sent to our error reporter" because steps 4 and 5 made both true.
+- **Terms of use**, including the thing that most needed saying plainly: we are the
+  platform, not the turf, and playing sport is at your own risk.
+- **Turf owner agreement**: commission, payouts, and that a turf cancelling on a player
+  refunds them in full out of that turf's own earnings.
+
+**Each page is authoritative in English with a Bangla summary** (D69), and says so in
+Bangla. Translating binding terms produces two documents that can disagree, and without
+a Bangladeshi lawyer reading both versions there is no way to know when they do — worse
+than one document plus an honest summary telling a reader what it says.
+
+**No cookie consent banner** (D70), and that is a decision rather than an omission: the
+only cookies set are the sign-in session and the language choice, both strictly necessary.
+There are no advertising or analytics cookies and no cross-site tracking, so a banner
+would ask permission for something that is not happening and train people to dismiss a
+dialogue without reading it. The privacy policy says what is set and why instead.
+
+The prose lives in `src/content/legal/`, not in `messages/*.json` — those files are the
+UI string catalogue where the key-parity and ICU-argument tests earn their keep, and
+three thousand words of prose would drown both.
+
+**Verified in the browser** (Chrome DevTools, production build, Bangla locale): the
+refund policy renders with its Bangla summary panel above the English text, the Bengali
+set in Hind Siliguri, and the "if these disagree, the English governs" line in Bangla
+underneath. Signed out, all four resolve; an unknown slug is a 404 rather than a blank
+page. Six Playwright tests cover exactly that, because "a player can read it before
+deciding to pay" is the property that matters, not the prose.
+
+**Deviations / notes**
+
+- "Last updated" and the footer are UI chrome and follow the reader's language; the
+  document body does not, by design.
+
+**Known gaps / follow-ups**
+
+- **These drafts have not been reviewed by a lawyer, and must be before launch.** They
+  are written to be accurate about what the software does, which is the part I can be
+  sure of; whether they are sufficient under Bangladeshi consumer and data protection law
+  is not something to assume. This is a launch blocker, listed here so it is not quietly
+  skipped.
+- The company's legal name, address and a support contact are not in them yet — they need
+  to be, and they are facts I do not have.

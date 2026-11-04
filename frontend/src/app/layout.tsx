@@ -7,6 +7,7 @@ import { getLocale } from "next-intl/server";
 
 import { InstallPrompt } from "@/components/layout/install-prompt";
 import { RegisterServiceWorker } from "@/components/layout/register-service-worker";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 
 import { Providers } from "./providers";
@@ -58,17 +59,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} className={bengali.variable} suppressHydrationWarning>
-      <body className="bg-background text-foreground min-h-dvh antialiased">
+      <body className="bg-background text-foreground flex min-h-dvh flex-col antialiased">
         {/* ClerkProvider belongs inside <body>, not wrapping <html>. */}
         <ClerkProvider nonce={nonce}>
           <NextIntlClientProvider>
             <Providers>
               <RegisterServiceWorker />
               <SiteHeader />
-              <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8">
+              <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8">
                 <InstallPrompt />
                 {children}
               </main>
+              <SiteFooter />
             </Providers>
           </NextIntlClientProvider>
         </ClerkProvider>
