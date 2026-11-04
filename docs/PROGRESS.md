@@ -1756,3 +1756,33 @@ the CI workflow and the runbook — and touched no account and no infrastructure
 
 **The numbers**: 1517 backend tests, 27 Vitest, 143 Playwright (including the eight
 launch journeys), 71 decisions recorded, 11 phases.
+
+### Phase 11 — two things CI caught that local runs did not (2026-11-04)
+
+**The catalogue seed broke every database built from migrations.**
+
+Step 1 added `label_bn` / `name_bn` columns to the sports and product catalogues and
+wrote them in `sync_catalogue()`. That function has two callers, and the second is a
+**data migration** — which runs *today's* code against *that migration's* schema. The
+column does not exist there, so `update_or_create` raised
+`FieldError: Invalid field name(s) for model Attribute: 'label_bn'` and **1548 tests
+errored**.
+
+Every local run passed, because `pytest` reuses an existing test database and only
+`--create-db` rebuilds it from migrations. CI uses `--create-db`; that is the whole
+reason it does.
+
+The fix is `only_existing(model, values)`: drop the keys the given model has no field
+for. The catalogue can now gain a column without breaking the migration that seeds it,
+and without that migration having to be rewritten each time. The same filter is applied
+to the inventory categories, which had the identical hazard and had not fired yet.
+
+The lesson is worth more than the fix: **a data migration is not a place for current
+code**, and `--create-db` is not an optimisation to skip — it is the only run that tests
+the path a real deployment takes.
+
+**The deploy workflow was armed.** Added in step 8 with `push: branches: [main]`, it
+fired on the next merge. It could not have deployed anything — there are no secrets and
+no app — but you had said not to deploy, and a workflow aimed at infrastructure that does
+not exist is noise at best. It is now `workflow_dispatch` only, with the trigger to add
+back written in the file and in `docs/DEPLOYMENT.md`.
