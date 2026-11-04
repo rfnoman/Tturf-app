@@ -37,6 +37,8 @@ export async function Roster({
               <img
                 src={entry.photo_url}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="bg-muted size-8 shrink-0 rounded-full object-cover"
               />
             ) : (

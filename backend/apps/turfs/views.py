@@ -5,6 +5,7 @@ from datetime import date as date_type
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.shortcuts import get_object_or_404
+from django.utils.translation import get_language
 from drf_spectacular.utils import OpenApiParameter, extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -13,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.cache import PUBLIC_TTL, cached
 from apps.core.permissions import IsPlatformAdmin
 from apps.core.utils import DHAKA, now
 
@@ -150,6 +152,26 @@ class TurfViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gen
             return _drf_error(exc)
         except ValueError:
             return Response({"radius_km": "Must be a number."}, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, *args, **kwargs):
+        """One turf, cached per slug and per language.
+
+        This is the page a shared link opens, it is the same answer for everybody, and
+        it joins grounds, hours, prices and amenities to build it. The *list* is not
+        cached: its `near=` variant is keyed by the caller's coordinates, so the key
+        space is unbounded and the hit rate would be roughly zero.
+
+        Invalidation is a signal on every model that feeds the page (`signals.py`), not
+        a call at each of the dozen places that edit one — which is the version that
+        still works after somebody adds a thirteenth.
+        """
+        slug = kwargs[self.lookup_field]
+        key = f"{slug}:{get_language() or 'en'}"
+
+        def build():
+            return super(TurfViewSet, self).retrieve(request, *args, **kwargs).data
+
+        return Response(cached("turfs", key, PUBLIC_TTL, build))
 
 
 class AmenityListView(APIView):

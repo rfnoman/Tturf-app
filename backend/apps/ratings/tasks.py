@@ -10,6 +10,7 @@ from django.conf import settings
 from django.db import transaction
 from django.utils.timezone import now
 
+from apps.core.cache import invalidate
 from apps.players.models import PlayerSportRating
 from apps.sports.models import Sport, StatDefinition
 from apps.turfs.models import Turf
@@ -166,4 +167,7 @@ def rebuild_leaderboards() -> int:
                         )
 
     logger.info("Leaderboards rebuilt", extra={"rows": written, "at": str(now())})
+
+    # Every cached board is now a stale copy of a table that just changed.
+    invalidate("leaderboard")
     return written

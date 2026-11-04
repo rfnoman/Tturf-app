@@ -211,6 +211,8 @@ function ResultCard({ player }: { player: PlayerSearchResult }) {
         <img
           src={player.photo_url}
           alt=""
+          loading="lazy"
+          decoding="async"
           className="bg-muted size-11 shrink-0 rounded-full object-cover"
         />
       ) : (
