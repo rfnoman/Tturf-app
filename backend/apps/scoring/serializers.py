@@ -109,7 +109,7 @@ class ScorecardSerializer(serializers.ModelSerializer):
     """The scorecard as everyone sees it, plus what *this* reader may do with it."""
 
     match_id = serializers.UUIDField(source="match.id", read_only=True)
-    sport = serializers.CharField(source="match.sport.name", read_only=True)
+    sport = serializers.CharField(source="match.sport.display_name", read_only=True)
     sport_slug = serializers.CharField(source="match.sport.slug", read_only=True)
     turf_name = serializers.CharField(source="match.booking.ground.turf.name", read_only=True)
     ground_name = serializers.CharField(source="match.booking.ground.name", read_only=True)

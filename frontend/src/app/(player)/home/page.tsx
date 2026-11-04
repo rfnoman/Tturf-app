@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { StreakBadge } from "@/components/fitness/streak-badge";
@@ -7,6 +7,7 @@ import { WeekRing } from "@/components/fitness/week-ring";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatWhen } from "@/i18n/formats";
 
 export const metadata = { title: "Home · TurfApp" };
 
@@ -25,6 +26,7 @@ export default async function HomePage() {
   ]);
 
   const t = await getTranslations("fitness");
+  const locale = await getLocale();
   const week = dashboard.data?.week;
   const goals = dashboard.data?.goals ?? [];
   const nextMatch = (mine.data ?? [])[0];
@@ -36,15 +38,7 @@ export default async function HomePage() {
     ? await api.GET("/api/v1/bundles", { params: { query: { match: String(nextMatch.id) } } })
     : { data: [] };
 
-  const when = (value: string) =>
-    new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Dhaka",
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(value));
+  const when = (value: string) => formatWhen(value, locale, "full");
 
   return (
     <div className="flex flex-col gap-6" data-testid="home-dashboard">

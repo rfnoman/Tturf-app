@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import type { MatchSummary } from "@/lib/api/types";
 import { Badge } from "@/components/ui/badge";
 import { ratingTone } from "@/components/player/rating";
+import { Money } from "@/components/ui/money";
+import { formatWhen } from "@/i18n/formats";
 
 /**
  * One match on the board (DOMAIN §6).
@@ -13,15 +15,9 @@ import { ratingTone } from "@/components/player/rating";
  */
 export async function MatchCard({ match }: { match: MatchSummary }) {
   const t = await getTranslations("board");
+  const locale = await getLocale();
 
-  const when = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Dhaka",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(match.starts_at));
+  const when = formatWhen(match.starts_at, locale, "full");
 
   return (
     <Link
@@ -63,7 +59,7 @@ export async function MatchCard({ match }: { match: MatchSummary }) {
           ) : (
             <span className="text-muted-foreground">{t("unrated")}</span>
           )}
-          <span className="font-mono tabular-nums">৳{match.price}</span>
+          <Money amount={match.price} />
         </div>
       </div>
     </Link>

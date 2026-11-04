@@ -9,13 +9,28 @@ export type ApiClient = Client<paths>;
 export type TokenGetter = () => Promise<string | null | undefined>;
 
 /**
+ * Tells the API which language to label catalogue rows in.
+ *
+ * Sports and product categories are stored with a Bangla column and resolved per
+ * request by Django's `LocaleMiddleware` (DECISIONS D63), so the locale has to travel
+ * with the call. Everything else in the API is language-neutral.
+ */
+function languageHeader(locale: string | undefined): string {
+  return locale === "bn" ? "bn,en;q=0.8" : "en";
+}
+
+/**
  * Build a typed client that attaches a Clerk session token to every request.
  *
  * The token source is injected rather than imported so one implementation serves both
  * sides of the app: `useApiClient()` passes the browser's `useAuth().getToken`, and
  * `getServerApiClient()` passes the server's `(await auth()).getToken`.
  */
-export function createApiClient(getToken: TokenGetter, baseUrl: string = API_BASE_URL): ApiClient {
+export function createApiClient(
+  getToken: TokenGetter,
+  baseUrl: string = API_BASE_URL,
+  locale?: string,
+): ApiClient {
   const client = createClient<paths>({ baseUrl });
 
   const auth: Middleware = {
@@ -24,6 +39,7 @@ export function createApiClient(getToken: TokenGetter, baseUrl: string = API_BAS
       if (token) {
         request.headers.set("Authorization", `Bearer ${token}`);
       }
+      request.headers.set("Accept-Language", languageHeader(locale));
       return request;
     },
   };
@@ -33,6 +49,13 @@ export function createApiClient(getToken: TokenGetter, baseUrl: string = API_BAS
 }
 
 /** A client for endpoints that need no credentials (health, public listings). */
-export function createPublicApiClient(baseUrl: string = API_BASE_URL): ApiClient {
-  return createClient<paths>({ baseUrl });
+export function createPublicApiClient(baseUrl: string = API_BASE_URL, locale?: string): ApiClient {
+  const client = createClient<paths>({ baseUrl });
+  client.use({
+    async onRequest({ request }) {
+      request.headers.set("Accept-Language", languageHeader(locale));
+      return request;
+    },
+  });
+  return client;
 }

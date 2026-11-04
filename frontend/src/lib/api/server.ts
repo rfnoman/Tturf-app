@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { getLocale } from "next-intl/server";
 
 import { type ApiClient, createApiClient } from "./client";
 
@@ -10,5 +11,5 @@ import { type ApiClient, createApiClient } from "./client";
  */
 export async function getServerApiClient(): Promise<ApiClient> {
   const { getToken } = await auth();
-  return createApiClient(getToken);
+  return createApiClient(getToken, undefined, await getLocale());
 }

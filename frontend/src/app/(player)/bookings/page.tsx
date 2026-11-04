@@ -5,6 +5,7 @@ import { getServerApiClient } from "@/lib/api/server";
 import { BookingStatusBadge } from "@/components/booking/booking-status";
 import { BookingTime } from "@/components/booking/booking-time";
 import { Card, CardContent } from "@/components/ui/card";
+import { Money } from "@/components/ui/money";
 
 export const metadata = { title: "My bookings · TurfApp" };
 
@@ -78,7 +79,7 @@ export default async function MyBookingsPage({
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <BookingStatusBadge status={booking.status} label={booking.status_label} />
-                    <span className="font-mono text-sm tabular-nums">৳{booking.price}</span>
+                    <Money amount={booking.price} className="text-sm" />
                   </div>
                 </div>
               </Link>

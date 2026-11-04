@@ -7,20 +7,50 @@ it. Prices are realistic Dhaka counter prices in BDT.
 from __future__ import annotations
 
 CATEGORIES = [
-    {"slug": "drinks", "label": "Drinks", "icon": "🥤", "order": 1, "is_consumable": True},
-    {"slug": "food", "label": "Food", "icon": "🍌", "order": 2, "is_consumable": True},
+    {
+        "slug": "drinks",
+        "label": "Drinks",
+        "label_bn": "পানীয়",
+        "icon": "🥤",
+        "order": 1,
+        "is_consumable": True,
+    },
+    {
+        "slug": "food",
+        "label": "Food",
+        "label_bn": "খাবার",
+        "icon": "🍌",
+        "order": 2,
+        "is_consumable": True,
+    },
     {
         "slug": "supplements",
         "label": "Supplements",
+        "label_bn": "সাপ্লিমেন্ট",
         "icon": "💪",
         "order": 3,
         "is_consumable": True,
     },
-    {"slug": "gear", "label": "Gear", "icon": "⚽", "order": 4, "is_consumable": False},
-    {"slug": "apparel", "label": "Apparel", "icon": "👕", "order": 5, "is_consumable": False},
+    {
+        "slug": "gear",
+        "label": "Gear",
+        "label_bn": "সরঞ্জাম",
+        "icon": "⚽",
+        "order": 4,
+        "is_consumable": False,
+    },
+    {
+        "slug": "apparel",
+        "label": "Apparel",
+        "label_bn": "পোশাক",
+        "icon": "👕",
+        "order": 5,
+        "is_consumable": False,
+    },
     {
         "slug": "accessories",
         "label": "Accessories",
+        "label_bn": "আনুষঙ্গিক",
         "icon": "🧦",
         "order": 6,
         "is_consumable": False,
@@ -28,6 +58,7 @@ CATEGORIES = [
     {
         "slug": "rental",
         "label": "Rental gear",
+        "label_bn": "ভাড়ার সরঞ্জাম",
         "icon": "🎽",
         "order": 7,
         "is_consumable": False,
@@ -214,6 +245,7 @@ def sync_categories(registry) -> dict:
             slug=row["slug"],
             defaults={
                 "label": row["label"],
+                "label_bn": row.get("label_bn", ""),
                 "icon": row["icon"],
                 "order": row["order"],
                 "is_consumable": row["is_consumable"],

@@ -1,8 +1,9 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { cn } from "cn";
 
 import type { RatingChange } from "@/lib/api/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatWhen } from "@/i18n/formats";
 
 /**
  * The rating line, and what moved it.
@@ -12,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  */
 export async function RatingHistory({ changes }: { changes: RatingChange[] }) {
   const t = await getTranslations("ratingHistory");
+  const locale = await getLocale();
   if (changes.length === 0) return null;
 
   // Oldest first for the line; the list underneath stays newest-first.
@@ -62,11 +64,7 @@ export async function RatingHistory({ changes }: { changes: RatingChange[] }) {
                 <span className="truncate">
                   {change.turf_name}
                   <span className="text-muted-foreground ml-1.5 text-xs">
-                    {new Intl.DateTimeFormat("en-GB", {
-                      timeZone: "Asia/Dhaka",
-                      day: "numeric",
-                      month: "short",
-                    }).format(new Date(change.played_at))}
+                    {formatWhen(change.played_at, locale, "dayMonth")}
                   </span>
                 </span>
                 <span

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { ConductReport } from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
@@ -10,10 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { formatWhen } from "@/i18n/formats";
 
 /** Uphold or dismiss, with a note. Upholding is what moves a fair-play score. */
 export function ConductQueue({ reports }: { reports: ConductReport[] }) {
   const t = useTranslations("adminConduct");
+  const locale = useLocale();
   const router = useRouter();
   const api = useApiClient();
 
@@ -59,13 +61,7 @@ export function ConductQueue({ reports }: { reports: ConductReport[] }) {
                 </CardTitle>
                 <p className="text-muted-foreground mt-1 text-xs">
                   {t("by", { name: report.reporter_name })} · {report.match_summary} ·{" "}
-                  {new Intl.DateTimeFormat("en-GB", {
-                    timeZone: "Asia/Dhaka",
-                    day: "numeric",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(report.created_at))}
+                  {formatWhen(report.created_at, locale, "dayMonthTime")}
                 </p>
               </div>
               <Badge variant="outline">{report.reason_label}</Badge>

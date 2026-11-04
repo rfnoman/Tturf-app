@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { PayButton } from "@/components/payments/pay-button";
+import { Money } from "@/components/ui/money";
 
 import { BookingActions } from "./booking-actions";
 
@@ -51,7 +52,7 @@ export default async function BookingPage({ params }: { params: Promise<{ bookin
         </div>
         <div className="flex flex-col items-end gap-2">
           <BookingStatusBadge status={data.status} label={data.status_label} />
-          <span className="font-mono text-lg font-semibold tabular-nums">৳{data.price}</span>
+          <Money amount={data.price} className="text-lg font-semibold" />
           {data.price_label && (
             <span className="text-muted-foreground text-xs">{data.price_label}</span>
           )}

@@ -112,7 +112,7 @@ def sport_totals(*, profile: PlayerProfile, sport: Sport | None = None) -> dict:
 
     return {
         row.sport.slug: {
-            "sport": row.sport.name,
+            "sport": row.sport.display_name,
             "matches": row.matches,
             "wins": row.wins,
             "draws": row.draws,
@@ -138,7 +138,7 @@ def track_record(*, profile: PlayerProfile, sport: Sport | None = None) -> list[
             "turf_name": row.turf.name,
             "turf_slug": row.turf.slug,
             "ground_name": row.ground.name,
-            "sport": row.sport.name,
+            "sport": row.sport.display_name,
             "matches": row.matches,
             "wins": row.wins,
             "draws": row.draws,

@@ -35,10 +35,6 @@
     "ctaPlay": "Find a match",
     "ctaOwner": "List your turf"
   },
-  "player": {
-    "heading": "Your matches",
-    "empty": "Nothing booked yet. Bookings arrive in Phase 03."
-  },
   "owner": {
     "heading": "Turf dashboard",
     "body": "Your turfs, their review status, and the staff who run them.",
@@ -51,7 +47,7 @@
   },
   "admin": {
     "heading": "Platform admin",
-    "empty": "Review queues arrive in Phase 02.",
+    "empty": "Every review queue the platform runs, in one place.",
     "forbidden": "You need platform administrator access to view this page.",
     "navSports": "Sports catalogue",
     "navTurfs": "Turf review",
@@ -217,7 +213,6 @@
     "kmAway": "{km} km away",
     "priceFrom": "from ৳{price}",
     "groundCount": "{count, plural, one {# ground} other {# grounds}}",
-    "taka": "৳{price}",
     "availability": "Availability",
     "availabilityHint": "Pick a ground and a date to see what is open and what it costs.",
     "ground": "Ground",
@@ -225,7 +220,6 @@
     "loadingSlots": "Loading slots…",
     "noSlots": "The turf is closed on this date.",
     "noGrounds": "No bookable grounds yet.",
-    "selectedSlot": "{time} · ৳{price}",
     "openingHours": "Opening hours",
     "closed": "Closed",
     "amenities": "Amenities",

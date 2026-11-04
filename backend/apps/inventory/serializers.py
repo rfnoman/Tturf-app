@@ -17,6 +17,9 @@ from .models import (
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
+    # The reader's language, not the row's (DECISIONS D63).
+    label = serializers.CharField(source="display_label", read_only=True)
+
     class Meta:
         model = ProductCategory
         fields = ["id", "slug", "label", "icon", "order", "is_consumable"]

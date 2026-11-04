@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import type { SquadMember } from "@/lib/api/types";
 import { getServerApiClient } from "@/lib/api/server";
@@ -8,8 +8,10 @@ import { Roster } from "@/components/match/roster";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Money } from "@/components/ui/money";
 
 import { MatchActions } from "./match-actions";
+import { formatWhen } from "@/i18n/formats";
 
 export default async function MatchPage({ params }: { params: Promise<{ matchId: string }> }) {
   const { matchId } = await params;
@@ -21,6 +23,7 @@ export default async function MatchPage({ params }: { params: Promise<{ matchId:
   if (!data) notFound();
 
   const t = await getTranslations("matchPage");
+  const locale = await getLocale();
 
   // Who this reader could invite: their squad-mates who are not already playing.
   // Full player search arrives in Phase 06.
@@ -43,14 +46,7 @@ export default async function MatchPage({ params }: { params: Promise<{ matchId:
     invitable = invitable.slice(0, 50);
   }
 
-  const when = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Dhaka",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(data.starts_at));
+  const when = formatWhen(data.starts_at, locale, "full");
 
   return (
     <div className="flex flex-col gap-6">
@@ -78,7 +74,7 @@ export default async function MatchPage({ params }: { params: Promise<{ matchId:
           </div>
         </div>
         <div className="text-right">
-          <p className="font-mono text-lg font-semibold tabular-nums">৳{data.price}</p>
+          <Money amount={data.price} className="text-lg font-semibold" />
           <p className="text-muted-foreground text-xs">
             {t("organisedBy", { name: data.organiser_name })}
           </p>

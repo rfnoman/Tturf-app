@@ -23,6 +23,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
+from apps.core.utils import in_readers_language
 
 
 class Attribute(BaseModel):
@@ -34,6 +35,12 @@ class Attribute(BaseModel):
 
     key = models.SlugField(_("key"), max_length=32, unique=True)
     label = models.CharField(_("label"), max_length=64)
+    label_bn = models.CharField(
+        _("label (Bangla)"),
+        max_length=64,
+        blank=True,
+        help_text="Shown to Bangla readers. Blank falls back to the English label.",
+    )
     description = models.CharField(_("description"), max_length=200, blank=True)
     order = models.PositiveSmallIntegerField(_("display order"), default=0)
 
@@ -45,9 +52,20 @@ class Attribute(BaseModel):
     def __str__(self) -> str:
         return self.label
 
+    @property
+    def display_label(self) -> str:
+        """The label in the reader's language. Serializers expose this, never `label`."""
+        return in_readers_language(self, "label")
+
 
 class Sport(BaseModel):
     name = models.CharField(_("name"), max_length=80, unique=True)
+    name_bn = models.CharField(
+        _("name (Bangla)"),
+        max_length=80,
+        blank=True,
+        help_text="Shown to Bangla readers. Blank falls back to the English name.",
+    )
     slug = models.SlugField(_("slug"), max_length=80, unique=True)
     description = models.TextField(_("description"), blank=True)
     icon = models.CharField(
@@ -84,12 +102,23 @@ class Sport(BaseModel):
     def __str__(self) -> str:
         return self.name
 
+    @property
+    def display_name(self) -> str:
+        """The name in the reader's language. Serializers expose this, never `name`."""
+        return in_readers_language(self)
+
 
 class SportFormat(BaseModel):
     """A way of playing a sport, e.g. football 5v5 or cricket nets."""
 
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="formats")
     name = models.CharField(_("name"), max_length=60)
+    name_bn = models.CharField(
+        _("name (Bangla)"),
+        max_length=60,
+        blank=True,
+        help_text="Shown to Bangla readers. Blank falls back to the English name.",
+    )
     slug = models.SlugField(_("slug"), max_length=60)
     players_per_side = models.PositiveSmallIntegerField(
         _("players per side"),
@@ -113,6 +142,11 @@ class SportFormat(BaseModel):
     @property
     def capacity(self) -> int:
         return self.players_per_side * 2
+
+    @property
+    def display_name(self) -> str:
+        """The name in the reader's language. Serializers expose this, never `name`."""
+        return in_readers_language(self, "name")
 
 
 class SportAttributeWeight(BaseModel):
@@ -149,6 +183,12 @@ class SportSkill(BaseModel):
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="skills")
     key = models.SlugField(_("key"), max_length=40)
     label = models.CharField(_("label"), max_length=64)
+    label_bn = models.CharField(
+        _("label (Bangla)"),
+        max_length=64,
+        blank=True,
+        help_text="Shown to Bangla readers. Blank falls back to the English label.",
+    )
     description = models.CharField(_("description"), max_length=200, blank=True)
     weight = models.DecimalField(
         _("weight"),
@@ -173,6 +213,11 @@ class SportSkill(BaseModel):
     def __str__(self) -> str:
         return f"{self.sport.name} / {self.label}"
 
+    @property
+    def display_label(self) -> str:
+        """The label in the reader's language. Serializers expose this, never `label`."""
+        return in_readers_language(self, "label")
+
 
 class StatDefinition(BaseModel):
     """One field on a scorecard for this sport (DOMAIN §7).
@@ -193,6 +238,12 @@ class StatDefinition(BaseModel):
     sport = models.ForeignKey(Sport, on_delete=models.CASCADE, related_name="stat_definitions")
     key = models.SlugField(_("key"), max_length=40)
     label = models.CharField(_("label"), max_length=64)
+    label_bn = models.CharField(
+        _("label (Bangla)"),
+        max_length=64,
+        blank=True,
+        help_text="Shown to Bangla readers. Blank falls back to the English label.",
+    )
     value_type = models.CharField(
         _("type"), max_length=10, choices=ValueType.choices, default=ValueType.INT
     )
@@ -221,6 +272,11 @@ class StatDefinition(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.sport.name} / {self.label}"
+
+    @property
+    def display_label(self) -> str:
+        """The label in the reader's language. Serializers expose this, never `label`."""
+        return in_readers_language(self, "label")
 
 
 class SportProposal(BaseModel):

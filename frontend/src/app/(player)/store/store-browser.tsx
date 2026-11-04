@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "cn";
 
 import type {
@@ -20,8 +20,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 
 import { CartPanel } from "./cart-panel";
+import { formatWhen } from "@/i18n/formats";
 
 /** Hours until a moment, or a negative number once it has passed. */
 function hoursUntil(when: string): number {
@@ -44,6 +46,7 @@ export function StoreBrowser({
   matches: MatchSummary[];
 }) {
   const t = useTranslations("store");
+  const locale = useLocale();
   const api = useApiClient();
   const router = useRouter();
 
@@ -134,15 +137,7 @@ export function StoreBrowser({
                 {t("forYourMatch", { turf: match.turf_name })}
               </CardTitle>
               <p className="text-muted-foreground text-xs">
-                {match.sport} ·{" "}
-                {new Intl.DateTimeFormat("en-GB", {
-                  timeZone: "Asia/Dhaka",
-                  weekday: "short",
-                  day: "numeric",
-                  month: "short",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }).format(new Date(match.starts_at))}
+                {match.sport} · {formatWhen(match.starts_at, locale, "full")}
               </p>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-2">
@@ -282,7 +277,7 @@ export function StoreBrowser({
                       <div className="flex items-start justify-between gap-2">
                         <span className="text-sm font-medium">{item.product.name}</span>
                         <span className="font-mono text-base font-semibold tabular-nums">
-                          ৳{item.price}
+                          <Money amount={item.price} />
                         </span>
                       </div>
 

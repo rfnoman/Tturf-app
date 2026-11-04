@@ -237,7 +237,7 @@ class OrderSerializer(serializers.ModelSerializer):
     def get_match_summary(self, obj) -> str:
         if not obj.match_id:
             return ""
-        return f"{obj.match.sport.name} at {obj.match.turf.name}"
+        return f"{obj.match.sport.display_name} at {obj.match.turf.name}"
 
 
 class RiderSerializer(serializers.ModelSerializer):

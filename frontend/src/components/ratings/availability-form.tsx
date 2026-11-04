@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { PlayerAvailability, Sport } from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatWhen } from "@/i18n/formats";
 
 /** Dhaka-local `YYYY-MM-DDTHH:mm` for a datetime-local input. */
 function dhakaLocal(offsetHours: number): string {
@@ -41,6 +42,7 @@ export function AvailabilityForm({
   windows: PlayerAvailability[];
 }) {
   const t = useTranslations("availability");
+  const locale = useLocale();
   const router = useRouter();
   const api = useApiClient();
 
@@ -100,14 +102,7 @@ export function AvailabilityForm({
             {windows.map((window) => (
               <li key={String(window.id)} className="flex items-center justify-between gap-2">
                 <span className="truncate">
-                  {new Intl.DateTimeFormat("en-GB", {
-                    timeZone: "Asia/Dhaka",
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(window.starts_at))}
+                  {formatWhen(window.starts_at, locale, "full")}
                   {window.area && <span className="text-muted-foreground"> · {window.area}</span>}
                   {window.sport_name && (
                     <span className="text-muted-foreground"> · {window.sport_name}</span>

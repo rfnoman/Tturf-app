@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 
 type Cart = Record<string, number>;
 
@@ -164,7 +165,7 @@ export function CounterPos({
                     <span className="line-clamp-2 text-sm font-medium">{item.product.name}</span>
                     <span className="flex w-full items-baseline justify-between">
                       <span className="font-mono text-base font-semibold tabular-nums">
-                        ৳{item.price}
+                        <Money amount={item.price} />
                       </span>
                       <span className="text-muted-foreground text-xs">
                         {soldOut ? t("soldOutShort") : t("left", { count: item.available })}
@@ -191,7 +192,7 @@ export function CounterPos({
               <ul className="flex flex-col divide-y text-sm" data-testid="todays-sales">
                 {sales.slice(0, 8).map((sale) => (
                   <li key={String(sale.id)} className="flex items-baseline gap-2 py-1.5">
-                    <span className="font-mono tabular-nums">৳{sale.total}</span>
+                    <Money amount={sale.total} />
                     <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
                       {sale.lines
                         .map((line) => `${line.quantity}× ${line.product_name}`)
@@ -251,7 +252,7 @@ export function CounterPos({
                       </Button>
                     </span>
                     <span className="w-16 text-right font-mono tabular-nums">
-                      ৳{(Number(item.price) * quantity).toFixed(0)}
+                      <Money amount={Number(item.price) * quantity} />
                     </span>
                   </li>
                 );
@@ -262,7 +263,7 @@ export function CounterPos({
           <div className="flex items-baseline justify-between border-t pt-3">
             <span className="text-sm font-medium">{t("total")}</span>
             <span className="font-mono text-2xl font-bold tabular-nums" data-testid="pos-total">
-              ৳{total.toFixed(0)}
+              <Money amount={total} />
             </span>
           </div>
 
@@ -282,7 +283,7 @@ export function CounterPos({
             <div className="flex items-baseline justify-between">
               <span className="text-sm font-medium">{t("changeDue")}</span>
               <span className="font-mono text-2xl font-bold tabular-nums" data-testid="change-due">
-                ৳{changeDue.toFixed(0)}
+                <Money amount={changeDue} />
               </span>
             </div>
           )}

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 
 type Choices = Record<string, string>;
 
@@ -185,7 +186,7 @@ export function CartPanel({
                         </Button>
                       </span>
                       <span className="w-14 text-right font-mono tabular-nums">
-                        ৳{line.line_total}
+                        <Money amount={line.line_total} />
                       </span>
                     </li>
                   ))}
@@ -216,7 +217,12 @@ export function CartPanel({
                         />
                         <span className={option.available ? "" : "text-muted-foreground"}>
                           {t("fulfilment", { kind: option.kind })}
-                          {option.available && Number(option.fee) > 0 && ` · ৳${option.fee}`}
+                          {option.available && Number(option.fee) > 0 && (
+                            <>
+                              {" · "}
+                              <Money amount={option.fee} />
+                            </>
+                          )}
                           {!option.available && option.reason && (
                             <span className="block">{option.reason}</span>
                           )}
@@ -294,7 +300,7 @@ export function CartPanel({
             <div className="flex items-baseline justify-between border-t pt-3">
               <span className="text-sm font-medium">{t("total")}</span>
               <span className="font-mono text-xl font-bold tabular-nums" data-testid="cart-total">
-                ৳{total.toFixed(0)}
+                <Money amount={total} />
               </span>
             </div>
 

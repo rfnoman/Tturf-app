@@ -15,7 +15,7 @@ class RatingChangeSerializer(serializers.ModelSerializer):
     """One match's effect, with the engine's own explanation attached."""
 
     turf_name = serializers.CharField(source="match.booking.ground.turf.name", read_only=True)
-    sport = serializers.CharField(source="sport.name", read_only=True)
+    sport = serializers.CharField(source="sport.display_name", read_only=True)
     delta = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -85,7 +85,7 @@ class AvailabilitySerializer(serializers.ModelSerializer):
     name silently produce a wrong client."""
 
     sport_slug = serializers.SlugField(source="sport.slug", read_only=True, allow_null=True)
-    sport_name = serializers.CharField(source="sport.name", read_only=True, allow_null=True)
+    sport_name = serializers.CharField(source="sport.display_name", read_only=True, allow_null=True)
 
     class Meta:
         model = Availability
@@ -172,7 +172,7 @@ class ConductReportSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.CharField())
     def get_match_summary(self, obj) -> str:
         match = obj.match
-        return f"{match.sport.name} at {match.turf.name}"
+        return f"{match.sport.display_name} at {match.turf.name}"
 
 
 class ConductReportCreateSerializer(serializers.Serializer):

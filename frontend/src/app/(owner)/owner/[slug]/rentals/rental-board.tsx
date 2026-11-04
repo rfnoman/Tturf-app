@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { Booking, Rental, StockItem } from "@/lib/api/types";
 import { useApiClient } from "@/lib/api/use-api";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatWhen } from "@/i18n/formats";
 
 /**
  * Gear going out and coming back.
@@ -30,6 +31,7 @@ export function RentalBoard({
   bookings: Booking[];
 }) {
   const t = useTranslations("rentals");
+  const locale = useLocale();
   const router = useRouter();
   const api = useApiClient();
 
@@ -176,11 +178,7 @@ export function RentalBoard({
                     {rental.out_at && (
                       <span className="text-muted-foreground text-xs">
                         {" · "}
-                        {new Intl.DateTimeFormat("en-GB", {
-                          timeZone: "Asia/Dhaka",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }).format(new Date(rental.out_at))}
+                        {formatWhen(rental.out_at, locale, "time")}
                       </span>
                     )}
                   </span>

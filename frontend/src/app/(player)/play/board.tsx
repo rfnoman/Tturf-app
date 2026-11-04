@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "cn";
 
 import type { MatchSummary, Sport } from "@/lib/api/types";
@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TurfMap, type MapMarker } from "@/components/turf/turf-map";
 import { ratingTone } from "@/components/player/rating";
+import { Money } from "@/components/ui/money";
+import { formatWhen } from "@/i18n/formats";
 
 type View = "list" | "map";
 
@@ -275,14 +277,8 @@ export function MatchBoard({
 /** A board row. Kept in this file because it reads live, client-filtered data. */
 function BoardRow({ match }: { match: MatchSummary }) {
   const t = useTranslations("board");
-  const when = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Dhaka",
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(match.starts_at));
+  const locale = useLocale();
+  const when = formatWhen(match.starts_at, locale, "full");
 
   return (
     <Link
@@ -330,7 +326,7 @@ function BoardRow({ match }: { match: MatchSummary }) {
           ) : (
             <span className="text-muted-foreground">{t("unrated")}</span>
           )}
-          <span className="font-mono tabular-nums">৳{match.price}</span>
+          <Money amount={match.price} />
         </span>
       </div>
     </Link>

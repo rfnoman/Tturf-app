@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "cn";
 
 import type { ActivityLog, GoalProgress, Sport, Streak, WeeklySummary } from "@/lib/api/types";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatWhen } from "@/i18n/formats";
 
 const GOAL_TYPES = ["matches_per_week", "minutes_per_week", "calories_per_week"] as const;
 
@@ -33,6 +34,7 @@ export function ActivityBoard({
   sports: Sport[];
 }) {
   const t = useTranslations("fitness");
+  const locale = useLocale();
   const router = useRouter();
   const api = useApiClient();
 
@@ -213,11 +215,7 @@ export function ActivityBoard({
               {logs.map((log) => (
                 <li key={String(log.id)} className="flex flex-wrap items-baseline gap-2 py-2">
                   <span className="font-mono text-xs tabular-nums">
-                    {new Intl.DateTimeFormat("en-GB", {
-                      timeZone: "Asia/Dhaka",
-                      day: "numeric",
-                      month: "short",
-                    }).format(new Date(`${log.happened_on}T12:00:00+06:00`))}
+                    {formatWhen(`${log.happened_on}T12:00:00+06:00`, locale, "dayMonth")}
                   </span>
                   <span className="min-w-0 flex-1 truncate">
                     {log.sport_name || t("otherExercise")}

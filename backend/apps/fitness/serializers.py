@@ -7,7 +7,7 @@ from .models import ActivityLog, Bundle, BundleItem, GoalType, ReminderPreferenc
 
 
 class ActivityLogSerializer(serializers.ModelSerializer):
-    sport_name = serializers.CharField(source="sport.name", read_only=True, allow_null=True)
+    sport_name = serializers.CharField(source="sport.display_name", read_only=True, allow_null=True)
     turf_name = serializers.SerializerMethodField()
 
     class Meta:

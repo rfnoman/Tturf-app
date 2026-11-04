@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { cn } from "cn";
 
 import { getServerApiClient } from "@/lib/api/server";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatWhen } from "@/i18n/formats";
 
 /**
  * A player's recent results — the track record on their profile.
@@ -24,6 +25,7 @@ export async function RecentResults({ playerId }: { playerId: string }) {
   if (results.length === 0) return null;
 
   const t = await getTranslations("results");
+  const locale = await getLocale();
 
   return (
     <Card className="w-full max-w-xl" data-testid="recent-results">
@@ -55,12 +57,7 @@ export async function RecentResults({ playerId }: { playerId: string }) {
                     : `${row.team_a_score}–${row.team_b_score}`}
                 </span>
                 <span className="text-muted-foreground min-w-0 flex-1 truncate text-xs">
-                  {row.sport} · {row.turf_name} ·{" "}
-                  {new Intl.DateTimeFormat("en-GB", {
-                    timeZone: "Asia/Dhaka",
-                    day: "numeric",
-                    month: "short",
-                  }).format(new Date(row.played_at))}
+                  {row.sport} · {row.turf_name} · {formatWhen(row.played_at, locale, "dayMonth")}
                 </span>
                 {row.is_motm && <Badge variant="outline">{t("motm")}</Badge>}
                 {row.verified_by_staff && <Badge variant="secondary">{t("verified")}</Badge>}

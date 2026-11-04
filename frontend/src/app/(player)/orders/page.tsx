@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { getServerApiClient } from "@/lib/api/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Money } from "@/components/ui/money";
 
 export const metadata = { title: "My orders · TurfApp" };
 
@@ -46,7 +47,7 @@ export default async function OrdersPage() {
                   <Badge variant={order.status === "cancelled" ? "outline" : "secondary"}>
                     {order.status_label}
                   </Badge>
-                  <span className="font-mono tabular-nums">৳{order.total}</span>
+                  <Money amount={order.total} />
                 </span>
               </Link>
             </li>

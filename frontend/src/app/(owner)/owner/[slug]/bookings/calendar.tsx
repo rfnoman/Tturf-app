@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Money } from "@/components/ui/money";
 
 /**
  * The turf's day view: the confirmation queue, the day's bookings with their actions,
@@ -79,8 +80,9 @@ export function TurfCalendar({
                   </Link>
                   <span className="text-muted-foreground block text-xs">
                     {booking.ground_name} ·{" "}
-                    <BookingTime start={booking.starts_at} end={booking.ends_at} /> · ৳
-                    {booking.price}
+                    <BookingTime start={booking.starts_at} end={booking.ends_at} />
+                    {" · "}
+                    <Money amount={booking.price} />
                   </span>
                 </span>
                 <span className="flex items-center gap-2">
@@ -157,7 +159,7 @@ export function TurfCalendar({
                   <span className="text-muted-foreground block text-xs">
                     {booking.ground_name} ·{" "}
                     <BookingTime start={booking.starts_at} end={booking.ends_at} withDate={false} />{" "}
-                    · ৳{booking.price}
+                    · <Money amount={booking.price} />
                   </span>
                 </span>
                 <span className="flex items-center gap-2">

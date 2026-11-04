@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { cn } from "cn";
 
 import type { Slot } from "@/lib/api/types";
+import { Money } from "@/components/ui/money";
 
 /**
  * A day's slots for one ground.
@@ -74,7 +75,7 @@ export function SlotGrid({
           >
             <span className="font-mono text-sm tabular-nums">{time}</span>
             <span className="flex w-full items-center justify-between gap-1 text-xs">
-              <span>{slot.price ? t("taka", { price: slot.price }) : "—"}</span>
+              <Money amount={slot.price} className="font-sans" />
               {slot.label && <span className="text-muted-foreground">{slot.label}</span>}
             </span>
             {!slot.available && (

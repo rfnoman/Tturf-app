@@ -14,6 +14,9 @@ from .models import (
 
 
 class AttributeSerializer(serializers.ModelSerializer):
+    # The reader's language, not the row's (DECISIONS D63).
+    label = serializers.CharField(source="display_label", read_only=True)
+
     class Meta:
         model = Attribute
         fields = ["id", "key", "label", "description", "order"]
@@ -21,6 +24,7 @@ class AttributeSerializer(serializers.ModelSerializer):
 
 class SportFormatSerializer(serializers.ModelSerializer):
     capacity = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(source="display_name", read_only=True)
 
     class Meta:
         model = SportFormat
@@ -28,6 +32,8 @@ class SportFormatSerializer(serializers.ModelSerializer):
 
 
 class SportSkillSerializer(serializers.ModelSerializer):
+    label = serializers.CharField(source="display_label", read_only=True)
+
     class Meta:
         model = SportSkill
         fields = [
@@ -50,6 +56,8 @@ class SportAttributeWeightSerializer(serializers.ModelSerializer):
 
 
 class StatDefinitionSerializer(serializers.ModelSerializer):
+    label = serializers.CharField(source="display_label", read_only=True)
+
     class Meta:
         model = StatDefinition
         fields = [
@@ -70,6 +78,10 @@ class StatDefinitionSerializer(serializers.ModelSerializer):
 class SportSerializer(serializers.ModelSerializer):
     """The full catalogue entry: one request feeds the whole onboarding wizard."""
 
+    # The reader's language, not the row's (DECISIONS D63). Sports are created through
+    # `SportProposal`, so nothing writes through this serializer and overriding `name`
+    # costs nothing.
+    name = serializers.CharField(source="display_name", read_only=True)
     formats = SportFormatSerializer(many=True, read_only=True)
     skills = SportSkillSerializer(many=True, read_only=True)
     attribute_weights = SportAttributeWeightSerializer(many=True, read_only=True)
@@ -103,6 +115,7 @@ class SportSummarySerializer(serializers.ModelSerializer):
     # Blank is a legitimate value but the schema must not make it optional, or every
     # consumer has to narrow `string | undefined` before rendering.
     icon = serializers.CharField(read_only=True, allow_blank=True)
+    name = serializers.CharField(source="display_name", read_only=True)
 
     class Meta:
         model = Sport
