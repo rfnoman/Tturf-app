@@ -198,4 +198,24 @@ TEMPLATES: dict[str, Template] = {
         "body": "{sport} at {turf} on {when}. After that it cannot reach the turf in time.",
         "email": False,
     },
+    NotificationKind.MATCH_DAY: {
+        "title": "{sport} today at {when}",
+        "body": "{turf}. Bring water and get there ten minutes early.",
+        "email": False,
+    },
+    NotificationKind.HYDRATION: {
+        "title": "Drink something now",
+        "body": "{sport} at {turf} in two hours. Water now beats water at kick-off.",
+        "email": False,
+    },
+    NotificationKind.RECOVERY: {
+        "title": "Good game",
+        "body": "{minutes} minutes of {sport}, about {calories} kcal. Protein within the hour helps.",
+        "email": False,
+    },
+    NotificationKind.WEEKLY_RECAP: {
+        "title": "Your week: {matches} match(es), {minutes} minutes",
+        "body": "About {calories} kcal. Streak: {streak} week(s).",
+        "email": False,
+    },
 }

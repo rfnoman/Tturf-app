@@ -118,6 +118,7 @@ class Command(BaseCommand):
         self.seed_squads_and_matches()
         self.seed_inventory()
         self.seed_delivery_zones()
+        self.seed_bundles()
         self.stdout.write(self.style.SUCCESS("Demo data seeded."))
 
     def seed_platform_admin(self, email: str) -> None:
@@ -539,3 +540,68 @@ class Command(BaseCommand):
             )
 
         self.stdout.write(f"{DeliveryZone.objects.count()} delivery zone(s)")
+
+    def seed_bundles(self) -> None:
+        """Curated kits for the store (Phase 09).
+
+        Platform bundles only: a turf's own kit is the turf's business, and inventing
+        one for every seeded turf would be putting words in their mouth.
+        """
+        from apps.fitness.models import Bundle, BundleItem, Occasion
+        from apps.inventory.models import OwnerType, Product
+        from apps.sports.models import Sport
+
+        catalogue = {
+            product.slug: product
+            for product in Product.objects.filter(owner_type=OwnerType.PLATFORM)
+        }
+        football = Sport.objects.filter(slug="football").first()
+
+        bundles = [
+            {
+                "slug": "evening-football-kit",
+                "name": "Evening football kit",
+                "description": "Water, an electrolyte drink and a glucose sachet — enough for one evening game.",
+                "occasion": Occasion.PRE_MATCH,
+                "sport": football,
+                "items": [
+                    ("mineral-water-500ml", 2),
+                    ("electrolyte-drink-500ml", 1),
+                    ("glucose-sachet", 1),
+                ],
+            },
+            {
+                "slug": "recovery-pack",
+                "name": "Recovery pack",
+                "description": "Protein and fluids for the hour after the whistle.",
+                "occasion": Occasion.RECOVERY,
+                "sport": None,
+                "items": [("protein-bar", 2), ("mineral-water-500ml", 1)],
+            },
+        ]
+
+        made = 0
+        for spec in bundles:
+            items = [
+                (catalogue[slug], quantity) for slug, quantity in spec["items"] if slug in catalogue
+            ]
+            if not items:
+                continue
+
+            bundle, _ = Bundle.objects.update_or_create(
+                slug=spec["slug"],
+                defaults={
+                    "name": spec["name"],
+                    "description": spec["description"],
+                    "occasion": spec["occasion"],
+                    "sport": spec["sport"],
+                    "is_active": True,
+                },
+            )
+            for product, quantity in items:
+                BundleItem.objects.update_or_create(
+                    bundle=bundle, product=product, defaults={"quantity": quantity}
+                )
+            made += 1
+
+        self.stdout.write(f"{made} bundle(s)")

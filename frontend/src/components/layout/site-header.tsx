@@ -21,10 +21,16 @@ export async function SiteHeader() {
 
         <nav className="hidden items-center gap-1 sm:flex" aria-label={t("nav.home")}>
           <Button variant="ghost" size="sm" asChild>
+            <Link href="/home">{t("nav.home")}</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
             <Link href="/play">{t("nav.play")}</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/bookings">{t("nav.myBookings")}</Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/activity">{t("nav.activity")}</Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
             <Link href="/profile">{t("nav.profile")}</Link>

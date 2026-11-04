@@ -69,6 +69,12 @@ class NotificationKind(models.TextChoices):
     ORDER_CANCELLED = "order_cancelled", _("Order cancelled")
     ORDER_CUTOFF_SOON = "order_cutoff_soon", _("Order before the cutoff")
 
+    # Phase 09 — the fitness layer
+    MATCH_DAY = "match_day", _("Match day")
+    HYDRATION = "hydration", _("Hydration reminder")
+    RECOVERY = "recovery", _("Recovery tip")
+    WEEKLY_RECAP = "weekly_recap", _("Your week")
+
 
 class Notification(BaseModel):
     user = models.ForeignKey(

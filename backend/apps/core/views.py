@@ -89,6 +89,8 @@ class ClientConfigView(APIView):
                     "turf_delivery_cutoff_hours": serializers.IntegerField(),
                     "currency": serializers.CharField(),
                     "time_zone": serializers.CharField(),
+                    "week_starts_on": serializers.IntegerField(),
+                    "vapid_public_key": serializers.CharField(allow_blank=True),
                 },
             )
         },
@@ -106,5 +108,9 @@ class ClientConfigView(APIView):
                 "turf_delivery_cutoff_hours": setting("TURF_DELIVERY_CUTOFF_HOURS"),
                 "currency": "BDT",
                 "time_zone": settings.TIME_ZONE,
+                "week_starts_on": setting("FITNESS_WEEK_STARTS_ON"),
+                # The *public* half of the VAPID pair, which is what a browser needs to
+                # subscribe. Empty in development, where push is switched off entirely.
+                "vapid_public_key": settings.VAPID_PUBLIC_KEY,
             }
         )

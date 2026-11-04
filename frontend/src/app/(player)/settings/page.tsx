@@ -4,17 +4,20 @@ import { getTranslations } from "next-intl/server";
 import { fetchClientConfig } from "@/lib/api/config-queries";
 import { getServerApiClient } from "@/lib/api/server";
 
+import { ReminderSettings } from "@/components/fitness/reminder-settings";
+
 import { SettingsForm } from "./settings-form";
 
 export const metadata = { title: "Settings · TurfApp" };
 
 export default async function SettingsPage() {
   const api = await getServerApiClient();
-  const [profile, attributes, sports, config] = await Promise.all([
+  const [profile, attributes, sports, config, reminders] = await Promise.all([
     api.GET("/api/v1/me/profile"),
     api.GET("/api/v1/attributes"),
     api.GET("/api/v1/sports"),
     fetchClientConfig(),
+    api.GET("/api/v1/me/reminders"),
   ]);
 
   if (!profile.data) notFound();
@@ -35,6 +38,10 @@ export default async function SettingsPage() {
         defaultRating={config.onboarding_default_rating}
         defaultWeightKg={config.default_player_weight_kg}
       />
+
+      {reminders.data && (
+        <ReminderSettings preference={reminders.data} vapidPublicKey={config.vapid_public_key} />
+      )}
     </div>
   );
 }

@@ -13,7 +13,7 @@ Updated by Claude Code at the end of each phase.
 | 06 Ratings, track record, discovery | **done** | 2026-11-03 | Pure versioned rating engine, rating history with explanations, track record, conduct reports, fair play, leaderboards, player search |
 | 07 Inventory & counter POS | **done** | 2026-11-04 | Product catalogue, stock ledger, counter POS, rentals, low-stock alerts, warehouse |
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
-| 09 Fitness layer & notifications+ | not started | | |
+| 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | not started | | |
 | 11 Hardening, Bangla, launch | not started | | |
 
@@ -829,4 +829,86 @@ from that turf's queue. No console errors.
 - Delivery to a *turf* is not yet distinguished in the rider view from delivery to an
   address; the card shows the match instead of a street, which works but is not a route.
 - django-storages is still not wired up, so product images are URLs.
+- e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.
+
+### Phase 09 — Fitness layer, reminders and live notifications (2026-11-04)
+
+**Built**
+
+- **`apps/fitness`**: `ActivityLog` (one per player per match, enforced by constraint),
+  `FitnessGoal`, `Bundle` + `BundleItem`, `ReminderPreference` and `PushSubscription`.
+  Streaks are computed, not stored — a stored streak is a cache that goes wrong quietly.
+- **Calories**: `MET × weight_kg × hours` (DOMAIN §10), using `Sport.met_value`. A player
+  who has not given their weight still gets a number, from the fallback, and the row is
+  flagged `is_estimate` so the UI can say "estimated" instead of implying precision.
+- **A week runs Saturday to Friday, in Dhaka** (D56). Bangladesh's weekend is Friday and
+  Saturday, so an ISO week would cut a Friday-night match off from the Saturday-morning
+  one that belongs with it. Every boundary is tested in Dhaka time.
+- **The streak counts matches only.** A player could otherwise keep one alive by typing in
+  a walk, and the streak is about turning up to play. It also survives the current week
+  until that week is over, which is what makes it worth saving.
+- **Bundles** are added whole in one tap. Partial stock adds what is there and names what
+  is missing — refusing the lot because the bananas ran out is the worse answer. A bundle
+  is always sourced from whoever owns it, so the Phase 08 "one order, one source" rule
+  still holds.
+- **Reminders** (Celery beat): match-day summary, hydration two hours out, a recovery tip
+  after the whistle, and a Saturday-morning weekly recap. Every one asks `should_send`
+  first — switched off, or inside quiet hours, means nothing is sent — and each is
+  idempotent per match or per week, because beat runs them repeatedly.
+- **The recovery job doubles as the activity safety net**: a match that finished with no
+  scorecard still gets logged, so a player's week is right whether or not anybody filled
+  the card in.
+- **Web push** (D55) through `pywebpush`, opt-in per device, skipped entirely when there
+  are no VAPID keys (development and CI). A subscription the push service reports as gone
+  is deleted — that is the only way a browser tells us it has forgotten.
+- **Live updates over SSE** (D54): Redis pub/sub fans a notification out to whichever
+  worker is holding a player's stream. The client reads it with `fetch`-streaming so the
+  token travels in a header rather than a query string, and a stream that will not open
+  is not an error — the bell already polls.
+- **Frontend**: a home dashboard (next match, the week as a ring, streak, suggested kit,
+  open matches nearby), an activity page (twelve-week bars, history, goals, manual entry),
+  bundle cards in the store, and reminder settings with push opt-in. A service worker
+  handles push and nothing else — caching an authenticated app badly is worse than not
+  caching it.
+- **Tests**: 1240 backend (81 in `apps/fitness`), 17 Vitest, 97 Playwright.
+
+**Verified in the browser** (Chrome DevTools, real Clerk session): the home dashboard
+showed the next match, 60 minutes and ~515 kcal from a locked match, and a one-week
+streak. Set a 180-minute weekly goal, added a 45-minute gym session, and the ring moved to
+105/180 with the session in the history. Added a kit to the cart in one tap (2 protein
+bars + water). Switched the hydration reminder off and confirmed it persisted. Opened the
+SSE stream with a bearer token, sent a notification from a separate process, and watched
+the frame arrive — `event: notification` with the rendered title and body. No console
+errors.
+
+**Two things the browser caught**
+
+- The bundle "add to cart" passed the match's turf as a source hint, which can never work:
+  a platform bundle's products are platform rows, and no turf stocks those. A bundle now
+  comes from whoever owns it, and the parameter is gone.
+- The reminder switches waited for the server before moving, which reads as a broken
+  toggle. They are optimistic now, and revert if the save fails.
+
+**Deviations / notes**
+
+- `/api/v1/store/home` was returning an untyped body (`responses={200: None}`), so the
+  generated client typed it `never`. It has a serializer now; an untyped endpoint is a
+  hole in the generated client, not a shortcut.
+- The SSE endpoint is excluded from the OpenAPI schema: it is `text/event-stream`, and
+  describing it as an operation with a JSON body would be a lie.
+- `fetchClientConfig` now also carries `week_starts_on` and the **public** VAPID key, so
+  the browser can subscribe without a second round trip.
+
+**Known gaps / follow-ups**
+
+- SSE needs an ASGI server in production (`gunicorn -k uvicorn.workers.UvicornWorker`);
+  `runserver` is threaded and handles it in development. The deployment change is noted in
+  D54 and belongs to Phase 11.
+- Live scoring over the same channel (Phase 05 step 5b) is still not built, and still
+  needs your confirmation.
+- VAPID keys are unset, so push is dark in development. Generating a pair and setting
+  `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` turns it on with no code change.
+- The weekly recap and match-day jobs are covered by tests and beat, not by a browser run
+  — there is nothing to watch for a week.
+- django-storages is still not wired up (carried from Phase 02).
 - e2e still is not in CI; it needs `CLERK_SECRET_KEY` as a repository secret.

@@ -2966,10 +2966,191 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * This player's week
+         * @description The home screen in one request: the week, the streak, the goals, the last few.
+         */
+        get: operations["fitness_dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My activity */
+        get: operations["activity_list"];
+        put?: never;
+        /** Add something I did */
+        post: operations["activity_add"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/activity/week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One week's totals */
+        get: operations["activity_week"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My goals and where they stand */
+        get: operations["goals_list"];
+        put?: never;
+        /** Set a goal (0 retires it) */
+        post: operations["goals_set"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My reminder settings */
+        get: operations["reminders_read"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change my reminder settings */
+        patch: operations["reminders_update"];
+        trace?: never;
+    };
+    "/api/v1/me/push": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register this browser for push
+         * @description A browser signing up for push (DECISIONS D55).
+         */
+        post: operations["push_subscribe"];
+        /**
+         * Forget this browser
+         * @description A browser signing up for push (DECISIONS D55).
+         */
+        delete: operations["push_unsubscribe"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bundles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bundles
+         * @description Curated kits (DOMAIN §10).
+         */
+        get: operations["bundles_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bundles/{slug}/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a whole bundle to the cart */
+        post: operations["bundle_add_to_cart"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        ActivityLog: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly sport_name: string | null;
+            readonly turf_name: string;
+            /** Format: uuid */
+            readonly match: string | null;
+            readonly source: components["schemas"]["ActivitySourceEnum"];
+            /**
+             * Date
+             * Format: date
+             */
+            readonly happened_on: string;
+            readonly minutes: number;
+            /** Calories */
+            readonly est_calories: number;
+            /**
+             * Estimated
+             * @description True when the player's weight was unknown and the fallback was used.
+             */
+            readonly is_estimate: boolean;
+            readonly note: string;
+        };
+        /**
+         * @description * `match` - A match
+         *     * `manual` - Added by the player
+         * @enum {string}
+         */
+        ActivitySourceEnum: "match" | "manual";
         AddToCartRequest: {
             /** Format: uuid */
             stock_item_id: string;
@@ -3183,6 +3364,46 @@ export interface components {
          * @enum {string}
          */
         BookingVisibilityEnum: "public" | "private";
+        Bundle: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            readonly slug: string;
+            readonly description: string;
+            readonly turf_slug: string;
+            readonly sport_slug: string | null;
+            readonly occasion: components["schemas"]["BundleOccasionEnum"];
+            readonly occasion_label: string;
+            /**
+             * Image
+             * Format: uri
+             */
+            readonly image_url: string;
+            readonly items: components["schemas"]["BundleItem"][];
+        };
+        BundleItem: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly product_id: string;
+            readonly product_name: string;
+            readonly quantity: number;
+        };
+        /**
+         * @description * `pre_match` - Before the match
+         *     * `during` - During the match
+         *     * `recovery` - After the match
+         * @enum {string}
+         */
+        BundleOccasionEnum: "pre_match" | "during" | "recovery";
+        BundleResult: {
+            added: {
+                [key: string]: unknown;
+            }[];
+            missing: string[];
+            /** Format: uuid */
+            source_id: string;
+        };
         CancelBookingRequest: {
             reason?: string;
         };
@@ -3244,6 +3465,8 @@ export interface components {
             turf_delivery_cutoff_hours: number;
             currency: string;
             time_zone: string;
+            week_starts_on: number;
+            vapid_public_key: string;
         };
         Closure: {
             /** Format: uuid */
@@ -3380,6 +3603,13 @@ export interface components {
             booking_id?: string | null;
             note?: string;
         };
+        /** @description Everything the home screen shows, in one request. */
+        Dashboard: {
+            week: components["schemas"]["WeeklySummary"];
+            streak: components["schemas"]["Streak"];
+            goals: components["schemas"]["GoalProgress"][];
+            recent: components["schemas"]["ActivityLog"][];
+        };
         DecideRequest: {
             approve: boolean;
         };
@@ -3402,6 +3632,13 @@ export interface components {
             red_cards: number;
             upheld_reports: number;
         };
+        /**
+         * @description * `matches_per_week` - Matches a week
+         *     * `minutes_per_week` - Minutes a week
+         *     * `calories_per_week` - Calories a week
+         * @enum {string}
+         */
+        FitnessGoalTypeEnum: "matches_per_week" | "minutes_per_week" | "calories_per_week";
         /** @description An option, and — when it is closed — why. */
         FulfilmentOption: {
             kind: components["schemas"]["OrderFulfilmentEnum"];
@@ -3410,6 +3647,15 @@ export interface components {
             fee: string;
             eta_hours: number | null;
             reason: string;
+        };
+        GoalProgress: {
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["FitnessGoalTypeEnum"];
+            label: string;
+            target: number;
+            achieved: number;
+            percent: number;
         };
         Ground: {
             /** Format: uuid */
@@ -3513,6 +3759,13 @@ export interface components {
              * @description Only for metric="top_stat", e.g. "goals".
              */
             readonly stat_key: string;
+        };
+        ManualActivityRequest: {
+            minutes: number;
+            /** Format: date */
+            happened_on?: string;
+            sport?: (string) | null;
+            note?: string;
         };
         MarkPaidRequest: {
             /**
@@ -3723,9 +3976,13 @@ export interface components {
          *     * `order_delivered` - Order delivered
          *     * `order_cancelled` - Order cancelled
          *     * `order_cutoff_soon` - Order before the cutoff
+         *     * `match_day` - Match day
+         *     * `hydration` - Hydration reminder
+         *     * `recovery` - Recovery tip
+         *     * `weekly_recap` - Your week
          * @enum {string}
          */
-        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined" | "scorecard_submitted" | "scorecard_disputed" | "scorecard_locked" | "motm_awarded" | "stock_low" | "rental_out" | "rental_overdue" | "order_placed" | "order_accepted" | "order_ready" | "order_assigned" | "order_delivered" | "order_cancelled" | "order_cutoff_soon";
+        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined" | "scorecard_submitted" | "scorecard_disputed" | "scorecard_locked" | "motm_awarded" | "stock_low" | "rental_out" | "rental_overdue" | "order_placed" | "order_accepted" | "order_ready" | "order_assigned" | "order_delivered" | "order_cancelled" | "order_cutoff_soon" | "match_day" | "hydration" | "recovery" | "weekly_recap";
         /** @description The nutrition panel, kept together so the UI can hide it in one go. */
         Nutrition: {
             serving_size: string;
@@ -4284,6 +4541,25 @@ export interface components {
                 [key: string]: number;
             };
         };
+        PatchedReminderPreferenceRequest: {
+            /** Match-day summary */
+            match_day?: boolean;
+            /** Hydration before a match */
+            hydration?: boolean;
+            /** Recovery after a match */
+            recovery?: boolean;
+            order_cutoff?: boolean;
+            weekly_recap?: boolean;
+            /** Web push */
+            push_enabled?: boolean;
+            /**
+             * Format: time
+             * @description Dhaka time. Default 22:00.
+             */
+            quiet_from?: string | null;
+            /** Format: time */
+            quiet_until?: string | null;
+        };
         PatchedSaveScorecardRequest: {
             team_a_score?: number;
             team_b_score?: number;
@@ -4839,6 +5115,13 @@ export interface components {
             readonly stat_definitions: components["schemas"]["StatDefinition"][];
             readonly rows: components["schemas"]["PlayerStatRow"][];
         };
+        PushSubscriptionRequest: {
+            /** Format: uri */
+            endpoint: string;
+            p256dh: string;
+            auth: string;
+            user_agent?: string;
+        };
         /** @description One match's effect, with the engine's own explanation attached. */
         RatingChange: {
             /** Format: uuid */
@@ -4870,6 +5153,25 @@ export interface components {
         ReceiveStockRequest: {
             quantity: number;
             note?: string;
+        };
+        ReminderPreference: {
+            /** Match-day summary */
+            match_day?: boolean;
+            /** Hydration before a match */
+            hydration?: boolean;
+            /** Recovery after a match */
+            recovery?: boolean;
+            order_cutoff?: boolean;
+            weekly_recap?: boolean;
+            /** Web push */
+            push_enabled?: boolean;
+            /**
+             * Format: time
+             * @description Dhaka time. Default 22:00.
+             */
+            quiet_from?: string | null;
+            /** Format: time */
+            quiet_until?: string | null;
         };
         RemovePlayerRequest: {
             /**
@@ -5080,6 +5382,10 @@ export interface components {
              */
             player_id: string | null;
         };
+        SetGoalRequest: {
+            type: components["schemas"]["FitnessGoalTypeEnum"];
+            target: number;
+        };
         SetTeamsRequest: {
             /** @description {match_player_id: "A"|"B"}. Anyone omitted is left off a team sheet. */
             assignments: {
@@ -5158,6 +5464,12 @@ export interface components {
             readonly capacity: number;
             /** Display order */
             order?: number;
+        };
+        SportMinutes: {
+            sport: string;
+            slug: string;
+            minutes: number;
+            sessions: number;
         };
         SportProposal: {
             /** Format: uuid */
@@ -5428,6 +5740,13 @@ export interface components {
          * @enum {string}
          */
         StockMovementTypeEnum: "purchase" | "sale" | "counter_sale" | "reservation" | "release" | "rental_out" | "rental_return" | "adjustment";
+        /** @description What the store's front page needs, typed so the client is too. */
+        StoreHome: {
+            match: components["schemas"]["StoreMatch"] | null;
+            /** Format: uuid */
+            platform_source_id: string;
+            sources: components["schemas"]["StoreSource"][];
+        };
         /** @description One buyable thing at one source: the product, its price here, and how many. */
         StoreItem: {
             /** Format: uuid */
@@ -5440,6 +5759,30 @@ export interface components {
             source_id: string;
             source_name: string;
             readonly turf_slug: string;
+        };
+        /** @description The match the store arranges itself around. */
+        StoreMatch: {
+            /** Format: uuid */
+            id: string;
+            sport: string;
+            turf_name: string;
+            turf_slug: string;
+            /** Format: date-time */
+            starts_at: string;
+            /** Format: uuid */
+            source_id: string | null;
+        };
+        StoreSource: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            turf_slug: string;
+            is_platform: boolean;
+        };
+        Streak: {
+            current: number;
+            best: number;
+            played_this_week: boolean;
         };
         TeamPlayer: {
             /** Format: uuid */
@@ -5730,6 +6073,18 @@ export interface components {
          * @enum {integer}
          */
         WeekdayEnum: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+        WeeklySummary: {
+            /** Format: date */
+            week_start: string;
+            /** Format: date */
+            week_end: string;
+            minutes: number;
+            calories: number;
+            sessions: number;
+            matches: number;
+            by_sport: components["schemas"]["SportMinutes"][];
+            is_estimate: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -9513,12 +9868,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description No response body */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["StoreHome"];
+                };
             };
         };
     };
@@ -9998,6 +10354,267 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Rider"][];
+                };
+            };
+        };
+    };
+    fitness_dashboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dashboard"];
+                };
+            };
+        };
+    };
+    activity_list: {
+        parameters: {
+            query?: {
+                /** @description How far back. Default 90. */
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityLog"][];
+                };
+            };
+        };
+    };
+    activity_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ManualActivityRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["ManualActivityRequest"];
+                "multipart/form-data": components["schemas"]["ManualActivityRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityLog"];
+                };
+            };
+        };
+    };
+    activity_week: {
+        parameters: {
+            query?: {
+                /** @description Any day in the week (Dhaka). */
+                date?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeeklySummary"];
+                };
+            };
+        };
+    };
+    goals_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalProgress"][];
+                };
+            };
+        };
+    };
+    goals_set: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetGoalRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SetGoalRequest"];
+                "multipart/form-data": components["schemas"]["SetGoalRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalProgress"][];
+                };
+            };
+        };
+    };
+    reminders_read: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderPreference"];
+                };
+            };
+        };
+    };
+    reminders_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedReminderPreferenceRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedReminderPreferenceRequest"];
+                "multipart/form-data": components["schemas"]["PatchedReminderPreferenceRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderPreference"];
+                };
+            };
+        };
+    };
+    push_subscribe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushSubscriptionRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PushSubscriptionRequest"];
+                "multipart/form-data": components["schemas"]["PushSubscriptionRequest"];
+            };
+        };
+        responses: {
+            /** @description No response body */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    push_unsubscribe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    bundles_list: {
+        parameters: {
+            query?: {
+                /** @description Tailor them to a match. */
+                match?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Bundle"][];
+                };
+            };
+        };
+    };
+    bundle_add_to_cart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleResult"];
                 };
             };
         };
