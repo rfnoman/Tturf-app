@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (step 1 of 9 done) | 2026-11-04 | Audit written; Bangla complete — 707 strings, catalogue labels, dates, money, Bengali font |
+| 11 Hardening, Bangla, launch | **in progress** (steps 1-2 of 9 done) | 2026-11-04 | Audit written; Bangla complete; installable PWA with an offline page |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1105,3 +1105,59 @@ the point of D63. No console errors.
 - Steps 2–9 of Phase 11 remain: PWA, performance, security, observability, admin tools,
   legal pages, deployment (needs a hosting decision from you) and the seven launch
   journeys.
+
+### Phase 11 — step 2 of 9: the installable app (2026-11-04)
+
+**Built**
+
+- **A web app manifest** (`src/app/manifest.ts`): standalone display, portrait, the brand
+  green as `theme_color`, and three shortcuts (find a match, my bookings, store) that
+  land on the long-press menu of an installed icon. Without this the browser never offers
+  to install, and in a market with no app-store listing an installed icon is how the app
+  gets opened a second time.
+- **Icons are drawn, not committed** (`src/app/icons/[size]/route.tsx`): one definition
+  renders the 192, the 512 and the maskable variant through `ImageResponse`, so they
+  cannot drift apart and there are no binaries in the repo nobody can diff. The maskable
+  one is not simply a bigger icon — Android crops it to the launcher's shape, so the mark
+  sits inside the middle 60% with the colour bled to the edges. Without a maskable icon
+  most Android launchers letterbox the square inside a white circle.
+- **The service worker caches exactly one thing**: the offline page. Everything else —
+  every API call, every authenticated page — goes straight to the network, because a
+  cache that serves one player's bookings to the next is worse than no cache at all
+  (the Phase 09 note said as much; this keeps it). The fetch handler only runs for
+  `mode: "navigate"` and only when the network has already failed.
+- **The offline page is bilingual and has no translator.** It is cached once, at install
+  time, so a localised version would be frozen in whichever language was active that day
+  — and the one moment somebody reads it is the moment nothing can be asked of the server.
+  Two short blocks is cheaper than being wrong.
+- **Registration moved out of the push opt-in.** Phase 09 registered the worker only when
+  a player turned notifications on, which left the offline page cached for nobody else.
+  It now registers on every visit; push stays opt-in because it needs a *subscription*,
+  which registration does not create.
+- **An install prompt that appears once** (`install-prompt.tsx`): it listens for
+  `beforeinstallprompt`, so there is nothing to feature-detect — no event, no banner, and
+  Safari correctly never shows it. Dismissal sticks in `localStorage`, because a prompt
+  that returns every visit is an advert.
+- **Four Playwright tests**, unauthenticated: the manifest parses and names all three
+  icons, every icon the manifest names is a real PNG, the offline page stands alone in
+  both languages, and the registered worker has actually cached it. A 404 icon makes the
+  app silently non-installable and nothing else in the suite would notice.
+
+**Verified in the browser** (Chrome DevTools, production build): the worker installed and
+activated at scope `/`, `turfapp-offline-v2` held the offline page, and the manifest
+served all three icons. Then **the server was stopped** and `/turfs` navigated to — the
+cached offline page rendered in place of Chrome's error page, which is the only test of
+an offline fallback that means anything. Restarting and updating the worker deleted the
+v1 cache and replaced it with v2, so bumping the name is how the page is changed.
+
+**Deviations / notes**
+
+- `maximum-scale` is deliberately not set: blocking pinch-zoom on a phone-first app
+  removes an accessibility feature to tidy a layout.
+- The cache name carries a version (`turfapp-offline-v2`) and `activate` deletes every
+  other cache. That is the whole invalidation story, and it is enough for one static page.
+
+**Known gaps / follow-ups**
+
+- Low-end Android over throttled 3G has not been measured yet — that is step 3
+  (performance), which also owns the image and query work.

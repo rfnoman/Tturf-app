@@ -1094,5 +1094,10 @@
     "refunds": "Refunds",
     "noRefunds": "No refunds.",
     "failed": "That did not go through. Try again."
+  },
+  "install": {
+    "body": "Add TurfApp to your home screen for one-tap booking.",
+    "install": "Add",
+    "notNow": "Not now"
   }
 }
