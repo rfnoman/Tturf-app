@@ -2,12 +2,15 @@ from __future__ import annotations
 
 from django.conf import settings
 from django.db import connection
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import OpenApiParameter, extend_schema, inline_serializer
 from rest_framework import serializers, status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .permissions import IsPlatformAdmin
+from .selectors import bookings_per_day, platform_overview, top_turfs
+from .serializers import PlatformDashboardSerializer, PlayerLookupSerializer
 from .utils import setting
 
 
@@ -148,3 +151,86 @@ class ClientConfigView(APIView):
                 "vapid_public_key": settings.VAPID_PUBLIC_KEY,
             }
         )
+
+
+class PlatformDashboardView(APIView):
+    """The numbers that say whether the pilot is working (Phase 11 step 6).
+
+    Everything here is already derivable from rows the app writes; what was missing was
+    anywhere to read it together. A turf owner has a finance page, and an admin has four
+    separate queues — but nobody could answer "how many bookings yesterday, and how many
+    of them did somebody turn up to".
+    """
+
+    permission_classes = [IsAuthenticated, IsPlatformAdmin]
+
+    @extend_schema(
+        operation_id="platform_dashboard",
+        summary="How the platform is doing",
+        parameters=[
+            OpenApiParameter("days", int, description="Window in days. Default 30, max 365.")
+        ],
+        responses={200: PlatformDashboardSerializer},
+    )
+    def get(self, request):
+        try:
+            days = min(max(int(request.query_params.get("days", 30)), 1), 365)
+        except TypeError, ValueError:
+            days = 30
+
+        return Response(
+            PlatformDashboardSerializer(
+                {
+                    **platform_overview(days=days),
+                    "per_day": bookings_per_day(days=days),
+                    "top_turfs": top_turfs(days=days),
+                }
+            ).data
+        )
+
+
+class PlayerLookupView(APIView):
+    """Find an account, for support (Phase 11 step 6).
+
+    Support needs to answer "I can't see my booking" from a name or an email, and the
+    player search built in Phase 06 cannot do it: it is deliberately limited to
+    discoverable players and never exposes contact details (D63, and the PII work in
+    step 4).
+
+    This is the deliberate exception, and it is narrow on purpose: platform admins only,
+    it returns what support needs to identify the right person and nothing more, and
+    **there is no impersonation** — an admin can read an account, never act as one.
+    """
+
+    permission_classes = [IsAuthenticated, IsPlatformAdmin]
+
+    @extend_schema(
+        operation_id="player_lookup",
+        summary="Find an account by name, email or phone",
+        parameters=[
+            OpenApiParameter("q", str, required=True, description="At least 3 characters.")
+        ],
+        responses={200: PlayerLookupSerializer(many=True)},
+    )
+    def get(self, request):
+        query = (request.query_params.get("q") or "").strip()
+        # Short queries would return most of the directory, which is not a lookup.
+        if len(query) < 3:
+            return Response([])
+
+        from django.db.models import Q as Filter
+
+        from apps.accounts.models import User
+
+        matches = (
+            User.objects.filter(
+                Filter(email__icontains=query)
+                | Filter(first_name__icontains=query)
+                | Filter(last_name__icontains=query)
+                | Filter(phone__icontains=query)
+                | Filter(player_profile__display_name__icontains=query)
+            )
+            .select_related("player_profile")
+            .order_by("-created_at")[:25]
+        )
+        return Response(PlayerLookupSerializer(matches, many=True).data)

@@ -54,7 +54,9 @@
     "navConduct": "Conduct reports",
     "navWarehouse": "Warehouse",
     "navOrders": "Store orders",
-    "navFinance": "Finance"
+    "navFinance": "Finance",
+    "navDashboard": "Dashboard",
+    "navSupport": "Support"
   },
   "me": {
     "heading": "Backend session",
@@ -1099,5 +1101,40 @@
     "body": "Add TurfApp to your home screen for one-tap booking.",
     "install": "Add",
     "notNow": "Not now"
+  },
+  "dashboard": {
+    "heading": "How it's going",
+    "unavailable": "Could not load the numbers.",
+    "lastDays": "{days} days",
+    "bookings": "Bookings",
+    "confirmedOf": "{count} confirmed",
+    "noShowRate": "No-show rate",
+    "noShowHint": "{count} of the bookings that reached their slot",
+    "activePlayers": "Active players",
+    "newPlayers": "{count} new",
+    "turfsLive": "Turfs live",
+    "turfsPending": "{count} awaiting review",
+    "platformEarnings": "Platform earnings",
+    "commission": "of which commission",
+    "matches": "Matches",
+    "orders": "Orders",
+    "fulfilled": "{count} delivered or picked up",
+    "perDay": "Bookings a day",
+    "chartLabel": "Bookings a day, confirmed shaded",
+    "peak": "peak {count}",
+    "topTurfs": "Busiest turfs",
+    "noTurfs": "No bookings in this period."
+  },
+  "support": {
+    "heading": "Support",
+    "body": "Find an account by name, email or phone. Read-only — nobody can act as somebody else.",
+    "search": "Search",
+    "searchPlaceholder": "Name, email or phone",
+    "searching": "Searching…",
+    "nobody": "No account matches that.",
+    "joined": "joined",
+    "inactive": "Deactivated",
+    "admin": "Admin",
+    "viewProfile": "View profile"
   }
 }

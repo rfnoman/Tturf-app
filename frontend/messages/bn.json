@@ -54,7 +54,9 @@
     "navConduct": "আচরণের অভিযোগ",
     "navWarehouse": "গুদাম",
     "navOrders": "স্টোরের অর্ডার",
-    "navFinance": "হিসাব"
+    "navFinance": "হিসাব",
+    "navDashboard": "ড্যাশবোর্ড",
+    "navSupport": "সহায়তা"
   },
   "me": {
     "heading": "ব্যাকএন্ড সেশন",
@@ -1099,5 +1101,40 @@
     "body": "এক চাপে বুকিং করতে টার্ফঅ্যাপ হোম স্ক্রিনে যোগ করুন।",
     "install": "যোগ করুন",
     "notNow": "এখন নয়"
+  },
+  "dashboard": {
+    "heading": "কেমন চলছে",
+    "unavailable": "সংখ্যাগুলো আনা গেল না।",
+    "lastDays": "{days} দিন",
+    "bookings": "বুকিং",
+    "confirmedOf": "{count}টি নিশ্চিত",
+    "noShowRate": "না-আসার হার",
+    "noShowHint": "স্লট পর্যন্ত পৌঁছানো বুকিংয়ের মধ্যে {count}টি",
+    "activePlayers": "সক্রিয় খেলোয়াড়",
+    "newPlayers": "{count} জন নতুন",
+    "turfsLive": "চালু টার্ফ",
+    "turfsPending": "{count}টি পর্যালোচনার অপেক্ষায়",
+    "platformEarnings": "প্ল্যাটফর্মের আয়",
+    "commission": "এর মধ্যে কমিশন",
+    "matches": "ম্যাচ",
+    "orders": "অর্ডার",
+    "fulfilled": "{count}টি পৌঁছেছে বা নেওয়া হয়েছে",
+    "perDay": "দৈনিক বুকিং",
+    "chartLabel": "দৈনিক বুকিং, নিশ্চিতগুলো গাঢ় রঙে",
+    "peak": "সর্বোচ্চ {count}",
+    "topTurfs": "সবচেয়ে ব্যস্ত টার্ফ",
+    "noTurfs": "এই সময়ে কোনো বুকিং নেই।"
+  },
+  "support": {
+    "heading": "সহায়তা",
+    "body": "নাম, ইমেইল বা ফোন দিয়ে অ্যাকাউন্ট খুঁজুন। শুধু দেখা যায় — কেউ অন্যের হয়ে কাজ করতে পারে না।",
+    "search": "খুঁজুন",
+    "searchPlaceholder": "নাম, ইমেইল বা ফোন",
+    "searching": "খোঁজা হচ্ছে…",
+    "nobody": "এরকম কোনো অ্যাকাউন্ট নেই।",
+    "joined": "যোগ দিয়েছেন",
+    "inactive": "নিষ্ক্রিয়",
+    "admin": "অ্যাডমিন",
+    "viewProfile": "প্রোফাইল দেখুন"
   }
 }

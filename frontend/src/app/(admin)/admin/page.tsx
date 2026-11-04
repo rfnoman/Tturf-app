@@ -11,6 +11,12 @@ export default async function AdminPage() {
       <h1 className="text-2xl font-semibold tracking-tight">{t("heading")}</h1>
       <p className="text-muted-foreground">{t("empty")}</p>
       <div className="flex flex-wrap gap-2">
+        <Button size="sm" asChild>
+          <Link href="/admin/dashboard">{t("navDashboard")}</Link>
+        </Button>
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/admin/support">{t("navSupport")}</Link>
+        </Button>
         <Button variant="outline" size="sm" asChild>
           <Link href="/admin/turfs">{t("navTurfs")}</Link>
         </Button>

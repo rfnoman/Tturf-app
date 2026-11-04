@@ -44,6 +44,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * How the platform is doing
+         * @description The numbers that say whether the pilot is working (Phase 11 step 6).
+         *
+         *     Everything here is already derivable from rows the app writes; what was missing was
+         *     anywhere to read it together. A turf owner has a finance page, and an admin has four
+         *     separate queues — but nobody could answer "how many bookings yesterday, and how many
+         *     of them did somebody turn up to".
+         */
+        get: operations["platform_dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/players": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find an account by name, email or phone
+         * @description Find an account, for support (Phase 11 step 6).
+         *
+         *     Support needs to answer "I can't see my booking" from a name or an email, and the
+         *     player search built in Phase 06 cannot do it: it is deliberately limited to
+         *     discoverable players and never exposes contact details (D63, and the PII work in
+         *     step 4).
+         *
+         *     This is the deliberate exception, and it is narrow on purpose: platform admins only,
+         *     it returns what support needs to identify the right person and nothing more, and
+         *     **there is no impersonation** — an admin can read an account, never act as one.
+         */
+        get: operations["player_lookup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -844,7 +898,19 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** One turf, by slug */
+        /**
+         * One turf, by slug
+         * @description One turf, cached per slug and per language.
+         *
+         *     This is the page a shared link opens, it is the same answer for everybody, and
+         *     it joins grounds, hours, prices and amenities to build it. The *list* is not
+         *     cached: its `near=` variant is keyed by the caller's coordinates, so the key
+         *     space is unbounded and the hit rate would be roughly zero.
+         *
+         *     Invalidation is a signal on every model that feeds the page (`signals.py`), not
+         *     a call at each of the dozen places that edit one — which is the version that
+         *     still works after somebody adds a thirteenth.
+         */
         get: operations["turfs_retrieve"];
         put?: never;
         post?: never;
@@ -3571,6 +3637,12 @@ export interface components {
          * @enum {string}
          */
         BookingVisibilityEnum: "public" | "private";
+        BookingsPerDay: {
+            /** Format: date */
+            day: string;
+            total: number;
+            confirmed: number;
+        };
         Bundle: {
             /** Format: uuid */
             readonly id: string;
@@ -3922,6 +3994,8 @@ export interface components {
             status: string;
             database: string;
             postgis: string | null;
+            cache: string;
+            workers: number | null;
             version: string;
         };
         InvitePlayerRequest: {
@@ -5027,6 +5101,32 @@ export interface components {
         PeerRatingsSaved: {
             saved: number;
         };
+        /** @description One screen's worth of "is this working". */
+        PlatformDashboard: {
+            /** Format: date */
+            period_start: string;
+            /** Format: date */
+            period_end: string;
+            bookings: number;
+            bookings_confirmed: number;
+            bookings_cancelled: number;
+            no_shows: number;
+            /** Format: double */
+            no_show_rate: number;
+            matches: number;
+            orders: number;
+            orders_fulfilled: number;
+            active_players: number;
+            new_players: number;
+            turfs_live: number;
+            turfs_pending: number;
+            /** Format: decimal */
+            platform_earnings: string;
+            /** Format: decimal */
+            commission: string;
+            per_day: components["schemas"]["BookingsPerDay"][];
+            top_turfs: components["schemas"]["TopTurf"][];
+        };
         /** @description The platform's own position for a period. */
         PlatformFinance: {
             /** Format: date */
@@ -5089,6 +5189,28 @@ export interface components {
          * @enum {string}
          */
         PlayerGenderEnum: "male" | "female" | "other" | "undisclosed";
+        /**
+         * @description What support needs to identify the right person, and nothing more.
+         *
+         *     Contact details are included here and nowhere else in the API: support answering
+         *     "I can't see my booking" has to be able to tell two Rafis apart. It is admin-only,
+         *     and there is no impersonation anywhere — an admin can read an account, never act as
+         *     one.
+         */
+        PlayerLookup: {
+            /** Format: uuid */
+            id: string;
+            readonly name: string;
+            /** Format: email */
+            email: string;
+            phone: string;
+            /** Format: uuid */
+            readonly player_profile_id: string | null;
+            is_platform_admin: boolean;
+            is_active: boolean;
+            /** Format: date-time */
+            created_at: string;
+        };
         /**
          * @description * `left` - Left
          *     * `right` - Right
@@ -6224,6 +6346,12 @@ export interface components {
          * @enum {string}
          */
         TeamSideEnum: "A" | "B";
+        TopTurf: {
+            name: string;
+            slug: string;
+            area: string;
+            bookings: number;
+        };
         /** @description Everything the track-record tab shows. */
         TrackRecord: {
             grounds: components["schemas"]["TrackRecordEntry"][];
@@ -6561,6 +6689,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientConfig"];
+                };
+            };
+        };
+    };
+    platform_dashboard: {
+        parameters: {
+            query?: {
+                /** @description Window in days. Default 30, max 365. */
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformDashboard"];
+                };
+            };
+        };
+    };
+    player_lookup: {
+        parameters: {
+            query: {
+                /** @description At least 3 characters. */
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlayerLookup"][];
                 };
             };
         };

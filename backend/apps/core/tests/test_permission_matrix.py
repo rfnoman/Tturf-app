@@ -177,6 +177,24 @@ class TestPersonalDataInPayloads:
         assert "@" not in label
         assert label == "Player"
 
+    def test_the_same_holds_for_a_player_who_has_a_profile(self):
+        """The layer the first fix missed.
+
+        `player_label` prefers `profile.name`, and `PlayerProfile.name` had the same
+        email fallback underneath it — so a player who had started onboarding but set no
+        name was still being identified by their email everywhere.
+        """
+        from apps.core.utils import player_label
+        from apps.players.services import get_or_create_profile
+
+        stranger = UserFactory(first_name="", last_name="", email="private@example.com")
+        profile = get_or_create_profile(stranger)
+        profile.display_name = ""
+        profile.save(update_fields=["display_name"])
+
+        assert "@" not in player_label(stranger)
+        assert "@" not in profile.name
+
     def test_a_named_player_is_called_by_their_name(self):
         from apps.core.utils import player_label
 
