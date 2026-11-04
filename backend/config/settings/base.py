@@ -269,10 +269,40 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 # Manifest storage requires a collectstatic run, so it is enabled in prod only.
 # Media moves to S3-compatible storage in Phase 02 (django-storages).
+#: Uploaded media — turf photos, player photos, squad crests.
+#:
+#: The local filesystem in development, and S3-compatible object storage wherever
+#: `AWS_STORAGE_BUCKET_NAME` is set (Phase 11 step 8, DECISIONS D71). "S3-compatible"
+#: rather than "AWS" is the point: the same settings drive DigitalOcean Spaces,
+#: Cloudflare R2 and Backblaze B2, so where the files live stays a deployment choice
+#: rather than a code one. A container filesystem is not a place to keep anything that
+#: has to survive a restart.
+MEDIA_BUCKET = env("AWS_STORAGE_BUCKET_NAME", default="")
+
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
+
+if MEDIA_BUCKET:
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": MEDIA_BUCKET,
+            # Everything here is a photo meant to be looked at by anybody who can see the
+            # turf or the match, so the objects are public and served straight from the
+            # bucket's CDN rather than signed on every read.
+            "default_acl": env("AWS_DEFAULT_ACL", default="public-read"),
+            "querystring_auth": False,
+            "file_overwrite": False,
+            # A year: filenames are unique per upload (`file_overwrite=False`), so a URL
+            # never points at different bytes.
+            "object_parameters": {"CacheControl": "public, max-age=31536000, immutable"},
+            "endpoint_url": env("AWS_S3_ENDPOINT_URL", default=None),
+            "region_name": env("AWS_S3_REGION_NAME", default=None),
+            "custom_domain": env("AWS_S3_CUSTOM_DOMAIN", default=None),
+        },
+    }
 
 # ---------------------------------------------------------------------------
 # DRF + OpenAPI

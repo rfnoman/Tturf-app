@@ -48,3 +48,18 @@ describe("formatWhen", () => {
     expect(formatDay("2026-11-05", "en")).toBe("5 Nov");
   });
 });
+
+describe("env", () => {
+  it("treats an empty variable as unset", async () => {
+    // `process.env.X ?? fallback` does not do this: `??` catches null and undefined, and
+    // an environment variable set to "" is neither. Docker turns an unset ARG into an
+    // empty ENV, so the production build died on `new URL("")` — which is how this
+    // function came to exist (Phase 11 step 8).
+    const { env } = await import("../../lib/env");
+
+    expect(env("", "fallback")).toBe("fallback");
+    expect(env("   ", "fallback")).toBe("fallback");
+    expect(env(undefined, "fallback")).toBe("fallback");
+    expect(env("https://turfapp.com.bd", "fallback")).toBe("https://turfapp.com.bd");
+  });
+});

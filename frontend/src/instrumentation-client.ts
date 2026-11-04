@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
+import { env } from "@/lib/env";
 
 import { scrub } from "@/lib/sentry-scrub";
 
@@ -14,9 +15,9 @@ const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 if (dsn) {
   Sentry.init({
     dsn,
-    environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "development",
+    environment: env(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT, "development"),
     release: process.env.NEXT_PUBLIC_SENTRY_RELEASE,
-    tracesSampleRate: Number(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE ?? 0.1),
+    tracesSampleRate: Number(env(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE, "0.1")),
     beforeSend: scrub,
     // Session replay is deliberately not enabled: it would record players' own screens,
     // including their phone numbers and delivery addresses, to a third party.

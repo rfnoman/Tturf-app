@@ -7,6 +7,7 @@ import { getLocale } from "next-intl/server";
 
 import { InstallPrompt } from "@/components/layout/install-prompt";
 import { RegisterServiceWorker } from "@/components/layout/register-service-worker";
+import { env } from "@/lib/env";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 
@@ -32,7 +33,7 @@ const bengali = Hind_Siliguri({
 export const metadata: Metadata = {
   // Absolute URLs for Open Graph images: a shared scorecard link is previewed by
   // Messenger and WhatsApp from their own servers, where a relative path means nothing.
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(env(process.env.NEXT_PUBLIC_SITE_URL, "http://localhost:3000")),
   title: "TurfApp",
   description: "Book sports turfs in Bangladesh, fill your match, build your profile.",
 };

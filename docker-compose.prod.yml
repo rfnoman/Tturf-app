@@ -1,0 +1,107 @@
+# Production topology (Phase 11 step 8).
+#
+# This is the shape of a deployment, not a deployment: Postgres and Redis are expected
+# to be managed services, and the three application processes are what you actually run.
+# It is written as compose because that is readable and runs on a single droplet, and it
+# maps one-to-one onto a container platform when that becomes worth doing.
+#
+# The three services share one image on purpose — same code, same dependencies, three
+# commands. Three images would be three things to keep in step, and the day they drift
+# is the day beat runs last week's business rules.
+
+name: turfapp
+
+x-backend: &backend
+  image: ${BACKEND_IMAGE:-turfapp-backend:latest}
+  build:
+    context: ./backend
+  env_file: [.env.prod]
+  environment:
+    DJANGO_SETTINGS_MODULE: config.settings.prod
+  restart: unless-stopped
+  depends_on:
+    postgres: {condition: service_healthy}
+    redis: {condition: service_healthy}
+
+services:
+  api:
+    <<: *backend
+    ports: ["8000:8000"]
+    healthcheck:
+      # The endpoint reports the database, the cache and the workers, so this answers
+      # "can it serve", not just "is the process alive" (Phase 11 step 5).
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  worker:
+    <<: *backend
+    command: celery -A config worker --loglevel=info --concurrency=4
+    healthcheck:
+      test: ["CMD", "celery", "-A", "config", "inspect", "ping", "-d", "celery@$$HOSTNAME"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  beat:
+    <<: *backend
+    # Exactly one. Two beats mean every timer fires twice — two hold-expiry runs, two
+    # weekly recaps — and the jobs are idempotent per match or per week, not per run.
+    command: celery -A config beat --loglevel=info --scheduler=celery.beat:PersistentScheduler
+    deploy:
+      replicas: 1
+
+  web:
+    image: ${FRONTEND_IMAGE:-turfapp-web:latest}
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
+        NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${NEXT_PUBLIC_SENTRY_ENVIRONMENT:-production}
+        NEXT_PUBLIC_SENTRY_RELEASE: ${NEXT_PUBLIC_SENTRY_RELEASE:-}
+    env_file: [.env.prod]
+    ports: ["3000:3000"]
+    restart: unless-stopped
+    depends_on: [api]
+
+  # Both of these belong on a managed service in anything but a single-box deployment:
+  # the backup story, the failover story and the upgrade story are all somebody else's
+  # job and they are better at them. They are here so the topology is complete and
+  # runnable.
+  postgres:
+    image: postgis/postgis:17-3.5
+    env_file: [.env.prod]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-turf}
+      POSTGRES_USER: ${POSTGRES_USER:-turf}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-turf}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:8-alpine
+    # `appendonly` because Redis is the Celery broker here: losing the queue on a restart
+    # means losing whatever timers were pending.
+    command: redis-server --appendonly yes
+    volumes: ["redisdata:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
