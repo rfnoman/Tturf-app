@@ -16,6 +16,8 @@ class HealthView(APIView):
 
     authentication_classes: list = []
     permission_classes = [AllowAny]
+    # A load balancer polling this must never be told to slow down.
+    throttle_classes: list = []
 
     @extend_schema(
         operation_id="health",
@@ -70,6 +72,10 @@ class ClientConfigView(APIView):
 
     authentication_classes: list = []
     permission_classes = [AllowAny]
+    # Unthrottled on purpose. Every server-rendered page reads this, and they all reach
+    # Django from the frontend server's single address — so an IP-keyed limit here
+    # throttles the site, not an attacker. The response is a handful of constants.
+    throttle_classes: list = []
 
     @extend_schema(
         operation_id="client_config",

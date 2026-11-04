@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.core.throttling import ReachingPeopleThrottle
 from apps.players.models import PlayerProfile
 
 from .models import JoinRequest, Match, MatchInvite, Squad, SquadInvite
@@ -185,7 +186,12 @@ class MatchViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         request=JoinRequestCreateSerializer,
         responses={201: JoinRequestSerializer},
     )
-    @action(detail=True, methods=["post"], url_path="request")
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="request",
+        throttle_classes=[ReachingPeopleThrottle],
+    )
     def request_join(self, request, pk=None):
         match = self.get_object()
         payload = JoinRequestCreateSerializer(data=request.data)
@@ -226,7 +232,7 @@ class MatchViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         request=InvitePlayerSerializer,
         responses={201: MatchInviteSerializer},
     )
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], throttle_classes=[ReachingPeopleThrottle])
     def invite(self, request, pk=None):
         match = self.get_object()
         payload = InvitePlayerSerializer(data=request.data)
@@ -464,7 +470,7 @@ class SquadViewSet(
         request=InvitePlayerSerializer,
         responses={201: SquadInviteSerializer},
     )
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], throttle_classes=[ReachingPeopleThrottle])
     def invite(self, request, slug=None):
         squad = self.get_object()
         payload = InvitePlayerSerializer(data=request.data)

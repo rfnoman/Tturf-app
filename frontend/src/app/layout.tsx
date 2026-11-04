@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Hind_Siliguri } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 
@@ -50,11 +51,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Locale comes from the cookie, resolved in src/i18n/request.ts (no URL prefix, D13).
   const locale = await getLocale();
 
+  // Clerk renders its own <script src>, which `strict-dynamic` blocks unless it carries
+  // the same nonce `src/proxy.ts` minted for this response. Next stamps its own scripts
+  // automatically; Clerk has to be told.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html lang={locale} className={bengali.variable} suppressHydrationWarning>
       <body className="bg-background text-foreground min-h-dvh antialiased">
         {/* ClerkProvider belongs inside <body>, not wrapping <html>. */}
-        <ClerkProvider>
+        <ClerkProvider nonce={nonce}>
           <NextIntlClientProvider>
             <Providers>
               <RegisterServiceWorker />

@@ -3,7 +3,7 @@ from __future__ import annotations
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from apps.core.utils import plain_decimal
+from apps.core.utils import plain_decimal, player_label
 from apps.sports.serializers import StatDefinitionSerializer
 
 from .models import (
@@ -16,11 +16,6 @@ from .models import (
     ScorecardStatus,
     TeamSide,
 )
-
-
-def player_label(user) -> str:
-    profile = getattr(user, "player_profile", None)
-    return profile.name if profile else (user.full_name or user.email)
 
 
 def profile_id_of(user):

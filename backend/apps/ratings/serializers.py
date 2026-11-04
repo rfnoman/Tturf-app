@@ -3,6 +3,7 @@ from __future__ import annotations
 from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
 
+from apps.core.utils import player_label
 from apps.players.serializers import (
     PlayerSportCardSerializer,
     PublicPlayerProfileSerializer,
@@ -158,8 +159,7 @@ class ConductReportSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def _name(self, user) -> str:
-        profile = getattr(user, "player_profile", None)
-        return profile.name if profile else (user.full_name or user.email)
+        return player_label(user)
 
     @extend_schema_field(serializers.CharField())
     def get_reporter_name(self, obj) -> str:

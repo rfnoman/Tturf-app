@@ -27,6 +27,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
+from apps.core.validators import validate_image_upload
 from apps.sports.models import Attribute, Sport, SportSkill
 
 RATING_MIN = 1
@@ -69,6 +70,7 @@ class PlayerProfile(BaseModel):
         upload_to="players/photos/",
         blank=True,
         null=True,
+        validators=[validate_image_upload],
         help_text="Overrides the Clerk avatar when set.",
     )
     date_of_birth = models.DateField(_("date of birth"), null=True, blank=True)

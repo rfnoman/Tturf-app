@@ -15,6 +15,11 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 X_FRAME_OPTIONS = "DENY"
+# A complete map of every endpoint, payload and parameter is the first thing anybody
+# probing the API would want. The people who need it have accounts (Phase 11 step 4).
+API_DOCS_PUBLIC = env.bool("API_DOCS_PUBLIC", default=False)
+# Behind the admin password is every booking, payment and player record (D64).
+ADMIN_REQUIRES_OTP = env.bool("ADMIN_REQUIRES_OTP", default=True)
 
 # WhiteNoise serves collected static files in production; in dev the staticfiles app does.
 MIDDLEWARE = MIDDLEWARE.copy()

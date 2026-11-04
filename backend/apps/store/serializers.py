@@ -3,6 +3,7 @@ from __future__ import annotations
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
+from apps.core.utils import player_label
 from apps.inventory.serializers import NutritionSerializer, ProductSerializer
 
 from .models import (
@@ -175,8 +176,7 @@ class OrderEventSerializer(serializers.ModelSerializer):
     def get_actor_name(self, obj) -> str:
         if not obj.actor:
             return ""
-        profile = getattr(obj.actor, "player_profile", None)
-        return profile.name if profile else (obj.actor.full_name or obj.actor.email)
+        return player_label(obj.actor)
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -226,8 +226,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.CharField())
     def get_player_name(self, obj) -> str:
-        profile = getattr(obj.player, "player_profile", None)
-        return profile.name if profile else (obj.player.full_name or obj.player.email)
+        return player_label(obj.player)
 
     @extend_schema_field(serializers.CharField(allow_blank=True))
     def get_rider_name(self, obj) -> str:

@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 
 from apps.core.cache import LEADERBOARD_TTL, cached
 from apps.core.permissions import IsPlatformAdmin
+from apps.core.throttling import PlayerSearchThrottle, ReportThrottle
 from apps.matches.models import Match
 from apps.matches.services import can_view_match
 from apps.players.models import PlayerProfile
@@ -59,6 +60,8 @@ class PlayerSearchView(ListAPIView):
 
     serializer_class = PlayerSearchResultSerializer
     permission_classes = [IsAuthenticated]
+    # Searchable is not the same as scrapeable (Phase 11 step 4).
+    throttle_classes = [PlayerSearchThrottle]
 
     @extend_schema(
         operation_id="player_search",
@@ -223,6 +226,8 @@ class MatchConductReportView(APIView):
     """Reporting somebody for what happened in a match (DOMAIN §8)."""
 
     permission_classes = [IsAuthenticated]
+    # The review queue is the scarce resource, not the database row.
+    throttle_classes = [ReportThrottle]
 
     @extend_schema(
         operation_id="conduct_report_create",

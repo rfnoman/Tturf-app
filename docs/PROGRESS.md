@@ -15,7 +15,7 @@ Updated by Claude Code at the end of each phase.
 | 08 Store, orders, delivery | **done** | 2026-11-04 | Match-aware store, cart split by source, fulfilment matrix with the 16h cutoff, orders, riders, cash on delivery |
 | 09 Fitness layer & notifications+ | **done** | 2026-11-04 | Activity from matches, goals, streaks, bundles, reminder jobs, web push, SSE live updates, home dashboard |
 | 10 Online payments & ledger | **done** (sandbox credentials pending) | 2026-11-04 | Provider abstraction, SSLCommerz with server-side validation, advances, policy refunds, balanced ledger, commissions, payouts |
-| 11 Hardening, Bangla, launch | **in progress** (steps 1-3 of 9 done) | 2026-11-04 | Audit; Bangla; installable PWA; two N+1s fixed with query budgets and a cache policy |
+| 11 Hardening, Bangla, launch | **in progress** (steps 1-4 of 9 done) | 2026-11-04 | Audit; Bangla; PWA; N+1s and caching; permission matrix, throttling, CSP, PII and upload limits |
 
 ## Log
 <!-- Per phase: what was built, deviations from the plan, known gaps, follow-ups. -->
@@ -1241,3 +1241,104 @@ page that was still free to improve.
 - Only four endpoints have budgets. The scorecard, store checkout and owner finance pages
   build nested payloads too and should get one each.
 - No load test yet — step 9 owns that, against staging.
+
+### Phase 11 — step 4 of 9: security (2026-11-04)
+
+**The permission matrix, and what it was for**
+
+167 routes were added by hand across eleven phases, and the failure mode is silent: one
+missing `IsAuthenticated` is a data leak no feature test notices, because every feature
+test is already signed in as somebody. `apps/core/tests/test_permission_matrix.py` walks
+the **URL conf itself** rather than a list somebody maintains — a route added tomorrow is
+covered tomorrow — and asserts three things:
+
+- every route refuses an anonymous request, unless it is named in `PUBLIC_ROUTES` **with
+  a reason**, which makes opening one an argument in a diff rather than a discovery in a
+  log;
+- every open route is one of those eleven, and no more;
+- every admin route refuses an ordinary signed-in player.
+
+A URL built wrongly 404s, and 404 is not in the accepted set — so a broken test URL fails
+loudly instead of passing for the wrong reason, which is the failure mode that would make
+the whole file worthless.
+
+**What it found**
+
+- **The complete API schema and two interactive documentation UIs were open to the
+  world.** 167 endpoints, their payloads and their parameters — the first thing anybody
+  probing the API would want. They are now gated by `API_DOCS_PUBLIC`: open locally so
+  `npm run gen:api` needs no credentials, platform admins only once deployed. The test
+  settings use the *production* posture, so the matrix covers those routes for real.
+  (The gate had to go in `SPECTACULAR_SETTINGS["SERVE_PERMISSIONS"]` — drf-spectacular's
+  views read that and ignore `permission_classes` passed to `as_view()`.)
+- **A player's email address was being used as their display name in eleven places.**
+  Every roster row, board card, timeline entry and audit line falls back to *something*
+  when a player has not set a name, and that fallback was `user.email` — so anybody who
+  signed up and did not finish onboarding had their email shown to everyone who could see
+  the match. There is now one `player_label()`: the profile name, else the account name,
+  else the neutral word "Player". Two unnamed players look alike, which is the correct
+  trade — they are strangers about to turn up to the same pitch, not people who need to
+  identify each other. The grep that found it is kept as a test.
+- **Image uploads had no size and no pixel limit.** `ImageField` refuses anything Pillow
+  cannot open, which stops the obvious "rename a script to .png", but it bounds nothing:
+  a turf photo could be a 500 MB file, or a 20,000 × 20,000 PNG that unpacks to over a
+  gigabyte the moment anything reads it. Now 5 MB and 6000 px a side, with Django's own
+  `DATA_UPLOAD_MAX_MEMORY_SIZE` as the cruder guard that runs first, and messages a
+  person can act on ("that image is 12.4 MB; the limit is 5").
+
+**Rate limiting, and the mistake worth recording** (D65)
+
+Nothing was metered at all before this: one script could fill a player's inbox with join
+requests, flood the admin conduct queue, or walk the whole player directory.
+
+The first attempt set the anonymous limit to 60/min and **took the entire end-to-end
+suite down**. The reason is worth keeping: DRF's `AnonRateThrottle` keys on IP, and every
+server-rendered page reaches Django from the *frontend server's* single address — so a
+thousand readers look like one caller, and a tight anonymous limit throttles the site
+long before it inconveniences a scraper. It is a crude flood guard and nothing more.
+
+So: `/api/v1/config` and the health probe are unthrottled outright (they are constants,
+and a load balancer polling a health check must never be told to slow down), the
+anonymous ceiling is 1200/min, and the limits that do real work are **scoped per user**
+on the actions that reach another person — invites and join requests 20/hour, conduct
+reports 10/hour, player search 120/hour. Searchable is not the same as scrapeable, and
+the difference is a rate. A test drives one past its limit and asserts the 429; another
+asserts that reading the board forty times in a row is still fine, because the day these
+limits start interrupting somebody filtering interactively is the day they are wrong.
+
+**A content policy with a real nonce**
+
+There was none. It could not go in `next.config.ts`, because the App Router emits inline
+`<script>` tags carrying the flight payload on every page and a static policy can only
+allow those with `'unsafe-inline'` — which is most of what a script policy is for. So
+`src/proxy.ts` mints a nonce per response, sets the policy on both the request (where
+Next reads it back to stamp its own scripts) and the response, and `ClerkProvider` is
+handed the same nonce — Clerk renders its own `<script src>`, and under `'strict-dynamic'`
+host allowlisting is disabled, so without the nonce sign-in simply stops working. Also
+set: `Referrer-Policy`, `Permissions-Policy` (geolocation and notifications only, camera,
+microphone and payment denied), `nosniff` and `X-Frame-Options: DENY`.
+
+**The Django admin now wants a second factor** (D64)
+
+Clerk guards player and owner accounts and brings its own, but `/admin/` is a separate
+door with a separate password, and behind it is every booking, every payment and every
+player's details. `django-otp` with TOTP, `OTPAdminSite`, off in development and on in
+production. The new dependency is justified in D64 as CLAUDE.md asks.
+
+**Dependency audits in CI**: `npm audit --audit-level=high` and `pip-audit` against the
+exported production requirements. Both pass today. `--audit-level=high` is deliberate —
+all 22 current npm advisories are moderate, every one of them in `minimatch` or eslint
+tooling that never reaches the bundle, and a job that cries wolf gets disabled.
+
+**Verified in the browser** (Chrome DevTools, production build): the policy header is
+served with a fresh nonce per response, Next's inline scripts carry it, Clerk loads, the
+page hydrates and the console is clean. Before the nonce was passed to `ClerkProvider`
+the console showed exactly the failure described above, which is how that line got
+written.
+
+**Known gaps / follow-ups**
+
+- CORS still allows the development origins; the production list is part of step 8.
+- The admin TOTP device has to be registered by hand after the first deploy — there is
+  no bootstrap flow, and for one or two administrators there should not be.
+- Notification and email templates remain English-only (carried from step 1).

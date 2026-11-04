@@ -51,3 +51,10 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # A known-vulnerable dependency is a security bug that nobody wrote, so nobody
+      # finds it in review. `--audit-level=high` keeps the signal: a low-severity
+      # advisory in a build-time tool is not worth failing a merge over, and a job that
+      # cries wolf gets disabled.
+      - name: Dependency audit
+        run: npm audit --audit-level=high

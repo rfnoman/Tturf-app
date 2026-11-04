@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from svix.webhooks import Webhook, WebhookVerificationError
 
+from apps.core.throttling import WebhookThrottle
+
 from .serializers import UserSerializer
 from .services import deactivate_user_from_clerk, sync_user_from_clerk
 
@@ -42,6 +44,9 @@ class ClerkWebhookView(APIView):
     """
 
     authentication_classes: list = []
+    # A scope of its own: without one this would share the anonymous bucket with every
+    # signed-out visitor, and a burst of user updates would start being dropped.
+    throttle_classes = [WebhookThrottle]
     permission_classes = [AllowAny]
 
     @extend_schema(

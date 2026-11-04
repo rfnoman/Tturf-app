@@ -22,6 +22,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
+from apps.core.validators import validate_image_upload
 from apps.sports.models import Sport, SportFormat
 
 
@@ -159,7 +160,9 @@ class Turf(BaseModel):
 
 class TurfPhoto(BaseModel):
     turf = models.ForeignKey(Turf, on_delete=models.CASCADE, related_name="photos")
-    image = models.ImageField(_("image"), upload_to="turfs/photos/")
+    image = models.ImageField(
+        _("image"), upload_to="turfs/photos/", validators=[validate_image_upload]
+    )
     caption = models.CharField(_("caption"), max_length=160, blank=True)
     order = models.PositiveSmallIntegerField(_("display order"), default=0)
 

@@ -27,6 +27,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.core.models import BaseModel
+from apps.core.validators import validate_image_upload
 from apps.players.models import PlayerProfile
 from apps.sports.models import Sport, SportFormat
 
@@ -37,7 +38,13 @@ class Squad(BaseModel):
     name = models.CharField(_("name"), max_length=80)
     slug = models.SlugField(_("slug"), max_length=90, unique=True)
     description = models.TextField(_("description"), max_length=500, blank=True)
-    crest = models.ImageField(_("crest"), upload_to="squads/crests/", blank=True, null=True)
+    crest = models.ImageField(
+        _("crest"),
+        upload_to="squads/crests/",
+        blank=True,
+        null=True,
+        validators=[validate_image_upload],
+    )
     leader = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="led_squads"
     )
