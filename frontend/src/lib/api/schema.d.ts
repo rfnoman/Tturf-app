@@ -2588,10 +2588,416 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/store/home": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The store, arranged around this player
+         * @description What the store leads with (DOMAIN §9): the player's next match, then nearby.
+         */
+        get: operations["store_home"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/store/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Products at one source
+         * @description What is for sale at one source, with the fitness filters.
+         */
+        get: operations["store_products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/store/cart": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My cart
+         * @description The cart, already grouped the way it will be ordered.
+         */
+        get: operations["cart_read"];
+        put?: never;
+        /**
+         * Add to the cart
+         * @description The cart, already grouped the way it will be ordered.
+         */
+        post: operations["cart_add"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change or remove a line
+         * @description The cart, already grouped the way it will be ordered.
+         */
+        patch: operations["cart_set_quantity"];
+        trace?: never;
+    };
+    "/api/v1/store/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Place the order(s)
+         * @description One order per source. All or nothing.
+         */
+        post: operations["checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My addresses */
+        get: operations["addresses_list"];
+        put?: never;
+        /** Add an address */
+        post: operations["addresses_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My orders */
+        get: operations["my_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Deliveries assigned to me
+         * @description A rider's own list — never the whole queue.
+         */
+        get: operations["my_deliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One order
+         * @description One order, for whoever is entitled to see it.
+         */
+        get: operations["order_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept an order
+         * @description Finding one order, for whoever is entitled to see it.
+         *
+         *     A mixin, not a base view: inheriting the detail view would give every action a GET
+         *     as well, which is eight operations sharing one id in the schema.
+         */
+        post: operations["order_accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}/pack": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark an order packed
+         * @description Finding one order, for whoever is entitled to see it.
+         *
+         *     A mixin, not a base view: inheriting the detail view would give every action a GET
+         *     as well, which is eight operations sharing one id in the schema.
+         */
+        post: operations["order_pack"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ready for pickup
+         * @description Finding one order, for whoever is entitled to see it.
+         *
+         *     A mixin, not a base view: inheriting the detail view would give every action a GET
+         *     as well, which is eight operations sharing one id in the schema.
+         */
+        post: operations["order_ready"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}/out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Out for delivery
+         * @description Finding one order, for whoever is entitled to see it.
+         *
+         *     A mixin, not a base view: inheriting the detail view would give every action a GET
+         *     as well, which is eight operations sharing one id in the schema.
+         */
+        post: operations["order_out_for_delivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}/settle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Delivered or picked up
+         * @description Finding one order, for whoever is entitled to see it.
+         *
+         *     A mixin, not a base view: inheriting the detail view would give every action a GET
+         *     as well, which is eight operations sharing one id in the schema.
+         */
+        post: operations["order_settle"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel an order
+         * @description Finding one order, for whoever is entitled to see it.
+         *
+         *     A mixin, not a base view: inheriting the detail view would give every action a GET
+         *     as well, which is eight operations sharing one id in the schema.
+         */
+        post: operations["order_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{order_id}/rider": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Give it to a rider
+         * @description Finding one order, for whoever is entitled to see it.
+         *
+         *     A mixin, not a base view: inheriting the detail view would give every action a GET
+         *     as well, which is eight operations sharing one id in the schema.
+         */
+        post: operations["order_assign_rider"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/turfs/{slug}/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Orders at my turf
+         * @description A turf's incoming orders, next to its bookings.
+         */
+        get: operations["turf_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The platform's order queue */
+        get: operations["platform_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/riders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Riders */
+        get: operations["riders_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AddToCartRequest: {
+            /** Format: uuid */
+            stock_item_id: string;
+            /** @default 1 */
+            quantity: number;
+        };
+        Address: {
+            /** Format: uuid */
+            readonly id: string;
+            /** @description e.g. "Home". */
+            label?: string;
+            /** Address */
+            line: string;
+            area: string;
+            phone?: string;
+            /** Default */
+            is_default?: boolean;
+        };
+        AddressRequest: {
+            /** @description e.g. "Home". */
+            label?: string;
+            /** Address */
+            line: string;
+            area: string;
+            phone?: string;
+            /** Default */
+            is_default?: boolean;
+        };
         AdjustStockRequest: {
             delta: number;
             reason: string;
@@ -2604,6 +3010,10 @@ export interface components {
             icon?: string;
             /** Display order */
             order?: number;
+        };
+        AssignRiderRequest: {
+            /** Format: uuid */
+            rider_id: string;
         };
         AssignScorerRequest: {
             /**
@@ -2776,6 +3186,53 @@ export interface components {
         CancelBookingRequest: {
             reason?: string;
         };
+        CancelOrderRequest: {
+            reason?: string;
+        };
+        Cart: {
+            groups: components["schemas"]["CartGroup"][];
+            /** Format: decimal */
+            subtotal: string;
+            item_count: number;
+        };
+        /** @description The cart as it will be ordered: one group per source, with its own options. */
+        CartGroup: {
+            /** Format: uuid */
+            source_id: string;
+            source_name: string;
+            turf_slug: string;
+            is_platform: boolean;
+            items: components["schemas"]["CartItem"][];
+            /** Format: decimal */
+            subtotal: string;
+            options: components["schemas"]["FulfilmentOption"][];
+        };
+        CartItem: {
+            /** Format: uuid */
+            readonly id: string;
+            /** Format: uuid */
+            readonly stock_item_id: string;
+            readonly product: components["schemas"]["Product"];
+            /** Format: decimal */
+            readonly price: string;
+            readonly quantity: number;
+            readonly available: number;
+            /** Format: decimal */
+            readonly line_total: string;
+        };
+        CheckoutChoiceRequest: {
+            /** Format: uuid */
+            source_id: string;
+            fulfilment: components["schemas"]["OrderFulfilmentEnum"];
+            /** Format: uuid */
+            match_id?: string | null;
+            /** Format: uuid */
+            address_id?: string | null;
+            notes?: string;
+        };
+        CheckoutRequest: {
+            choices: components["schemas"]["CheckoutChoiceRequest"][];
+        };
         ClientConfig: {
             rating_min: number;
             rating_max: number;
@@ -2944,6 +3401,15 @@ export interface components {
             yellow_cards: number;
             red_cards: number;
             upheld_reports: number;
+        };
+        /** @description An option, and — when it is closed — why. */
+        FulfilmentOption: {
+            kind: components["schemas"]["OrderFulfilmentEnum"];
+            available: boolean;
+            /** Format: decimal */
+            fee: string;
+            eta_hours: number | null;
+            reason: string;
         };
         Ground: {
             /** Format: uuid */
@@ -3250,9 +3716,16 @@ export interface components {
          *     * `stock_low` - Stock running low
          *     * `rental_out` - Gear taken out
          *     * `rental_overdue` - Gear not returned
+         *     * `order_placed` - New order
+         *     * `order_accepted` - Order accepted
+         *     * `order_ready` - Order ready for pickup
+         *     * `order_assigned` - Delivery assigned
+         *     * `order_delivered` - Order delivered
+         *     * `order_cancelled` - Order cancelled
+         *     * `order_cutoff_soon` - Order before the cutoff
          * @enum {string}
          */
-        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined" | "scorecard_submitted" | "scorecard_disputed" | "scorecard_locked" | "motm_awarded" | "stock_low" | "rental_out" | "rental_overdue";
+        NotificationKindEnum: "booking_created" | "booking_pending_confirmation" | "booking_confirmed" | "booking_expired" | "booking_cancelled" | "booking_paid" | "booking_no_show" | "booking_completed" | "booking_reminder" | "squad_invite" | "squad_joined" | "match_added" | "match_removed" | "match_player_left" | "match_join_request" | "match_join_approved" | "match_join_declined" | "match_invite" | "match_invite_proposed" | "match_invite_accepted" | "match_invite_declined" | "scorecard_submitted" | "scorecard_disputed" | "scorecard_locked" | "motm_awarded" | "stock_low" | "rental_out" | "rental_overdue" | "order_placed" | "order_accepted" | "order_ready" | "order_assigned" | "order_delivered" | "order_cancelled" | "order_cutoff_soon";
         /** @description The nutrition panel, kept together so the UI can hide it in one go. */
         Nutrition: {
             serving_size: string;
@@ -3322,6 +3795,97 @@ export interface components {
              */
             close_time: string;
         };
+        Order: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly source_name: string;
+            readonly turf_slug: string;
+            readonly player_name: string;
+            readonly fulfilment: components["schemas"]["OrderFulfilmentEnum"];
+            readonly fulfilment_label: string;
+            readonly status: components["schemas"]["OrderStatusEnum"];
+            readonly status_label: string;
+            /** Format: decimal */
+            readonly subtotal: string;
+            /** Format: decimal */
+            readonly delivery_fee: string;
+            /** Format: decimal */
+            readonly total: string;
+            /** Payment */
+            readonly payment_method: components["schemas"]["OrderPaymentMethodEnum"];
+            readonly address: components["schemas"]["Address"];
+            /**
+             * Format: uuid
+             * @description Required for delivery to a turf; optional for a pickup.
+             */
+            readonly match: string | null;
+            readonly match_summary: string;
+            readonly rider_name: string;
+            /**
+             * Needed by
+             * Format: date-time
+             * @description Kick-off, for an order going to a match.
+             */
+            readonly scheduled_for: string | null;
+            readonly notes: string;
+            /** Format: date-time */
+            readonly settled_at: string | null;
+            /** Cancellation reason */
+            readonly cancel_reason: string;
+            readonly items: components["schemas"]["OrderItem"][];
+            readonly events: components["schemas"]["OrderEvent"][];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        OrderEvent: {
+            /** Format: uuid */
+            readonly id: string;
+            /** From */
+            readonly from_status: components["schemas"]["OrderStatusEnum"];
+            /** To */
+            readonly to_status: components["schemas"]["OrderStatusEnum"];
+            readonly to_status_label: string;
+            readonly actor_name: string;
+            readonly note: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `pickup_at_turf` - Pick up at the turf
+         *     * `deliver_to_turf` - Delivered to the turf for a match
+         *     * `deliver_to_address` - Delivered to an address
+         * @enum {string}
+         */
+        OrderFulfilmentEnum: "pickup_at_turf" | "deliver_to_turf" | "deliver_to_address";
+        OrderItem: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            /** Format: decimal */
+            readonly unit_price: string;
+            readonly quantity: number;
+            /** Format: decimal */
+            readonly line_total: string;
+            readonly nutrition: components["schemas"]["Nutrition"];
+        };
+        /**
+         * @description * `cod` - Cash on delivery
+         *     * `pay_at_pickup` - Pay at pickup
+         * @enum {string}
+         */
+        OrderPaymentMethodEnum: "cod" | "pay_at_pickup";
+        /**
+         * @description * `placed` - Placed
+         *     * `accepted` - Accepted
+         *     * `packed` - Packed
+         *     * `out_for_delivery` - Out for delivery
+         *     * `ready_for_pickup` - Ready for pickup
+         *     * `delivered` - Delivered
+         *     * `picked_up` - Picked up
+         *     * `cancelled` - Cancelled
+         * @enum {string}
+         */
+        OrderStatusEnum: "placed" | "accepted" | "packed" | "out_for_delivery" | "ready_for_pickup" | "delivered" | "picked_up" | "cancelled";
         /** @description The owner's own view: status and review feedback, which players never see. */
         OwnerTurf: {
             /** Format: uuid */
@@ -3732,6 +4296,11 @@ export interface components {
             extra?: {
                 [key: string]: unknown;
             };
+        };
+        PatchedSetCartQuantityRequest: {
+            /** Format: uuid */
+            stock_item_id?: string;
+            quantity?: number;
         };
         PatchedSquadWriteRequest: {
             name?: string;
@@ -4404,6 +4973,14 @@ export interface components {
         ReviewDecisionRequest: {
             reason?: string;
         };
+        Rider: {
+            /** Format: uuid */
+            readonly id: string;
+            readonly name: string;
+            readonly phone: string;
+            /** Active */
+            readonly is_active: boolean;
+        };
         /** @description A roster entry carrying enough profile to render the Phase 01 card. */
         RosterPlayer: {
             /** Format: uuid */
@@ -4508,6 +5085,10 @@ export interface components {
             assignments: {
                 [key: string]: "A" | "B";
             };
+        };
+        SettleOrderRequest: {
+            /** Format: decimal */
+            cash_received?: string;
         };
         SettleRentalRequest: {
             /** Format: decimal */
@@ -4847,6 +5428,19 @@ export interface components {
          * @enum {string}
          */
         StockMovementTypeEnum: "purchase" | "sale" | "counter_sale" | "reservation" | "release" | "rental_out" | "rental_return" | "adjustment";
+        /** @description One buyable thing at one source: the product, its price here, and how many. */
+        StoreItem: {
+            /** Format: uuid */
+            stock_item_id: string;
+            product: components["schemas"]["Product"];
+            /** Format: decimal */
+            price: string;
+            available: number;
+            /** Format: uuid */
+            source_id: string;
+            source_name: string;
+            readonly turf_slug: string;
+        };
         TeamPlayer: {
             /** Format: uuid */
             match_player_id: string;
@@ -8906,6 +9500,504 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StockItem"];
+                };
+            };
+        };
+    };
+    store_home: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No response body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    store_products: {
+        parameters: {
+            query?: {
+                category?: string;
+                max_calories?: number;
+                min_protein?: number;
+                q?: string;
+                /** @description Stock location id, or "platform". */
+                source?: string;
+                sport?: string;
+                tag?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoreItem"][];
+                };
+            };
+        };
+    };
+    cart_read: {
+        parameters: {
+            query?: {
+                /** @description Address id, to price delivery. */
+                address?: string;
+                /** @description Match id, to price delivery to a turf. */
+                match?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cart"];
+                };
+            };
+        };
+    };
+    cart_add: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddToCartRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddToCartRequest"];
+                "multipart/form-data": components["schemas"]["AddToCartRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cart"];
+                };
+            };
+            /** @description No response body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cart_set_quantity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["PatchedSetCartQuantityRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["PatchedSetCartQuantityRequest"];
+                "multipart/form-data": components["schemas"]["PatchedSetCartQuantityRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Cart"];
+                };
+            };
+            /** @description No response body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    checkout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CheckoutRequest"];
+                "multipart/form-data": components["schemas"]["CheckoutRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+            /** @description No response body */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    addresses_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"][];
+                };
+            };
+        };
+    };
+    addresses_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AddressRequest"];
+                "multipart/form-data": components["schemas"]["AddressRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"];
+                };
+            };
+        };
+    };
+    my_orders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+        };
+    };
+    my_deliveries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+        };
+    };
+    order_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    order_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    order_pack: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    order_ready: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    order_out_for_delivery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    order_settle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SettleOrderRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["SettleOrderRequest"];
+                "multipart/form-data": components["schemas"]["SettleOrderRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    order_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CancelOrderRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["CancelOrderRequest"];
+                "multipart/form-data": components["schemas"]["CancelOrderRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    order_assign_rider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                order_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssignRiderRequest"];
+                "application/x-www-form-urlencoded": components["schemas"]["AssignRiderRequest"];
+                "multipart/form-data": components["schemas"]["AssignRiderRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"];
+                };
+            };
+        };
+    };
+    turf_orders: {
+        parameters: {
+            query?: {
+                /** @description Include finished orders. */
+                all?: boolean;
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+        };
+    };
+    platform_orders: {
+        parameters: {
+            query?: {
+                all?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Order"][];
+                };
+            };
+        };
+    };
+    riders_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rider"][];
                 };
             };
         };

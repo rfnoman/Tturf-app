@@ -1,0 +1,43 @@
+from django.urls import path
+
+from .views import (
+    AddressListView,
+    CartView,
+    CheckoutView,
+    MyDeliveriesView,
+    MyOrderListView,
+    OrderAcceptView,
+    OrderAssignRiderView,
+    OrderCancelView,
+    OrderDetailView,
+    OrderOutView,
+    OrderPackView,
+    OrderReadyView,
+    OrderSettleView,
+    PlatformOrderQueueView,
+    RiderListView,
+    StoreHomeView,
+    StoreProductsView,
+    TurfOrderQueueView,
+)
+
+urlpatterns = [
+    path("store/home", StoreHomeView.as_view(), name="store-home"),
+    path("store/items", StoreProductsView.as_view(), name="store-items"),
+    path("store/cart", CartView.as_view(), name="store-cart"),
+    path("store/checkout", CheckoutView.as_view(), name="store-checkout"),
+    path("me/addresses", AddressListView.as_view(), name="my-addresses"),
+    path("me/orders", MyOrderListView.as_view(), name="my-orders"),
+    path("me/deliveries", MyDeliveriesView.as_view(), name="my-deliveries"),
+    path("orders/<uuid:order_id>", OrderDetailView.as_view(), name="order-detail"),
+    path("orders/<uuid:order_id>/accept", OrderAcceptView.as_view(), name="order-accept"),
+    path("orders/<uuid:order_id>/pack", OrderPackView.as_view(), name="order-pack"),
+    path("orders/<uuid:order_id>/ready", OrderReadyView.as_view(), name="order-ready"),
+    path("orders/<uuid:order_id>/out", OrderOutView.as_view(), name="order-out"),
+    path("orders/<uuid:order_id>/settle", OrderSettleView.as_view(), name="order-settle"),
+    path("orders/<uuid:order_id>/cancel", OrderCancelView.as_view(), name="order-cancel"),
+    path("orders/<uuid:order_id>/rider", OrderAssignRiderView.as_view(), name="order-rider"),
+    path("me/turfs/<slug:slug>/orders", TurfOrderQueueView.as_view(), name="turf-orders"),
+    path("admin/orders", PlatformOrderQueueView.as_view(), name="platform-orders"),
+    path("admin/riders", RiderListView.as_view(), name="riders"),
+]

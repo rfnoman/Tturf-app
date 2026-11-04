@@ -40,6 +40,9 @@ export default async function ManageTurfPage({ params }: { params: Promise<{ slu
           <Button variant="outline" size="sm" asChild>
             <Link href={`/owner/${turf.data.slug}/counter`}>{t("openCounter")}</Link>
           </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/owner/${turf.data.slug}/orders`}>{t("viewOrders")}</Link>
+          </Button>
           {turf.data.status === "approved" && (
             <Button variant="outline" size="sm" asChild>
               <Link href={`/turfs/${turf.data.slug}`}>{t("viewPublic")}</Link>

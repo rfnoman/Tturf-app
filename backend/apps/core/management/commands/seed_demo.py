@@ -117,6 +117,7 @@ class Command(BaseCommand):
         self.seed_bookings()
         self.seed_squads_and_matches()
         self.seed_inventory()
+        self.seed_delivery_zones()
         self.stdout.write(self.style.SUCCESS("Demo data seeded."))
 
     def seed_platform_admin(self, email: str) -> None:
@@ -511,3 +512,30 @@ class Command(BaseCommand):
                 shelves += 1
 
         self.stdout.write(f"{Product.objects.count()} product(s), {shelves} turf shelf item(s)")
+
+    def seed_delivery_zones(self) -> None:
+        """Where the store delivers, with Dhaka fees (Phase 08).
+
+        Areas rather than polygons: a Dhaka address is a neighbourhood name long before
+        it is a coordinate, and the zone model falls back to exactly that.
+        """
+        from apps.store.models import DeliveryZone
+
+        zones = [
+            ("Dhanmondi & Mohammadpur", ["Dhanmondi", "Mohammadpur", "Lalmatia"], "60.00", 4),
+            ("Mirpur", ["Mirpur", "Pallabi", "Kazipara"], "80.00", 6),
+            ("Gulshan & Banani", ["Gulshan", "Banani", "Baridhara"], "70.00", 4),
+            ("Uttara", ["Uttara", "Airport"], "100.00", 8),
+        ]
+        for name, areas, fee, eta in zones:
+            DeliveryZone.objects.update_or_create(
+                name=name,
+                defaults={
+                    "areas": areas,
+                    "fee": price_decimal(fee),
+                    "eta_hours": eta,
+                    "is_active": True,
+                },
+            )
+
+        self.stdout.write(f"{DeliveryZone.objects.count()} delivery zone(s)")

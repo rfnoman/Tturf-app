@@ -60,6 +60,15 @@ class NotificationKind(models.TextChoices):
     RENTAL_OUT = "rental_out", _("Gear taken out")
     RENTAL_OVERDUE = "rental_overdue", _("Gear not returned")
 
+    # Phase 08 — the store
+    ORDER_PLACED = "order_placed", _("New order")
+    ORDER_ACCEPTED = "order_accepted", _("Order accepted")
+    ORDER_READY = "order_ready", _("Order ready for pickup")
+    ORDER_ASSIGNED = "order_assigned", _("Delivery assigned")
+    ORDER_DELIVERED = "order_delivered", _("Order delivered")
+    ORDER_CANCELLED = "order_cancelled", _("Order cancelled")
+    ORDER_CUTOFF_SOON = "order_cutoff_soon", _("Order before the cutoff")
+
 
 class Notification(BaseModel):
     user = models.ForeignKey(

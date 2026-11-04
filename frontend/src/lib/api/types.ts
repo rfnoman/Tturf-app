@@ -79,6 +79,16 @@ export type StockItem = Schemas["StockItem"];
 export type StockMovement = Schemas["StockMovement"];
 export type CounterSale = Schemas["CounterSale"];
 export type Rental = Schemas["Rental"];
+
+export type StoreItem = Schemas["StoreItem"];
+export type Cart = Schemas["Cart"];
+export type CartGroup = Schemas["CartGroup"];
+export type CartItem = Schemas["CartItem"];
+export type FulfilmentOption = Schemas["FulfilmentOption"];
+export type Order = Schemas["Order"];
+export type OrderItem = Schemas["OrderItem"];
+export type StoreAddress = Schemas["Address"];
+export type Rider = Schemas["Rider"];
 export type LeaderboardEntry = Schemas["LeaderboardEntry"];
 
 /**
